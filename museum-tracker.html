@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>museum · collection tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+<script>
+  Parse.initialize("G9QH61WfFxbMqM8pfxMTlkBQDkDkHornk0MRX6Zb", "9oUG5sdMcxYQwTe5XqdNDw8gXmyLmwsN3v3vUom2");
+  Parse.serverURL = "https://parseapi.back4app.com/";
+</script>
+<style>
+  :root{--bg:#f0ebe3;--bg2:#e8e1d6;--surface:#ede6da;--border:#c9bfb0;--border-lt:#d9d1c4;
+    --rust:#a0522d;--rust-lt:#c47a4a;--moss:#6b7c5c;--clay:#b5714e;--wheat:#c9a96e;
+    --dusk:#8c7b6e;--ink:#3b3028;--ink-mid:#6b5c50;--ink-dim:#9e8f83;
+    --done-bg:#dde6d5;--done-tx:#4a5e3a;--urgent-bg:#f5e8d5;--urgent-tx:#8a4a1a;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}html{font-size:15px;}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:4rem;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");}
+  header{padding:3rem 2rem 0;border-bottom:1px solid var(--border);max-width:900px;margin:0 auto;}
+  .header-top{display:flex;align-items:baseline;gap:1.2rem;flex-wrap:wrap;padding-bottom:1.5rem;}
+  .site-title{font-family:'DM Mono',monospace;font-weight:400;font-size:1.05rem;color:var(--ink);}
+  .site-title span{color:var(--rust);font-size:0.9rem;}
+  .site-meta{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--ink-dim);letter-spacing:0.04em;text-transform:uppercase;}
+  .nav-links{margin-left:auto;display:flex;gap:1rem;align-items:center;}
+  .back-link{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--ink-dim);text-decoration:none;letter-spacing:0.04em;border-bottom:1px solid var(--border);padding-bottom:1px;transition:color 0.15s;}
+  .back-link:hover{color:var(--rust);border-color:var(--rust);}
+  .user-chip{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);}
+
+  /* PRIMARY TABS */
+  .primary-tab-nav{display:flex;gap:0;margin-top:1.2rem;}
+  .primary-tab-btn{font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.07em;text-transform:uppercase;
+    color:var(--ink-dim);background:none;border:none;border-bottom:2px solid transparent;
+    padding:0.6rem 1.4rem 0.7rem;cursor:pointer;white-space:nowrap;transition:color 0.15s,border-color 0.15s;position:relative;top:1px;}
+  .primary-tab-btn:hover{color:var(--ink-mid);}
+  .primary-tab-btn.active{color:var(--rust);border-bottom-color:var(--rust);}
+  .primary-tab-btn .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--wheat);margin-right:0.5rem;vertical-align:middle;position:relative;top:-1px;}
+  .primary-tab-btn.active .dot{background:var(--rust);}
+
+  .wrap{max-width:900px;margin:0 auto;padding:2rem;}
+  .primary-panel{display:none;}.primary-panel.active{display:block;}
+
+  /* THIS MONTH PANEL */
+  .month-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.6rem;flex-wrap:wrap;gap:1rem;}
+  .month-label{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-dim);}
+  .month-name{font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--rust);font-weight:500;}
+  .month-summary{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--ink-dim);}
+  .month-section{margin-bottom:2rem;}
+  .month-sec-header{display:flex;align-items:center;gap:0.8rem;margin-bottom:0.75rem;}
+  .month-sec-title{font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-mid);}
+  .month-sec-badge{font-family:'DM Mono',monospace;font-size:0.6rem;background:var(--urgent-bg);color:var(--urgent-tx);border:1px solid var(--wheat);border-radius:99px;padding:0.1rem 0.55rem;}
+  .month-sec-badge.all-done{background:var(--done-bg);color:var(--done-tx);border-color:#b0c9a0;}
+  .month-all-done{font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--done-tx);background:var(--done-bg);border:1px solid #b0c9a0;border-radius:6px;padding:0.75rem 1rem;text-align:center;}
+
+  /* COLLECTION (sub-tab) PANEL */
+  .sec-label{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:1rem;}
+  .tab-nav{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);}
+  .tab-nav::-webkit-scrollbar{display:none;}
+  .tab-btn{font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.07em;text-transform:uppercase;
+    color:var(--ink-dim);background:none;border:none;border-bottom:2px solid transparent;
+    padding:0.6rem 1rem 0.7rem;cursor:pointer;white-space:nowrap;transition:color 0.15s,border-color 0.15s;position:relative;top:1px;}
+  .tab-btn:hover{color:var(--ink-mid);}.tab-btn.active{color:var(--rust);border-bottom-color:var(--rust);}
+  .tab-count{font-size:0.6rem;color:var(--ink-dim);margin-left:0.4rem;font-family:'DM Mono',monospace;}
+  .tab-btn.active .tab-count{color:var(--rust-lt);}
+  .tab-panel{display:none;}.tab-panel.active{display:block;}
+  .sub-panel-wrap{padding-top:1.5rem;}
+
+  /* SHARED GRID */
+  .progress-row{display:flex;align-items:center;gap:1rem;margin-bottom:1.6rem;}
+  .prog-track{flex:1;height:5px;background:var(--border-lt);border-radius:99px;overflow:hidden;}
+  .prog-fill{height:100%;background:var(--rust);border-radius:99px;transition:width 0.4s ease;}
+  .prog-label{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--ink-dim);white-space:nowrap;}
+  .prog-label strong{color:var(--rust);font-weight:500;}
+  .controls-row{display:flex;gap:0.7rem;margin-bottom:1.2rem;flex-wrap:wrap;}
+  .search-wrap{flex:1 1 200px;display:flex;align-items:center;border:1px solid var(--border);border-radius:5px;background:var(--surface);overflow:hidden;transition:border-color 0.15s;}
+  .search-wrap:focus-within{border-color:var(--rust);}
+  .search-wrap input{font-family:'Inter',sans-serif;font-size:0.82rem;border:none;background:transparent;color:var(--ink);padding:0.5rem 0.75rem;outline:none;width:100%;}
+  .search-wrap input::placeholder{color:var(--ink-dim);}
+  .filter-btn{font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.05em;padding:0.5rem 0.9rem;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--ink-dim);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+  .filter-btn:hover{background:var(--bg2);color:var(--ink);border-color:var(--dusk);}
+  .filter-btn.active{color:var(--rust);border-color:var(--rust-lt);background:var(--bg2);}
+  .item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:1px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--border);}
+  .item-card{background:var(--surface);padding:0.75rem 0.85rem;cursor:pointer;transition:background 0.12s;display:flex;align-items:center;gap:0.65rem;user-select:none;}
+  .item-card:hover{background:var(--bg2);}.item-card.collected{background:var(--done-bg);}.item-card.collected:hover{background:#d3deca;}
+  .item-check{width:14px;height:14px;border:1.5px solid var(--border);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background 0.12s,border-color 0.12s;}
+  .item-card.collected .item-check{background:var(--moss);border-color:var(--moss);}
+  .item-check svg{display:none;}.item-card.collected .item-check svg{display:block;}
+  .item-info{min-width:0;}
+  .item-name{font-size:0.8rem;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .item-card.collected .item-name{color:var(--done-tx);}
+  .item-sub{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-dim);margin-top:0.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .item-card.collected .item-sub{color:#7a9e6a;}
+  .empty-msg{font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--ink-dim);text-align:center;padding:3rem 1rem;border:1px solid var(--border-lt);border-radius:8px;}
+
+  footer{text-align:center;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);letter-spacing:0.06em;padding:0 2rem;max-width:900px;margin:2rem auto 0;}
+  @media(max-width:520px){.item-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}header{padding:2rem 1.2rem 0;}.wrap{padding:1.5rem 1.2rem;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-top">
+    <div class="site-title">museum <span>/ collection tracker</span></div>
+    <div class="site-meta">animal crossing · nh</div>
+    <div class="nav-links">
+      <span class="user-chip" id="userChip"></span>
+      <a class="back-link" href="index.html">← home</a>
+    </div>
+  </div>
+  <nav class="primary-tab-nav">
+    <button class="primary-tab-btn active" id="ptab-month" onclick="setPrimaryTab('month')">
+      <span class="dot"></span>this month
+    </button>
+    <button class="primary-tab-btn" id="ptab-collection" onclick="setPrimaryTab('collection')">
+      <span class="dot"></span>collection
+    </button>
+  </nav>
+</header>
+
+<div class="wrap">
+  <!-- THIS MONTH PANEL -->
+  <div class="primary-panel active" id="ppanel-month">
+    <div class="month-header">
+      <div>
+        <div class="month-label">active this month</div>
+        <div class="month-name" id="monthName"></div>
+      </div>
+      <div class="month-summary" id="monthSummary"></div>
+    </div>
+    <div id="monthContent"></div>
+  </div>
+
+  <!-- COLLECTION PANEL -->
+  <div class="primary-panel" id="ppanel-collection">
+    <nav class="tab-nav" id="tabNav"></nav>
+    <div class="sub-panel-wrap">
+      <div id="tabPanels"></div>
+    </div>
+  </div>
+</div>
+
+<footer>data synced via back4app<br>made by zahra w/ html,css,js &amp; some sparkle dust</footer>
+
+<script>
+const MONTH_NAMES=['january','february','march','april','may','june','july','august','september','october','november','december'];
+const MONTH_ABBR=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+
+const SECTIONS={
+  fish:{label:'Fish',total:80,items:[{name:'Anchovy',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 4a - 9p'},{name:'Angelfish',sub:'aug, jul, jun, may, oct, sep · 4p - 9a'},{name:'Arapaima',sub:'aug, jul, jun, sep · 4p -9a'},{name:'Arowana',sub:'aug, jul, jun, sep · 4p - 9a'},{name:'Barred Knifejaw',sub:'apr, aug, jul, jun, mar, may, nov, oct, sep'},{name:'Barreleye',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 9p - 4a'},{name:'Betta',sub:'aug, jul, jun, may, oct, sep · 9 - 4p'},{name:'Bitterling',sub:'dec, feb, jan, mar, nov'},{name:'Black Bass',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Blowfish',sub:'dec, feb, jan, nov · 9p- 4a'},{name:'Blue Marlin',sub:'apr, aug, dec, feb, jan, jul, mar, nov, sep'},{name:'Bluegill',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 9- 4p'},{name:'Butterfly Fish',sub:'apr, aug, jul, jun, may, sep'},{name:'Carp',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Catfish',sub:'aug, jul, jun, may, oct, sep · 4p - 9a'},{name:'Char',sub:'apr, jun, mar, may, nov, oct, sep · 4p - 9a'},{name:'Cherry Salmon',sub:'apr, mar, may, nov, oct, sep · 4p - 9a'},{name:'Clown Fish',sub:'apr, aug, jul, jun, may, sep'},{name:'Coelacanth',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Crawfish',sub:'apr, aug, jul, jun, may, sep'},{name:'Crucian Carp',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Dab',sub:'apr, dec, feb, jan, mar, nov, oct'},{name:'Dace',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 4p - 9a'},{name:'Dorado',sub:'aug, jul, jun, sep · 4a - 9p'},{name:'Football Fish',sub:'dec, feb, jan, mar, nov · 4p - 9a'},{name:'Freshwater goby',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 4p - 9a'},{name:'Frog',sub:'aug, jul, jun, may'},{name:'Gar',sub:'aug, jul, jun, sep · 4p - 9a'},{name:'Giant Snakehead',sub:'aug, jul, jun · 9a - 4p'},{name:'Giant Trevally',sub:'aug, jul, jun, may, oct, sep'},{name:'Golden Trout',sub:'apr, mar, may, nov, oct, sep · 4p - 9a'},{name:'Goldfish',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Great White Shark',sub:'aug, jul, jun, sep · 4p - 9a'},{name:'Guppy',sub:'apr, aug, jul, jun, may, nov, oct, sep · 9a - 4p'},{name:'Hammerhead Shark',sub:'aug, jul, jun, sep · 4p - 9a'},{name:'Horse Mackerel',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Killifish',sub:'apr, aug, jul, jun, may'},{name:'King Salmon',sub:'sep'},{name:'Koi',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 4p - 9a'},{name:'Loach',sub:'apr, mar, may'},{name:'Mahi-mahi',sub:'aug, jul, jun, may, oct, sep'},{name:'Mitten Crab',sub:'nov, oct, sep · 4p - 9a'},{name:'Moray Eel',sub:'aug, oct, sep'},{name:'Napoleonfish',sub:'aug, jul · 4a - 9p'},{name:'Neon Tetra',sub:'apr, aug, jul, jun, may, nov, oct, sep · 9a - 4p'},{name:'Nibble Fish',sub:'aug, jul, jun, may, sep · 9a - 4p'},{name:'Oarfish',sub:'apr, dec, feb, jan, mar, may'},{name:'Ocean Sunfish',sub:'aug, jul, sep · 4a - 9p'},{name:'Olive Flounder',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Pale Chub',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 9a - 4p'},{name:'Pike',sub:'dec, nov, oct, sep'},{name:'Piranha',sub:'aug, jul, jun, sep · 9a - 4p & 9p - 4a'},{name:'Pond Smelt',sub:'dec, feb, jan'},{name:'Pop-eyed Goldfish',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 9a - 4p'},{name:'Puffer Fish',sub:'aug, jul, sep'},{name:'Rainbowfish',sub:'aug, jul, jun, may, oct, sep · 9a - 4p'},{name:'Ranchu Goldfish',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 9a - 4p'},{name:'Ray',sub:'aug, nov, oct, sep · 4a - 9p'},{name:'Red Snapper',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Ribbon Eel',sub:'aug, jul, jun, oct, sep'},{name:'Saddled Bichir',sub:'aug, jul, jun, sep · 9p - 4a'},{name:'Salmon',sub:'sep'},{name:'Saw Shark',sub:'aug, jul, jun, sep · 4p - 9a'},{name:'Sea Bass',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Sea Butterfly',sub:'dec, feb, jan, mar'},{name:'Sea Horse',sub:'apr, aug, jul, jun, may, nov, oct, sep'},{name:'Snapping Turtle',sub:'apr, aug, jul, jun, may, oct, sep · 9p - 4a'},{name:'Soft-shelled Turtle',sub:'aug, sep · 4p - 9a'},{name:'Squid',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may'},{name:'Stringfish',sub:'dec, feb, jan, mar · 4p - 9a'},{name:'Sturgeon',sub:'dec, feb, jan, mar, nov, oct, sep'},{name:'Suckerfish',sub:'aug, jul, jun, sep'},{name:'Surgeonfish',sub:'apr, aug, jul, jun, may, sep'},{name:'Sweetfish',sub:'aug, jul, sep'},{name:'Tadpole',sub:'apr, jul, jun, mar, may'},{name:'Tilapia',sub:'aug, jul, jun, oct, sep'},{name:'Tuna',sub:'apr, dec, feb, jan, mar, nov'},{name:'Whale Shark',sub:'aug, jul, jun, sep'},{name:'Yellow Perch',sub:'dec, feb, jan, mar, nov, oct'},{name:'Zebra Turkeyfish',sub:'apr, aug, jul, jun, may, nov, oct, sep'}]},
+  bugs:{label:'Bugs',total:80,items:[{name:'Agrias Butterfly',sub:'apr, aug, jul, jun, may, sep · 8a - 5p'},{name:'Ant',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Atlas Moth',sub:'apr, aug, jul, jun, may, sep · 7p - 4a'},{name:'Bagworm',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Banded Dragonfly',sub:'aug, jul, jun, may, oct, sep · 8a - 5p'},{name:'Bell Cricket',sub:'oct, sep · 5p - 8a'},{name:'Blue Weevil Beetle',sub:'aug, jul'},{name:'Brown Cicada',sub:'aug, jul · 8a - 5p'},{name:'Centipede',sub:'apr, dec, feb, jan, jun, mar, may, nov, oct, sep · 4p - 11a'},{name:'Cicada Shell',sub:'aug, jul'},{name:'Citrus Long-horned Beetle',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Common Bluebottle',sub:'apr, aug, jul, jun, may · 4a - 7p'},{name:'Common Butterfly',sub:'apr, dec, feb, jan, jun, mar, may, nov, oct, sep · 4a - 7p'},{name:'Cricket',sub:'nov, oct, sep · 5p - 8a'},{name:'Cyclommatus Stag',sub:'aug, jul · 5p - 8a'},{name:'Damselfly',sub:'dec, feb, jan, nov'},{name:'Darner Dragonfly',sub:'apr, aug, jul, jun, may, oct, sep · 8a - 5p'},{name:'Diving Beetle',sub:'aug, jul, jun, may, sep · 8a - 7p'},{name:'Drone Beetle',sub:'aug, jul, jun'},{name:'Dung Beetle',sub:'dec, feb, jan'},{name:'Earth-Boring Dung Beetle',sub:'aug, jul, sep'},{name:'Emperor Butterfly',sub:'aug, dec, feb, jan, jul, jun, mar, sep · 5p - 8a'},{name:'Evening Cicada',sub:'aug, jul · 4a - 8a & 4p - 7p'},{name:'Firefly',sub:'jun · 7p - 4a'},{name:'Flea',sub:'apr, aug, jul, jun, may, nov, oct, sep'},{name:'Fly',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Giant Cicada',sub:'aug, jul · 8a - 5p'},{name:'Giant Stag',sub:'aug, jul · 11p - 8a'},{name:'Giant Water Bug',sub:'apr, aug, jul, jun, may, sep · 7p - 8a'},{name:'Giraffe Stag',sub:'aug, jul · 5p - 8a'},{name:'Golden Stag',sub:'aug, jul · 5p - 8a'},{name:'Goliath Beetle',sub:'aug, jul, jun, sep · 5p - 8a'},{name:'Grasshopper',sub:'aug, jul, sep · 8a - 5p'},{name:'Great Purple Emperor',sub:'aug, jul, jun, may · 4a - 7p'},{name:'Hermit Crab',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 7p - 8a'},{name:'Honeybee',sub:'apr, jul, jun, mar, may · 8a - 5p'},{name:'Horned Atlas',sub:'aug, jul · 5p - 8a'},{name:'Horned Dynastid',sub:'aug, jul · 5p - 8a'},{name:'Horned Elephant',sub:'aug, jul · 5p - 8a'},{name:'Horned Hercules',sub:'aug, jul · 5p - 8a'},{name:'Jewel Beetle',sub:'apr, aug, jul, jun, may'},{name:'Ladybug',sub:'apr, jun, mar, may, oct · 8a - 5p'},{name:'Long Locust',sub:'apr, aug, jul, jun, may, nov, oct, sep · 8a - 7p'},{name:'Madagascan Sunset Moth',sub:'apr, aug, jul, jun, may, sep · 8a - 4p'},{name:'Man-faced Stink Bug',sub:'apr, aug, jul, jun, mar, may, oct, sep · 7p - 8a'},{name:'Mantis',sub:'apr, aug, jul, jun, mar, may, nov, oct, sep · 8a - 5p'},{name:'Migratory Locust',sub:'aug, nov, oct, sep · 8a - 7p'},{name:'Miyama Stag',sub:'aug, jul'},{name:'Mole Cricket',sub:'apr, dec, feb, jan, mar, may, nov · 8a - 5p'},{name:'Monarch Butterfly',sub:'nov, oct, sep · 4a - 5p'},{name:'Mosquito',sub:'aug, jul, jun, sep · 5p - 4a'},{name:'Moth',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 7p - 4a'},{name:'Orchid Mantis',sub:'apr, aug, jul, jun, mar, may, nov, oct, sep · 8a - 5p'},{name:'Paper Kite Butterfly',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 8a - 7p'},{name:'Peacock Butterfly',sub:'apr, jun, mar, may · 4a - 7p'},{name:'Pill Bug',sub:'apr, dec, feb, jan, jun, mar, may, nov, oct, sep · 11p - 4p'},{name:'Pondskater',sub:'aug, jul, jun, may, sep · 8a - 7p'},{name:"Queen Alexandra's Birdwing",sub:'aug, jul, jun, may, sep · 8a - 4p'},{name:'Rainbow Stag',sub:'aug, jul, jun, sep · 7p - 8a'},{name:"Rajah Brooke's Birdwing",sub:'apr, aug, dec, feb, jan, jul, jun, may, sep · 8a - 5p'},{name:'Red Dragonfly',sub:'oct, sep · 8a - 7p'},{name:'Rice Grasshopper',sub:'aug, nov, oct, sep · 8a - 7p'},{name:'Robust Cicada',sub:'aug, jul · 8a - 5p'},{name:'Rosalia Batesi Beetle',sub:'aug, jul, jun, may, sep'},{name:'Saw Stag',sub:'aug, jul'},{name:'Scarab Beetle',sub:'aug, jul · 11p - 8a'},{name:'Scorpion',sub:'aug, jul, jun, may, oct, sep · 7p - 4a'},{name:'Snail',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Spider',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 7p - 8a'},{name:'Stinkbug',sub:'apr, aug, jul, jun, mar, may, oct, sep'},{name:'Tiger Beetle',sub:'apr, aug, feb, jul, jun, mar, may, oct, sep'},{name:'Tiger Butterfly',sub:'apr, aug, jul, jun, mar, may, sep · 4a - 7p'},{name:'Trantula',sub:'apr, dec, feb, jan, mar, nov · 7p - 4a'},{name:'Violin Beetle',sub:'jun, may, nov, oct, sep'},{name:'Walker Cicada',sub:'aug, sep · 8a - 5p'},{name:'Walking Leaf',sub:'aug, jul, sep'},{name:'Walking Stick',sub:'aug, jul, nov, oct, sep · 4a - 8a & 5p - 7p'},{name:'Wasp',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Wharf Roach',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Yellow Butterfly',sub:'apr, jun, mar, may, oct, sep · 4a - 7p'}]},
+  sea:{label:'Sea Creatures',total:40,items:[{name:'Abalone',sub:'aug, dec, jan, jul, jun, nov, oct, sep · 4p - 9a'},{name:'Acorn Barnacle',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Chambered Nautilus',sub:'apr, jun, mar, may, nov, oct, sep · 4p - 9a'},{name:'Dungeness Crab',sub:'apr, dec, feb, jan, mar, may, nov'},{name:'Firefly Squid',sub:'apr, jun, mar, may · 9p - 4a'},{name:'Flatworm',sub:'aug, sep · 4p - 9a'},{name:'Gazami Crab',sub:'aug, jul, jun, nov, oct, sep'},{name:'Giant Isopod',sub:'aug, jul, oct, sep · 9a - 4p & 9p - 4a'},{name:'Gigas Giant Clam',sub:'aug, jul, jun, may, sep'},{name:'Horseshoe Crab',sub:'aug, jul, sep · 9p - 4a'},{name:'Lobster',sub:'apr, dec, jan, jun, may'},{name:'Mantis Shrimp',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 4p - 9a'},{name:'Moon Jellyfish',sub:'aug, jul, sep'},{name:'Mussel',sub:'aug, dec, jul, jun, nov, oct, sep'},{name:'Octopus',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Oyster',sub:'dec, feb, jan, nov, oct, sep'},{name:'Pearl Oyster',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Red King Crab',sub:'dec, feb, jan, mar, nov'},{name:'Scallop',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Sea Anemone',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Sea Cucumber',sub:'apr, dec, feb, jan, mar, nov'},{name:'Sea Grapes',sub:'aug, jul, jun, sep'},{name:'Sea Pig',sub:'dec, feb, jan, nov · 4p-9a'},{name:'Sea Pineapple',sub:'apr, aug, jul, jun, may'},{name:'Sea Slug',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Sea Star',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Sea Urchin',sub:'aug, jul, jun, may, sep'},{name:'Seaweed',sub:'apr, dec, feb, jan, jul, jun, mar, may, nov, oct'},{name:'Slate Pencil Urchin',sub:'aug, jul, jun, may, sep · 4p - 9p'},{name:'Snow Crab',sub:'apr, dec, feb, jan, mar, nov'},{name:'Spider Crab',sub:'apr, mar'},{name:'Spiny Lobster',sub:'apr, jun, may · 9p - 4a'},{name:'Spotted Garden Eel',sub:'aug, jul, jun, may, oct, sep · 4a - 9p'},{name:'Sweet Shrimp',sub:'dec, feb, jan, nov, oct, sep · 4p - 9a'},{name:'Tiger Prawn',sub:'aug, jul, jun, sep · 4p - 9a'},{name:'Turban Shell',sub:'apr, dec, mar, may, nov, oct, sep'},{name:'Umbrella Octopus',sub:'apr, mar, may, nov, oct, sep'},{name:'Vampire Squid',sub:'aug, jul, jun, may · 4p - 9a'},{name:"Venus' Flower Basket",sub:'dec, feb, jan, nov, oct'},{name:'Whelk',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'}]},
+  fossils:{label:'Fossils',total:73,items:[
+    {name:'Acanthostega',sub:'single'},{name:'Amber',sub:'single'},{name:'Ammonite',sub:'single'},{name:'Ankylo Skull',sub:'ankylosaurus 1/3'},{name:'Ankylo Torso',sub:'ankylosaurus 2/3'},{name:'Ankylo Tail',sub:'ankylosaurus 3/3'},{name:'Anomalocaris',sub:'single'},{name:'Archaeopteryx',sub:'single'},{name:'Archelon Skull',sub:'archelon 1/2'},{name:'Archelon Tail',sub:'archelon 2/2'},{name:'Australopith',sub:'single'},{name:'Brachio Skull',sub:'brachiosaurus 1/4'},{name:'Brachio Chest',sub:'brachiosaurus 2/4'},{name:'Brachio Pelvis',sub:'brachiosaurus 3/4'},{name:'Brachio Tail',sub:'brachiosaurus 4/4'},{name:'Coprolite',sub:'single'},{name:'Deinony Torso',sub:'deinonychus 1/2'},{name:'Deinony Tail',sub:'deinonychus 2/2'},{name:'Dimetrodon Skull',sub:'dimetrodon 1/2'},{name:'Dimetrodon Torso',sub:'dimetrodon 2/2'},{name:'Dinosaur Track',sub:'single'},{name:'Diplo Skull',sub:'diplodocus 1/5'},{name:'Diplo Neck',sub:'diplodocus 2/5'},{name:'Diplo Chest',sub:'diplodocus 3/5'},{name:'Diplo Hip',sub:'diplodocus 4/5'},{name:'Diplo Tail',sub:'diplodocus 5/5'},{name:'Diplo Tail Tip',sub:'diplodocus tip'},{name:'Dunkleosteus',sub:'single'},{name:'Eusthenopteron',sub:'single'},{name:'Ichthyo Skull',sub:'ichthyosaurus 1/2'},{name:'Ichthyo Torso',sub:'ichthyosaurus 2/2'},{name:'Iguanodon Skull',sub:'iguanodon 1/2'},{name:'Iguanodon Torso',sub:'iguanodon 2/2'},{name:'Iguanodon Tail',sub:'iguanodon tail'},{name:'Juramaia',sub:'single'},{name:'Left Megalo Side',sub:'megaloceros 1/3'},{name:'Right Megalo Side',sub:'megaloceros 2/3'},{name:'Megalo Torso',sub:'megaloceros 3/3'},{name:'Megalodon',sub:'single'},{name:'Myllokunmingia',sub:'single'},{name:'Ophthalmo Skull',sub:'ophthalmosaurus 1/2'},{name:'Ophthalmo Torso',sub:'ophthalmosaurus 2/2'},{name:'Pachy Skull',sub:'pachycephalosaurus 1/2'},{name:'Pachy Tail',sub:'pachycephalosaurus 2/2'},{name:'Left Ptera Wing',sub:'pteranodon 1/3'},{name:'Right Ptera Wing',sub:'pteranodon 2/3'},{name:'Ptera Body',sub:'pteranodon 3/3'},{name:'Quetzal Torso',sub:'quetzalcoatlus 1/2'},{name:'Left Quetzal Wing',sub:'quetzalcoatlus 2/2'},{name:'Right Quetzal Wing',sub:'quetzalcoatlus wing'},{name:'Sabertooth Skull',sub:'smilodon 1/2'},{name:'Sabertooth Torso',sub:'smilodon 2/2'},{name:'Shark-tooth Pattern',sub:'single'},{name:'Spino Skull',sub:'spinosaurus 1/3'},{name:'Spino Torso',sub:'spinosaurus 2/3'},{name:'Spino Tail',sub:'spinosaurus 3/3'},{name:'Stego Skull',sub:'stegosaurus 1/3'},{name:'Stego Torso',sub:'stegosaurus 2/3'},{name:'Stego Tail',sub:'stegosaurus 3/3'},{name:'T. Rex Skull',sub:'t-rex 1/3'},{name:'T. Rex Torso',sub:'t-rex 2/3'},{name:'T. Rex Tail',sub:'t-rex 3/3'},{name:'Tricera Skull',sub:'triceratops 1/3'},{name:'Tricera Torso',sub:'triceratops 2/3'},{name:'Tricera Tail',sub:'triceratops 3/3'},{name:'Trilobite',sub:'single'},{name:'Shastasaurus',sub:'single'},{name:'Plesio Skull',sub:'plesiosaurus 1/3'},{name:'Plesio Body',sub:'plesiosaurus 2/3'},{name:'Plesio Tail',sub:'plesiosaurus 3/3'},{name:'Ptera Body',sub:'pteranodon body'},{name:'Styraco Skull',sub:'styracosaurus 1/2'},{name:'Styraco Tail',sub:'styracosaurus 2/2'},
+  ]},
+  art:{label:'Art',total:43,items:[{name:'Academic Painting',sub:'fake'},{name:'Amazing Painting',sub:'fake'},{name:'Ancient Statue',sub:'two fakes'},{name:'Basic Painting',sub:'fake'},{name:'Beautiful Statue',sub:'fake'},{name:'Calm Painting',sub:'always'},{name:'Common Painting',sub:'always'},{name:'Detailed Painting',sub:'fake'},{name:'Dynamic Painting',sub:'always'},{name:'Familiar Statue',sub:'always'},{name:'Famous Painting',sub:'fake'},{name:'Flowery Painting',sub:'always'},{name:'Gallant Statue',sub:'fake'},{name:'Glowing Painting',sub:'always'},{name:'Graceful Painting',sub:'two fakes'},{name:'Great Statue',sub:'always'},{name:'Informative Statue',sub:'fake'},{name:'Jolly Painting',sub:'fake'},{name:'Moody Painting',sub:'always'},{name:'Motherly Statue',sub:'fake'},{name:'Moving Painting',sub:'fake'},{name:'Mysterious Painting',sub:'always'},{name:'Mystic Statue',sub:'fake'},{name:'Nice Painting',sub:'always'},{name:'Perfect Painting',sub:'always'},{name:'Proper Painting',sub:'always'},{name:'Quaint Painting',sub:'fake'},{name:'Robust Statue',sub:'fake'},{name:'Rock-head Statue',sub:'fake'},{name:'Scary Painting',sub:'two fakes'},{name:'Scenic Painting',sub:'fake'},{name:'Serene Painting',sub:'fake'},{name:'Sinking Painting',sub:'always'},{name:'Solemn Painting',sub:'fake'},{name:'Tremendous Statue',sub:'fake'},{name:'Twinkling Painting',sub:'always'},{name:'Valiant Statue',sub:'fake'},{name:'Warm Painting',sub:'always'},{name:'Warrior Statue',sub:'fake'},{name:'Wild Painting Left Half',sub:'fake'},{name:'Wild Painting Right Half',sub:'fake'},{name:'Wistful Painting',sub:'fake'},{name:'Worthy Painting',sub:'always'}]}
+};
+
+const CATCHABLE_SECTIONS=['fish','bugs','sea'];
+
+let collected={fish:[],bugs:[],sea:[],fossils:[],art:[]};
+let parseObj=null;
+let primaryTab='month';
+let activeTab='fish';
+let activeFilter={fish:'all',bugs:'all',sea:'all',fossils:'all',art:'all'};
+let searchQuery={fish:'',bugs:'',sea:'',fossils:'',art:''};
+
+function isActiveThisMonth(item){
+  const now=new Date();
+  const abbr=MONTH_ABBR[now.getMonth()];
+  return item.sub.toLowerCase().includes(abbr);
+}
+
+(async()=>{
+  const u=Parse.User.current();
+  if(!u){window.location.href='index.html';return;}
+  document.getElementById('userChip').textContent=u.get('email')||u.get('username');
+  await loadData();
+  render();
+})();
+
+async function loadData(){
+  const u=Parse.User.current();
+  try{
+    const q=new Parse.Query('MuseumData');q.equalTo('user',u);
+    parseObj=await q.first()||null;
+    if(parseObj){
+      const saved=parseObj.get('collected')||{};
+      Object.keys(collected).forEach(k=>{collected[k]=saved[k]||[];});
+    }
+  }catch(e){console.error(e);}
+}
+
+async function saveData(){
+  const u=Parse.User.current();if(!u)return;
+  try{
+    if(!parseObj){
+      const MuseumData=Parse.Object.extend('MuseumData');
+      parseObj=new MuseumData();
+      parseObj.set('user',u);
+      const acl=new Parse.ACL(u);parseObj.setACL(acl);
+    }
+    parseObj.set('collected',collected);
+    await parseObj.save();
+  }catch(e){console.error(e);}
+}
+
+function toggleItem(section,idx){
+  const arr=collected[section];
+  const pos=arr.indexOf(idx);
+  if(pos>=0)arr.splice(pos,1);else arr.push(idx);
+  saveData();
+  render();
+}
+
+function setPrimaryTab(tab){
+  primaryTab=tab;
+  document.querySelectorAll('.primary-tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('ptab-'+tab).classList.add('active');
+  document.querySelectorAll('.primary-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('ppanel-'+tab).classList.add('active');
+  render();
+}
+
+function renderMonthPanel(){
+  const now=new Date();
+  const monthAbbr=MONTH_ABBR[now.getMonth()];
+  const monthFull=MONTH_NAMES[now.getMonth()];
+  document.getElementById('monthName').textContent=monthFull;
+
+  let totalNeeded=0,totalDone=0;
+  const content=document.getElementById('monthContent');
+  content.innerHTML='';
+
+  CATCHABLE_SECTIONS.forEach(key=>{
+    const sec=SECTIONS[key];
+    const activeItems=sec.items.map((item,idx)=>({item,idx}))
+      .filter(({item})=>isActiveThisMonth(item));
+    const missing=activeItems.filter(({idx})=>!collected[key].includes(idx));
+    const done=activeItems.filter(({idx})=>collected[key].includes(idx));
+    totalNeeded+=activeItems.length;
+    totalDone+=done.length;
+
+    const section=document.createElement('div');
+    section.className='month-section';
+
+    const allCaught=missing.length===0;
+    section.innerHTML=`
+      <div class="month-sec-header">
+        <span class="month-sec-title">${sec.label}</span>
+        <span class="month-sec-badge${allCaught?' all-done':''}">${allCaught?'all caught ✓':missing.length+' left'}</span>
+      </div>`;
+
+    if(allCaught){
+      const msg=document.createElement('div');
+      msg.className='month-all-done';
+      msg.textContent='✓ all '+sec.label.toLowerCase()+' donated this month!';
+      section.appendChild(msg);
+    } else {
+      const grid=document.createElement('div');
+      grid.className='item-grid';
+      missing.forEach(({item,idx})=>{
+        const card=document.createElement('div');
+        card.className='item-card';
+        card.innerHTML=`<div class="item-check"><svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="item-info"><div class="item-name">${item.name}</div><div class="item-sub">${item.sub}</div></div>`;
+        card.onclick=()=>toggleItem(key,idx);
+        grid.appendChild(card);
+      });
+      section.appendChild(grid);
+    }
+    content.appendChild(section);
+  });
+
+  document.getElementById('monthSummary').textContent=`${totalDone} of ${totalNeeded} active critters donated`;
+}
+
+function buildCollectionTabs(){
+  const nav=document.getElementById('tabNav');nav.innerHTML='';
+  Object.entries(SECTIONS).forEach(([key,sec])=>{
+    const done=collected[key].length,total=sec.items.length;
+    const btn=document.createElement('button');
+    btn.className='tab-btn'+(key===activeTab?' active':'');
+    btn.innerHTML=`${sec.label}<span class="tab-count">${done}/${total}</span>`;
+    btn.onclick=()=>{activeTab=key;render();};
+    nav.appendChild(btn);
+  });
+}
+
+function buildCollectionPanels(){
+  const container=document.getElementById('tabPanels');container.innerHTML='';
+  Object.entries(SECTIONS).forEach(([key,sec])=>{
+    const done=collected[key].length,total=sec.items.length,pct=total>0?Math.round(done/total*100):0;
+    const panel=document.createElement('div');
+    panel.className='tab-panel'+(key===activeTab?' active':'');
+    panel.id='panel-'+key;
+    panel.innerHTML=`
+      <div class="sec-label">${sec.label.toLowerCase()} · ${done} of ${total} donated</div>
+      <div class="progress-row"><div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div><div class="prog-label"><strong>${pct}%</strong> complete</div></div>
+      <div class="controls-row">
+        <div class="search-wrap"><input type="text" placeholder="search…" value="${searchQuery[key]||''}" oninput="searchQuery['${key}']=this.value;renderItems('${key}')"/></div>
+        <button class="filter-btn${(activeFilter[key]||'all')==='all'?' active':''}" onclick="setFilter('all','${key}',event)">all</button>
+        <button class="filter-btn${(activeFilter[key]||'all')==='missing'?' active':''}" onclick="setFilter('missing','${key}',event)">missing</button>
+        <button class="filter-btn${(activeFilter[key]||'all')==='collected'?' active':''}" onclick="setFilter('collected','${key}',event)">donated</button>
+      </div>
+      <div class="item-grid" id="grid-${key}"></div>
+      <div class="empty-msg" id="empty-${key}" style="display:none">nothing matches.</div>`;
+    container.appendChild(panel);
+    renderItems(key);
+  });
+}
+
+function renderItems(key){
+  const sec=SECTIONS[key];
+  const grid=document.getElementById('grid-'+key);
+  const empty=document.getElementById('empty-'+key);
+  if(!grid)return;
+  grid.innerHTML='';
+  const q=(searchQuery[key]||'').toLowerCase().trim();
+  const filt=activeFilter[key]||'all';
+  let visible=0;
+  sec.items.forEach((item,idx)=>{
+    const isColl=collected[key].includes(idx);
+    const mF=filt==='all'||(filt==='collected'&&isColl)||(filt==='missing'&&!isColl);
+    const mS=!q||item.name.toLowerCase().includes(q)||item.sub.toLowerCase().includes(q);
+    if(!mF||!mS)return;
+    visible++;
+    const card=document.createElement('div');
+    card.className='item-card'+(isColl?' collected':'');
+    card.innerHTML=`<div class="item-check"><svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="item-info"><div class="item-name">${item.name}</div><div class="item-sub">${item.sub}</div></div>`;
+    card.onclick=()=>toggleItem(key,idx);
+    grid.appendChild(card);
+  });
+  grid.style.display=visible?'grid':'none';
+  empty.style.display=visible?'none':'block';
+}
+
+function setFilter(f,key,e){
+  activeFilter[key]=f;
+  document.querySelectorAll(`#panel-${key} .filter-btn`).forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  renderItems(key);
+}
+
+function render(){
+  renderMonthPanel();
+  buildCollectionTabs();
+  buildCollectionPanels();
+}
+</script>
+</body>
+</html>

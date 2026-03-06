@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>k.k. slider · song tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+<script>
+  Parse.initialize("G9QH61WfFxbMqM8pfxMTlkBQDkDkHornk0MRX6Zb", "9oUG5sdMcxYQwTe5XqdNDw8gXmyLmwsN3v3vUom2");
+  Parse.serverURL = "https://parseapi.back4app.com/";
+</script>
+<style>
+  :root{--bg:#f0ebe3;--bg2:#e8e1d6;--surface:#ede6da;--border:#c9bfb0;--border-lt:#d9d1c4;
+    --rust:#a0522d;--rust-lt:#c47a4a;--moss:#6b7c5c;--clay:#b5714e;--wheat:#c9a96e;
+    --dusk:#8c7b6e;--ink:#3b3028;--ink-mid:#6b5c50;--ink-dim:#9e8f83;
+    --done-bg:#dde6d5;--done-tx:#4a5e3a;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}html{font-size:15px;}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:4rem;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");}
+  header{padding:3rem 2rem 1.5rem;border-bottom:1px solid var(--border);max-width:860px;margin:0 auto;}
+  .header-top{display:flex;align-items:baseline;gap:1.2rem;flex-wrap:wrap;}
+  .site-title{font-family:'DM Mono',monospace;font-weight:400;font-size:1.05rem;color:var(--ink);}
+  .site-title span{color:var(--rust);font-size:0.9rem;}
+  .site-meta{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--ink-dim);letter-spacing:0.04em;text-transform:uppercase;}
+  .nav-links{margin-left:auto;display:flex;gap:1rem;align-items:center;}
+  .back-link{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--ink-dim);text-decoration:none;letter-spacing:0.04em;border-bottom:1px solid var(--border);padding-bottom:1px;transition:color 0.15s;}
+  .back-link:hover{color:var(--rust);border-color:var(--rust);}
+  .user-chip{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);}
+  .wrap{max-width:860px;margin:0 auto;padding:2rem;}
+  .sec-label{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:1rem;}
+  .progress-row{display:flex;align-items:center;gap:1rem;margin-bottom:1.8rem;}
+  .prog-track{flex:1;height:5px;background:var(--border-lt);border-radius:99px;overflow:hidden;}
+  .prog-fill{height:100%;background:var(--rust);border-radius:99px;transition:width 0.4s ease;}
+  .prog-label{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--ink-dim);white-space:nowrap;}
+  .prog-label strong{color:var(--rust);font-weight:500;}
+  .controls-row{display:flex;gap:0.7rem;margin-bottom:1.4rem;flex-wrap:wrap;}
+  .search-wrap{flex:1 1 200px;display:flex;align-items:center;border:1px solid var(--border);border-radius:5px;background:var(--surface);overflow:hidden;transition:border-color 0.15s;}
+  .search-wrap:focus-within{border-color:var(--rust);}
+  .search-wrap input{font-family:'Inter',sans-serif;font-size:0.82rem;border:none;background:transparent;color:var(--ink);padding:0.5rem 0.75rem;outline:none;width:100%;}
+  .search-wrap input::placeholder{color:var(--ink-dim);}
+  .filter-btn{font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.05em;padding:0.5rem 0.9rem;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--ink-dim);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+  .filter-btn:hover{background:var(--bg2);color:var(--ink);border-color:var(--dusk);}
+  .filter-btn.active{color:var(--rust);border-color:var(--rust-lt);background:var(--bg2);}
+  .genre-row{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.6rem;}
+  .genre-pill{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.3rem 0.7rem;border:1px solid var(--border-lt);border-radius:99px;background:var(--surface);color:var(--ink-dim);cursor:pointer;transition:all 0.15s;}
+  .genre-pill:hover{border-color:var(--dusk);color:var(--ink-mid);}
+  .genre-pill.active{background:var(--rust);border-color:var(--rust);color:#f5ede4;}
+  .song-list{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .song-row{display:flex;align-items:center;gap:0.9rem;padding:0.7rem 1rem;background:var(--surface);border-bottom:1px solid var(--border-lt);cursor:pointer;transition:background 0.12s;user-select:none;}
+  .song-row:last-child{border-bottom:none;}
+  .song-row:hover{background:var(--bg2);}.song-row.owned{background:var(--done-bg);}.song-row.owned:hover{background:#d3deca;}
+  .song-check{width:14px;height:14px;border:1.5px solid var(--border);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background 0.12s,border-color 0.12s;}
+  .song-row.owned .song-check{background:var(--moss);border-color:var(--moss);}
+  .song-check svg{display:none;}.song-row.owned .song-check svg{display:block;}
+  .song-num{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-dim);width:24px;flex-shrink:0;text-align:right;}
+  .song-info{flex:1;min-width:0;}
+  .song-name{font-size:0.85rem;font-weight:500;color:var(--ink);}
+  .song-row.owned .song-name{color:var(--done-tx);}
+  .song-meta{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-dim);margin-top:0.1rem;}
+  .song-row.owned .song-meta{color:#7a9e6a;}
+  .song-genre{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--ink-dim);padding:0.15rem 0.5rem;border:1px solid var(--border-lt);border-radius:99px;white-space:nowrap;flex-shrink:0;}
+  .song-row.owned .song-genre{border-color:#a8c89a;color:#6b8f5e;}
+  .how-tag{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--ink-dim);white-space:nowrap;flex-shrink:0;min-width:60px;text-align:right;}
+  .song-row.owned .how-tag{color:#7a9e6a;}
+  .how-note{font-size:0.78rem;color:var(--ink-mid);line-height:1.65;border-left:2px solid var(--border);padding-left:0.9rem;margin-bottom:1.6rem;}
+  .how-note strong{color:var(--rust);font-weight:600;}
+  .empty-msg{font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--ink-dim);text-align:center;padding:3rem 1rem;border:1px solid var(--border-lt);border-radius:8px;}
+  footer{text-align:center;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);letter-spacing:0.06em;padding:0 2rem;max-width:860px;margin:2rem auto 0;}
+  @media(max-width:520px){.how-tag{display:none;}header{padding:2rem 1.2rem 1rem;}.wrap{padding:1.5rem 1.2rem;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-top">
+    <div class="site-title">k.k. slider <span>/ song tracker</span></div>
+    <div class="site-meta">animal crossing · nh</div>
+    <div class="nav-links">
+      <span class="user-chip" id="userChip"></span>
+      <a class="back-link" href="index.html">← home</a>
+    </div>
+  </div>
+</header>
+<div class="wrap">
+  <div class="sec-label">song collection</div>
+  <div class="progress-row"><div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div><div class="prog-label" id="progLabel"><strong>0%</strong> collected</div></div>
+  <div class="how-note">K.K. visits <strong>every Saturday night</strong>. Request a song by name for the vinyl. Songs marked <em>★ secret</em> must be requested by exact name.</div>
+  <div class="controls-row">
+    <div class="search-wrap"><input type="text" id="searchInput" placeholder="search songs…" oninput="applyFilters()"/></div>
+    <button class="filter-btn active" id="filterAll" onclick="setFilter('all')">all</button>
+    <button class="filter-btn" id="filterMissing" onclick="setFilter('missing')">missing</button>
+    <button class="filter-btn" id="filterOwned" onclick="setFilter('owned')">owned</button>
+  </div>
+  <div class="genre-row" id="genreRow"></div>
+  <div class="song-list" id="songList"></div>
+  <div class="empty-msg" id="emptyMsg" style="display:none">nothing matches.</div>
+</div>
+<footer>data synced via back4app<br>made by zahra w/ html,css,js & some sparkle dust</footer>
+
+<script>
+const SONGS=[{name:'Agent K.K.',genre:'folk',how:'request'},{name:'Aloha K.K.',genre:'reggae',how:'request'},{name:'Animal City',genre:'pop',how:'request'},{name:'Bubblegum K.K.',genre:'pop',how:'request'},{name:'Café K.K.',genre:'jazz',how:'request'},{name:'Chillwave',genre:'electronic',how:'secret'},{name:'Comrade K.K.',genre:'folk',how:'request'},{name:'DJ K.K.',genre:'electronic',how:'request'},{name:'Drivin’',genre:'other',how:'request'},{name:'Farewell',genre:'folk',how:'request'},{name:'Forest Life',genre:'folk',how:'request'},{name:'Go K.K. Rider',genre:'rock',how:'request'},{name:'Hypno K.K.',genre:'electronic',how:'request'},{name:'I Love You',genre:'folk',how:'secret'},{name:'Imperial K.K.',genre:'world',how:'request'},{name:'King K.K.',genre:'rock',how:'request'},{name:'K.K. Adventure',genre:'electronic',how:'request'},{name:'K.K. Aria',genre:'classical',how:'request'},{name:'K.K. Ballad',genre:'easy listening',how:'request'},{name:'K.K. Bashment',genre:'reggae',how:'secret'},{name:'K.K. Bazaar',genre:'world',how:'secret'},{name:'K.K. Birthday',genre:'pop',how:'request'},{name:'K.K. Blues',genre:'blues',how:'request'},{name:'K.K. Bossa',genre:'bossa nova',how:'request'},{name:'K.K. Break',genre:'electronic',how:'secret'},{name:'K.K. Calypso',genre:'world',how:'request'},{name:'K.K. Casbah',genre:'world',how:'request'},{name:'K.K. Chorale',genre:'classical',how:'request'},{name:'K.K. Chorinho',genre:'bossa nova',how:'request'},{name:'K.K. Condor',genre:'world',how:'request'},{name:'K.K. Country',genre:'folk',how:'request'},{name:'K.K. Crusin’',genre:'other',how:'request'},{name:'K.K. D&B',genre:'electronic',how:'request'},{name:'K.K. Dirge',genre:'horror',how:'secret'},{name:'K.K. Disco',genre:'pop',how:'request'},{name:'K.K. Dixie',genre:'jazz',how:'request'},{name:'K.K. Dub',genre:'reggae',how:'secret'},{name:'K.K. Étude',genre:'classical',how:'request'},{name:'K.K. Faire',genre:'folk',how:'request'},{name:'K.K. Flamenco',genre:'world',how:'request'},{name:'K.K. Folk',genre:'folk',how:'request'},{name:'K.K. Fugue',genre:'classical',how:'secret'},{name:'K.K. Fusion',genre:'jazz',how:'request'},{name:'K.K. Groove',genre:'r&b',how:'request'},{name:'K.K. Gumbo',genre:'blues',how:'request'},{name:'K.K. Hop',genre:'electronic',how:'secret'},{name:'K.K. House',genre:'electronic',how:'request'},{name:'K.K. Island',genre:'world',how:'request'},{name:'K.K. Jazz',genre:'jazz',how:'request'},{name:'K.K. Jongara',genre:'world',how:'secret'},{name:'K.K. Khoomei',genre:'world',how:'secret'},{name:'K.K. Lament',genre:'blues',how:'request'},{name:'K.K. Love Song',genre:'easy listening',how:'request'},{name:'K.K. Lovers',genre:'easy listening',how:'secret'},{name:'K.K. Lullaby',genre:'easy listening',how:'request'},{name:'K.K. Mambo',genre:'latin',how:'request'},{name:'K.K. Marathon',genre:'electronic',how:'request'},{name:'K.K. March',genre:'classical',how:'request'},{name:'K.K. Mariachi',genre:'latin',how:'secret'},{name:'K.K. Metal',genre:'rock',how:'request'},{name:'K.K. Milonga',genre:'latin',how:'request'},{name:'K.K. Moody',genre:'jazz',how:'request'},{name:'K.K. Oasis',genre:'world',how:'request'},{name:'K.K. Parade',genre:'classical',how:'request'},{name:'K.K. Polka',genre:'folk',how:'secret'},{name:'K.K. Ragtime',genre:'jazz',how:'request'},{name:'K.K. Rally',genre:'pop',how:'secret'},{name:'K.K. Reggae',genre:'reggae',how:'request'},{name:'K.K. Robot Synth',genre:'electronic',how:'request'},{name:'K.K. Rock',genre:'rock',how:'request'},{name:'K.K. Rockabilly',genre:'rock',how:'request'},{name:'K.K. Safari',genre:'world',how:'request'},{name:'K.K. Salsa',genre:'latin',how:'request'},{name:'K.K. Samba',genre:'latin',how:'request'},{name:'K.K. Ska',genre:'reggae',how:'request'},{name:'K.K. Slack-Key',genre:'folk',how:'request'},{name:'K.K. Sonata',genre:'classical',how:'request'},{name:'K.K. Song',genre:'folk',how:'request'},{name:'K.K. Soul',genre:'r&b',how:'request'},{name:'K.K. Steppe',genre:'world',how:'request'},{name:'K.K. Stroll',genre:'easy listening',how:'request'},{name:'K.K. Swing',genre:'jazz',how:'request'},{name:'K.K. Synth',genre:'electronic',how:'request'},{name:'K.K. Tango',genre:'latin',how:'request'},{name:'K.K. Technopop',genre:'electronic',how:'request'},{name:'K.K. Waltz',genre:'classical',how:'request'},{name:'K.K. Western',genre:'folk',how:'request'},{name:'Lucky K.K.',genre:'folk',how:'request'},{name:'Marine Song 2001',genre:'folk',how:'request'},{name:'Mountain Song',genre:'folk',how:'secret'},{name:'Mr. K.K.',genre:'easy listening',how:'request'},{name:'My Place',genre:'folk',how:'request'},{name:'Neapolitan',genre:'folk',how:'request'},{name:'Only Me',genre:'folk',how:'secret'},{name:'Pondering',genre:'easy listening',how:'request'},{name:'Rockin’ K.K.',genre:'other',how:'request'},{name:'Soulful K.K.',genre:'r&b',how:'request'},{name:'Space K.K.',genre:'electronic',how:'request'},{name:'Spring Blossoms',genre:'folk',how:'request'},{name:'Stale Cupcakes',genre:'easy listening',how:'request'},{name:'Steep Hill',genre:'folk',how:'request'},{name:'Surfin’ K.K.',genre:'other',how:'request'},{name:'The K. Funk',genre:'r&b',how:'request'},{name:'To the Edge',genre:'rock',how:'request'},{name:'Two Days Ago',genre:'blues',how:'request'},{name:'Wandering',genre:'folk',how:'request'},{name:'Welcome Horizons',genre:'pop',how:'request'}].sort((a,b)=>a.name.localeCompare(b.name));
+
+const GENRES=[...new Set(SONGS.map(s=>s.genre))].sort();
+let owned=new Set();
+let parseObj=null;
+let activeFilter='all',activeGenre='all';
+
+(async()=>{
+  const u=Parse.User.current();
+  if(!u){window.location.href='index.html';return;}
+  document.getElementById('userChip').textContent=u.get('email')||u.get('username');
+  await loadData();
+  buildGenres();renderList();updateProgress();
+})();
+
+async function loadData(){
+  const u=Parse.User.current();
+  try{
+    const q=new Parse.Query('KKData');q.equalTo('user',u);
+    parseObj=await q.first()||null;
+    if(parseObj) owned=new Set(parseObj.get('owned')||[]);
+  }catch(e){console.error(e);}
+}
+
+async function saveData(){
+  const u=Parse.User.current();if(!u)return;
+  try{
+    if(!parseObj){
+      const KKData=Parse.Object.extend('KKData');
+      parseObj=new KKData();parseObj.set('user',u);
+      const acl=new Parse.ACL(u);parseObj.setACL(acl);
+    }
+    parseObj.set('owned',[...owned]);
+    await parseObj.save();
+  }catch(e){console.error(e);}
+}
+
+function toggle(idx){owned.has(idx)?owned.delete(idx):owned.add(idx);saveData();renderList();updateProgress();}
+
+function buildGenres(){
+  const row=document.getElementById('genreRow');
+  const all=document.createElement('button');all.className='genre-pill active';all.id='genre-all';all.textContent='all genres';all.onclick=()=>setGenre('all');row.appendChild(all);
+  GENRES.forEach(g=>{const p=document.createElement('button');p.className='genre-pill';p.id=`genre-${g}`;p.textContent=g;p.onclick=()=>setGenre(g);row.appendChild(p);});
+}
+function setGenre(g){activeGenre=g;document.querySelectorAll('.genre-pill').forEach(p=>p.classList.remove('active'));document.getElementById(`genre-${g}`)?.classList.add('active');renderList();}
+function setFilter(f){activeFilter=f;['all','missing','owned'].forEach(x=>{const cap=x.charAt(0).toUpperCase()+x.slice(1);document.getElementById('filter'+cap).classList.toggle('active',x===f);});renderList();}
+function applyFilters(){renderList();}
+
+function renderList(){
+  const list=document.getElementById('songList');const emptyMsg=document.getElementById('emptyMsg');
+  const q=document.getElementById('searchInput').value.toLowerCase().trim();
+  list.innerHTML='';let visible=0;
+  SONGS.forEach((song,idx)=>{
+    const isOwned=owned.has(idx);
+    const mF=activeFilter==='all'||(activeFilter==='owned'&&isOwned)||(activeFilter==='missing'&&!isOwned);
+    const mG=activeGenre==='all'||song.genre===activeGenre;
+    const mS=!q||song.name.toLowerCase().includes(q)||song.genre.toLowerCase().includes(q);
+    if(!mF||!mG||!mS)return;
+    visible++;
+    const row=document.createElement('div');
+    row.className='song-row'+(isOwned?' owned':'');
+    row.innerHTML=`<div class="song-check"><svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="song-num">${String(idx+1).padStart(2,'0')}</div>
+      <div class="song-info"><div class="song-name">${song.name}</div><div class="song-meta">${song.genre}</div></div>
+      <div class="song-genre">${song.genre}</div>
+      <div class="how-tag">${song.how==='secret'?'★ secret':'request'}</div>`;
+    row.onclick=()=>toggle(idx);list.appendChild(row);
+  });
+  list.style.display=visible?'flex':'none';emptyMsg.style.display=visible?'none':'block';
+}
+
+function updateProgress(){
+  const total=SONGS.length,done=owned.size,pct=Math.round(done/total*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progLabel').innerHTML=`<strong>${pct}%</strong> collected &nbsp;·&nbsp; ${done} / ${total}`;
+}
+</script>
+</body>
+</html>

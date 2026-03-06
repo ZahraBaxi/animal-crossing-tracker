@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>island tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+<script>
+  Parse.initialize("G9QH61WfFxbMqM8pfxMTlkBQDkDkHornk0MRX6Zb", "9oUG5sdMcxYQwTe5XqdNDw8gXmyLmwsN3v3vUom2");
+  Parse.serverURL = "https://parseapi.back4app.com/";
+</script>
+<style>
+  :root {
+    --bg:#f0ebe3;--bg2:#e8e1d6;--surface:#ede6da;--border:#c9bfb0;--border-lt:#d9d1c4;
+    --rust:#a0522d;--rust-lt:#c47a4a;--moss:#6b7c5c;--clay:#b5714e;--wheat:#c9a96e;
+    --dusk:#8c7b6e;--ink:#3b3028;--ink-mid:#6b5c50;--ink-dim:#9e8f83;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  html{font-size:15px;}
+
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+
+  /* ── AUTH OVERLAY ── */
+  .auth-overlay{
+    position:fixed;inset:0;background:var(--bg);z-index:100;
+    display:flex;align-items:center;justify-content:center;padding:2rem;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+  .auth-box{width:100%;max-width:340px;animation:fadeUp 0.4s ease both;}
+  .auth-wordmark{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:1.8rem;}
+  .auth-title{font-family:'Inter',sans-serif;font-size:2rem;font-weight:400;color:var(--ink);line-height:1.1;margin-bottom:0.5rem;}
+  .auth-title em{color:var(--rust);font-style:italic;}
+  .auth-sub{font-size:0.82rem;color:var(--ink-dim);line-height:1.65;margin-bottom:2rem;}
+  .auth-tabs{display:flex;gap:0;margin-bottom:1.4rem;border-bottom:1px solid var(--border);}
+  .auth-tab{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;
+    background:none;border:none;border-bottom:2px solid transparent;padding:0.45rem 0.9rem 0.55rem;
+    cursor:pointer;color:var(--ink-dim);position:relative;top:1px;transition:color 0.15s,border-color 0.15s;}
+  .auth-tab.active{color:var(--rust);border-bottom-color:var(--rust);}
+  .auth-field{display:flex;flex-direction:column;gap:0.3rem;margin-bottom:0.85rem;}
+  .auth-field label{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-dim);}
+  .auth-field input{font-family:'DM Mono',monospace;font-size:0.82rem;padding:0.55rem 0.8rem;
+    border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--ink);outline:none;transition:border-color 0.15s;}
+  .auth-field input:focus{border-color:var(--rust);}
+  .auth-err{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--clay);margin-bottom:0.7rem;min-height:0.9rem;}
+  .btn-auth{font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.07em;text-transform:uppercase;
+    padding:0.65rem 1.4rem;border-radius:5px;border:1px solid var(--rust);cursor:pointer;
+    background:var(--rust);color:#f5ede4;width:100%;transition:background 0.15s,border-color 0.15s;}
+  .btn-auth:hover{background:var(--rust-lt);border-color:var(--rust-lt);}
+  .btn-auth:disabled{opacity:0.5;cursor:not-allowed;}
+
+  /* ── MAIN LAYOUT ── */
+  .main-content{display:none;}
+  .main-content.visible{
+    display:grid;
+    height:100vh;
+    max-height:100vh;
+    grid-template-rows:auto 1fr auto;
+    overflow:hidden;
+  }
+
+  /* ── TOP BAR ── */
+  .top-bar{
+    display:flex;align-items:center;gap:1rem;
+    padding:1rem 2.5rem;
+    border-bottom:1px solid var(--border);
+  }
+  .site-wordmark{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-dim);flex:1;}
+  .site-wordmark strong{color:var(--rust);}
+  .user-email{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-dim);}
+  .btn-logout{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;
+    padding:0.3rem 0.7rem;border:1px solid var(--border);border-radius:4px;background:none;
+    color:var(--ink-dim);cursor:pointer;transition:all 0.15s;flex-shrink:0;}
+  .btn-logout:hover{border-color:var(--rust);color:var(--rust);}
+
+  /* ── BODY ── */
+  .body-grid{
+    display:grid;
+    grid-template-columns:1fr 2fr;
+    overflow:hidden;
+    min-height:0;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar{
+    border-right:1px solid var(--border);
+    padding:3rem 2.5rem;
+    display:flex;flex-direction:column;justify-content:space-between;
+    overflow:hidden;
+  }
+  .sidebar-top{}
+  .island-label{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:1.4rem;display:flex;align-items:center;gap:0.5rem;}
+  .island-label::before{content:'';display:inline-block;width:16px;height:1px;background:var(--border);}
+  .big-title{font-family:'Inter',sans-serif;font-size:clamp(2.4rem,4vw,3.6rem);font-weight:400;color:var(--ink);line-height:1.05;margin-bottom:1.2rem;}
+  .big-title em{color:var(--rust);font-style:italic;}
+  .sidebar-desc{font-size:0.83rem;color:var(--ink-mid);line-height:1.75;max-width:220px;}
+  .sidebar-bottom{}
+  .sidebar-meta{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.06em;color:var(--ink-dim);line-height:2;}
+
+  /* decorative line */
+  .deco-rule{margin:2rem 0;border:none;border-top:1px solid var(--border-lt);}
+
+  /* ── TOOL GRID ── */
+  .tools-area{
+    padding:2rem 2.5rem;
+    display:flex;flex-direction:column;
+    overflow:hidden;
+    min-height:0;
+  }
+  .tools-label{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:1.2rem;}
+  .tool-grid{
+    display:grid;
+    grid-template-rows:repeat(3,1fr);
+    gap:1px;
+    background:var(--border);
+    border:1px solid var(--border);
+    border-radius:8px;
+    overflow:hidden;
+    flex:1;
+    min-height:0;
+  }
+  .tool-card{
+    background:var(--surface);
+    padding:1.2rem 1.5rem;
+    text-decoration:none;
+    display:grid;
+    grid-template-columns:1fr auto;
+    grid-template-rows:auto auto 1fr auto;
+    gap:0.2rem 1rem;
+    transition:background 0.13s;
+    position:relative;
+    overflow:hidden;
+    min-height:0;
+  }
+  .tool-card::after{
+    content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+    background:var(--rust);opacity:0;transition:opacity 0.15s;
+  }
+  .tool-card:hover{background:var(--bg2);}
+  .tool-card:hover::after{opacity:1;}
+  .card-tag{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-dim);grid-column:1;align-self:start;}
+  .card-arrow{font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--rust);grid-column:2;grid-row:1/5;align-self:center;opacity:0;transform:translateX(-6px);transition:opacity 0.15s,transform 0.15s;}
+  .tool-card:hover .card-arrow{opacity:1;transform:translateX(0);}
+  .card-title{font-family:'Inter',sans-serif;font-size:1.05rem;font-weight:500;color:var(--ink);grid-column:1;}
+  .card-desc{font-size:0.76rem;color:var(--ink-mid);line-height:1.55;grid-column:1;align-self:start;}
+  .card-meta{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;grid-column:1;align-self:end;padding-top:0.4rem;}
+  .card-pill{font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.05em;text-transform:uppercase;
+    padding:0.15rem 0.45rem;border-radius:99px;border:1px solid var(--border-lt);color:var(--ink-dim);background:var(--bg);}
+  .card-prog{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--rust);padding:0.15rem 0.45rem;border-radius:99px;background:rgba(160,82,45,0.08);border:1px solid rgba(160,82,45,0.2);}
+
+  /* ── FOOTER ── */
+  footer{
+    text-align:center;font-family:'DM Mono',monospace;font-size:0.6rem;
+    color:var(--ink-dim);letter-spacing:0.06em;
+    padding:0.75rem 2rem;
+    border-top:1px solid var(--border);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+  .tool-card{animation:fadeUp 0.35s ease both;}
+  .tool-card:nth-child(1){animation-delay:0.05s;}
+  .tool-card:nth-child(2){animation-delay:0.12s;}
+  .tool-card:nth-child(3){animation-delay:0.19s;}
+
+  /* ── MOBILE ── */
+  @media(max-width:700px){
+    .main-content.visible{
+      display:flex;flex-direction:column;
+      height:auto;max-height:none;overflow:auto;
+    }
+    .body-grid{grid-template-columns:1fr;overflow:visible;}
+    .sidebar{
+      border-right:none;border-bottom:1px solid var(--border);
+      padding:2.2rem 1.5rem 1.8rem;
+      justify-content:flex-start;gap:0;
+    }
+    .big-title{font-size:2.5rem;margin-bottom:0.8rem;}
+    .sidebar-desc{max-width:100%;}
+    .sidebar-bottom{display:none;}
+    .tools-area{padding:1.5rem;overflow:visible;}
+    .tool-grid{grid-template-rows:none;gap:1px;flex:none;}
+    .tool-card{min-height:100px;}
+    footer{border-top:1px solid var(--border);}
+  }
+  @media(max-width:400px){
+    .top-bar{padding:0.9rem 1.2rem;}
+    .sidebar{padding:2rem 1.2rem 1.5rem;}
+    .tools-area{padding:1.2rem;}
+  }
+</style>
+</head>
+<body>
+
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-box">
+    <div class="auth-wordmark">animal crossing · nh</div>
+    <div class="auth-title">island <em>tools.</em></div>
+    <div class="auth-sub">sign in!</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">sign in</button>
+      <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')">create account</button>
+    </div>
+    <div class="auth-field"><label>email</label><input type="email" id="authEmail" placeholder="you@example.com"/></div>
+    <div class="auth-field"><label>password</label><input type="password" id="authPassword" placeholder="••••••••"/></div>
+    <div class="auth-err" id="authErr"></div>
+    <button class="btn-auth" id="authBtn" onclick="doAuth()">sign in</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-content" id="mainContent">
+
+  <div class="top-bar">
+    <div class="site-wordmark">island <strong>tools</strong> · nh</div>
+    <div class="user-email" id="userEmail"></div>
+    <button class="btn-logout" onclick="doLogout()">sign out</button>
+  </div>
+
+  <div class="body-grid">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-top">
+        <div class="island-label">animal crossing · new horizons</div>
+        <div class="big-title">island<br><em>tools.</em></div>
+        <!-- <p class="sidebar-desc">.</p> -->
+        <hr class="deco-rule"/>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="sidebar-meta">
+          data synced via back4app<br>
+          made by zahra<br>
+          made with html · css · js & sparkle dust
+        </div>
+      </div>
+    </div>
+
+    <!-- TOOLS -->
+    <div class="tools-area">
+      <div class="tools-label">tools &amp; trackers</div>
+      <div class="tool-grid" id="toolGrid"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const TOOLS=[
+  {href:'turnip-tracker.html',tag:'economy',title:'turnip tracker',
+    desc:'Log weekly stalk market prices, view all-time archive, and spot sell patterns.',
+    pills:['weekly archive','pattern analysis','profit %'],progress:null},
+  {href:'museum-tracker.html',tag:'collection',title:'museum tracker',
+    desc:'Track every fish, bug, sea creature, fossil, and artwork donated to Blathers.',
+    pills:['fish','bugs','sea','fossils','art'],
+    progress:async()=>{
+      const u=Parse.User.current();if(!u)return null;
+      try{
+        const q=new Parse.Query('MuseumData');q.equalTo('user',u);
+        const r=await q.first();
+        const TOTALS={fish:80,bugs:80,sea:40,fossils:73,art:43};
+        const TOTAL=Object.values(TOTALS).reduce((a,b)=>a+b,0);
+        if(!r)return{done:0,total:TOTAL};
+        const all=r.get('collected')||{};
+        let done=0;
+        ['fish','bugs','sea','fossils','art'].forEach(k=>{done+=(all[k]||[]).length;});
+        return{done,total:TOTAL};
+      }catch{return null;}
+    }},
+  {href:'kk-tracker.html',tag:'music',title:'k.k. slider songs',
+    desc:"Track which vinyls you've collected. Flags all 13 secret request songs.",
+    pills:['95 songs','secret requests','by genre'],
+    progress:async()=>{
+      const u=Parse.User.current();if(!u)return null;
+      try{
+        const q=new Parse.Query('KKData');q.equalTo('user',u);
+        const r=await q.first();
+        if(!r)return{done:0,total:107};
+        return{done:(r.get('owned')||[]).length,total:107};
+      }catch{return null;}
+    }},
+];
+
+function switchTab(t){
+  document.getElementById('tabLogin').classList.toggle('active',t==='login');
+  document.getElementById('tabSignup').classList.toggle('active',t==='signup');
+  document.getElementById('authBtn').textContent=t==='login'?'sign in':'create account';
+  document.getElementById('authErr').textContent='';
+  document.getElementById('authOverlay').dataset.tab=t;
+}
+document.getElementById('authOverlay').dataset.tab='login';
+
+async function doAuth(){
+  const tab=document.getElementById('authOverlay').dataset.tab;
+  const email=document.getElementById('authEmail').value.trim();
+  const pass=document.getElementById('authPassword').value;
+  const btn=document.getElementById('authBtn');
+  const err=document.getElementById('authErr');
+  if(!email||!pass){err.textContent='please fill in all fields.';return;}
+  btn.disabled=true;err.textContent='';
+  try{
+    if(tab==='login') await Parse.User.logIn(email,pass);
+    else{
+      const u=new Parse.User();
+      u.set('username',email);u.set('email',email);u.set('password',pass);
+      await u.signUp();
+    }
+    showMain();
+  }catch(e){
+    err.textContent=e.message||'something went wrong.';
+  }finally{btn.disabled=false;}
+}
+
+async function doLogout(){
+  await Parse.User.logOut();
+  document.getElementById('mainContent').classList.remove('visible');
+  document.getElementById('authOverlay').style.display='flex';
+  document.getElementById('authEmail').value='';
+  document.getElementById('authPassword').value='';
+}
+
+async function showMain(){
+  document.getElementById('authOverlay').style.display='none';
+  document.getElementById('mainContent').classList.add('visible');
+  const u=Parse.User.current();
+  document.getElementById('userEmail').textContent=u?.get('email')||u?.get('username')||'';
+  await buildGrid();
+}
+
+async function buildGrid(){
+  const grid=document.getElementById('toolGrid');
+  grid.innerHTML='';
+  TOOLS.forEach((tool,i)=>{
+    const a=document.createElement('a');
+    a.className='tool-card';a.href=tool.href;a.id=`tool-card-${i}`;
+    const progSlot=tool.progress?`<span class="card-prog" id="prog-${i}" style="opacity:0.4">…</span>`:'';
+    a.innerHTML=`
+      <div class="card-tag">${tool.tag}</div>
+      <div class="card-arrow">→</div>
+      <div class="card-title">${tool.title}</div>
+      <div class="card-desc">${tool.desc}</div>
+      <div class="card-meta">${tool.pills.map(p=>`<span class="card-pill">${p}</span>`).join('')}${progSlot}</div>`;
+    grid.appendChild(a);
+  });
+  TOOLS.forEach(async(tool,i)=>{
+    if(!tool.progress)return;
+    try{
+      const p=await tool.progress();
+      const el=document.getElementById(`prog-${i}`);
+      if(!el)return;
+      if(p&&p.total>0){
+        el.textContent=`${p.done}/${p.total} · ${Math.round(p.done/p.total*100)}%`;
+        el.style.opacity='1';
+      }else{
+        el.textContent='0% collected';
+        el.style.opacity='0.5';
+      }
+    }catch{
+      const el=document.getElementById(`prog-${i}`);
+      if(el)el.textContent='';
+    }
+  });
+}
+
+['authEmail','authPassword'].forEach(id=>
+  document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();}));
+
+(async()=>{
+  const u=Parse.User.current();
+  if(u)await showMain();
+})();
+</script>
+</body>
+</html>
