@@ -94,6 +94,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);
 .chk-note{display:block;font-family:'DM Mono',monospace;font-size:0.61rem;color:var(--ink-dim);margin-top:0.08rem;line-height:1.4;}
 .chk-item.done .chk-note{text-decoration:none;color:var(--border);}
 
+
+/* ── upcoming event block ── */
+.upcoming-block{margin-top:1.4rem;padding-top:1.2rem;border-top:1px solid var(--border-lt);}
+.upcoming-eyebrow{font-family:'DM Mono',monospace;font-size:0.57rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:0.6rem;}
+.upcoming-card{border:1px solid var(--border);border-radius:7px;padding:0.85rem 1rem;background:var(--surface);}
+.upcoming-card.is-now{border-color:rgba(160,82,45,0.35);background:rgba(160,82,45,0.05);}
+.upcoming-name{font-size:0.88rem;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;margin-bottom:0.2rem;}
+.upcoming-date{font-family:'DM Mono',monospace;font-size:0.63rem;color:var(--ink-dim);margin-bottom:0.4rem;}
+.upcoming-desc{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-dim);line-height:1.5;}
+.upcoming-card.is-now .upcoming-date{color:var(--rust);}
 /* ── SEASONAL CALENDAR styles ── */
 .cal-now-label{font-family:'DM Mono',monospace;font-size:0.57rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:0.9rem;}
 .cal-month{margin-bottom:1.6rem;}
@@ -308,12 +318,6 @@ async function buildGrid(){
 // months: 0=Jan … 11=Dec  (undefined = every month)
 const TASKS = [
   // ── every day ──
-  {id:'nookstop',  group:'nook stop',  days:null,
-    text:'Check in at Nook Stop for daily miles',
-    note:'50 miles/day — streak of 7 days earns 300 miles/day bonus'},
-  {id:'nookplus',  group:'nook stop',  days:null,
-    text:'Complete your first 5 Nook Miles+ tasks',
-    note:'First 5 per day are worth double miles — do these before anything else'},
   {id:'fossils',   group:'island',     days:null,
     text:'Dig up all 4 fossils & take to Blathers',
     note:'Star-shaped cracks in the ground — donate new ones, sell duplicates'},
@@ -326,51 +330,9 @@ const TASKS = [
   {id:'bottle',    group:'island',     days:null,
     text:'Pick up the DIY recipe bottle on the beach',
     note:'One washes up each day — check early AM and again after 4pm for a second'},
-  {id:'trees',     group:'island',     days:null,
-    text:'Shake non-fruit trees for hidden furniture',
-    note:'2 furniture items hidden in trees each day — also watch for wasps!'},
-  {id:'balloon',   group:'island',     days:null,
-    text:'Pop balloon presents',
-    note:'Appear every 5 min — shoot with slingshot. More common at :04 and :54 past the hour'},
-  {id:'shells',    group:'island',     days:null,
-    text:'Collect beach shells',
-    note:'Respawn throughout the day — Summer Shells worth up to 600 bells each'},
-  {id:'villagers', group:'social',     days:null,
-    text:'Talk to all your villagers',
-    note:'Check if anyone is crafting (smoke from chimney, open curtains) — ask for the recipe'},
-  {id:'gyroid',    group:'island',     days:null,
-    text:'Dig up & water your buried gyroid',
-    note:'Plant a gyroid fragment from a Kapp\'n island — it grows overnight'},
-  {id:'shops',     group:'shops',      days:null,
-    text:"Check Nook's Cranny stock & hot item",
-    note:'Hot item sells for 2× — craft it if you have materials. Prices change at noon'},
-  {id:'able',      group:'shops',      days:null,
-    text:'Check Able Sisters for new clothing',
-    note:'3 new items on the floor daily — talk to Sable to unlock pattern designs over time'},
   {id:'nookshop',  group:'shops',      days:null,
     text:'Order a K.K. song from Nook Shopping',
     note:'Only place to buy K.K. vinyls — 1 new one available per day in the app'},
-  {id:'recycling', group:'shops',      days:null,
-    text:'Check the recycling bin at Res. Services',
-    note:'Items villagers throw away appear here — free furniture!'},
-  {id:'visitor',   group:'visitors',   days:null,
-    text:'Find today\'s special island visitor',
-    note:'Could be Redd, Leif, Kicks, Flick, C.J., Saharah, Gulliver, Label, Celeste…'},
-  {id:'kappn',     group:'visitors',   days:null,
-    text:'Take a Kapp\'n island tour',
-    note:'1 per day, 1,000 Nook Miles — find rare seasonal items, crops, and gyroid fragments'},
-  {id:'roost',     group:'visitors',   days:null,
-    text:'Have a coffee at The Roost',
-    note:'Talk to Brewster daily — after 8 visits he lets you invite villagers for coffee'},
-  {id:'hhp',       group:'happy home paradise', days:null,
-    text:'Visit Happy Home Paradise & design a home',
-    note:'Earn Poki for each home — check Wardell\'s shop for new furniture (5 items/day)'},
-  {id:'chocolates',group:'happy home paradise', days:null,
-    text:'Buy souvenir chocolates from Wardell (800 Poki ea.)',
-    note:'Give to islanders to invite them to HHP — buy 3 at once for a 400 Poki discount'},
-  {id:'harvest',   group:'farm',       days:null,
-    text:'Water & harvest crops',
-    note:'Pumpkins, wheat, tomatoes, sugarcane, carrots, potatoes, and more from Leif'},
 
   // ── sunday only ──
   {id:'daisy',     group:'sunday',     days:[0],
@@ -386,9 +348,9 @@ const TASKS = [
     note:'Say the exact song title to receive the vinyl — any time after 6pm counts'},
 
   // ── monday ──
-  {id:'monvisitor',group:'monday',     days:[1],
-    text:'Check who\'s visiting this week',
-    note:'Weekly NPC schedule resets Monday — check the campsite and look around your island'},
+  {id:'daisy',group:'monday',     days:[1],
+    text:'Get free turnips',
+    note:'Happy home paradise, daisy mae\'s grandmother hands out free turnips to celebrate the start of the week'},
 ];
 
 const SVG = '<svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -418,10 +380,9 @@ function renderToday(){
 
   // special banners
   const banners=[];
-  if(dow===0) banners.push({icon:'🌿',text:'<strong>Daisy Mae</strong> is visiting until noon — buy your turnips before 12pm!'});
-  if(dow===6) banners.push({icon:'🎸',text:'<strong>K.K. Slider</strong> performs tonight from 6pm. Request any song by exact name to receive the vinyl.'});
-  if(dow===1) banners.push({icon:'📅',text:'New week — the weekly <strong>NPC visitor schedule</strong> has reset. A new guest arrives today.'});
-  if(mo===7 && dow===0) banners.push({icon:'🎆',text:'<strong>Fireworks Sunday!</strong> Redd has a raffle at the plaza and Isabelle is giving out bopper hats.'});
+  if(dow===0 && mo!==7) banners.push({icon:'🌿',text:'<strong>Daisy Mae</strong> is visiting until noon — buy turnips before 12pm!'});
+  if(dow===0 && mo===7) banners.push({icon:'🎆',text:'<strong>Fireworks Sunday</strong> + <strong>Daisy Mae</strong> until noon. Redd has a raffle tonight and Isabelle is handing out bopper hats.'});
+  if(dow===6) banners.push({icon:'🎸',text:'<strong>K.K. Slider</strong> performs from 6pm. Request any song by exact title to receive the vinyl.'});
 
   // group tasks preserving source order within each group
   const groupOrder=[], groupMap={};
@@ -453,7 +414,9 @@ function renderToday(){
     html+='</div>';
   });
 
-  document.getElementById('panel-today').innerHTML=html;
+  const panelEl=document.getElementById('panel-today');
+  panelEl.innerHTML=html;
+  renderUpcoming(panelEl);
 }
 
 function toggleTask(id){
@@ -508,6 +471,43 @@ const EVENTS=[
 
 const MONTH_NAMES_FULL=['January','February','March','April','May','June','July','August','September','October','November','December'];
 
+
+function getUpcomingEvent(){
+  const now=new Date(), mo=now.getMonth(), day=now.getDate();
+  // Parse a rough month+day from the event date string to find next/current
+  // We store month index on each event already — find soonest one
+  // Strategy: find events in current month with day >= today, then next months
+  // For events with date ranges like "Oct 1–31" or fixed like "Oct 31"
+  // We'll do a simple pass: current month first, then wrap
+  const order=[...Array(12)].map((_,i)=>(mo+i)%12);
+  for(const m of order){
+    const evs=EVENTS.filter(e=>e.mo===m && (e.tag==='event'||e.tag==='tourney'||e.tag==='weekly'));
+    if(!evs.length) continue;
+    // if same month, prefer ones that haven't fully passed
+    // just return the first event in the month (they're ordered)
+    const ev=evs[0];
+    const isNow=(m===mo);
+    return{ev, isNow};
+  }
+  return null;
+}
+
+function renderUpcoming(panelEl){
+  const result=getUpcomingEvent();
+  if(!result) return;
+  const {ev, isNow}=result;
+  const eyebrow=isNow?'happening now / soon':'coming up next';
+  const tagHtml=`<span class="ctag ctag-${ev.tag}">${ev.tag}</span>`;
+  panelEl.insertAdjacentHTML('beforeend',`
+    <div class="upcoming-block">
+      <div class="upcoming-eyebrow">${eyebrow}</div>
+      <div class="upcoming-card${isNow?' is-now':''}">
+        <div class="upcoming-name">${tagHtml}${ev.name}</div>
+        <div class="upcoming-date">${ev.d}</div>
+        <div class="upcoming-desc">${ev.desc}</div>
+      </div>
+    </div>`);
+}
 function renderCalendar(){
   const now=new Date(), curMo=now.getMonth();
   // show current month first, wrap around full year
