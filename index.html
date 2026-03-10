@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>island tools</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
-<script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+<script src="https://unpkg.com/parse/dist/parse.min.js"></script>
 <script>
   Parse.initialize("G9QH61WfFxbMqM8pfxMTlkBQDkDkHornk0MRX6Zb", "9oUG5sdMcxYQwTe5XqdNDw8gXmyLmwsN3v3vUom2");
   Parse.serverURL = "https://parseapi.back4app.com/";
@@ -14,21 +14,27 @@
 :root{
   --bg:#f0ebe3;--bg2:#e8e1d6;--surface:#ede6da;--border:#c9bfb0;--border-lt:#d9d1c4;
   --rust:#a0522d;--rust-lt:#c47a4a;--moss:#6b7c5c;--clay:#b5714e;--wheat:#c9a96e;
-  --dusk:#8c7b6e;--ink:#3b3028;--ink-mid:#6b5c50;--ink-dim:#9e8f83;
+  --dusk:#8c7b6e;--ink:#3b3028;--ink-mid:#6b5c50;--ink-dim:#9e8f83;--ink-ghost:#bfb3a8;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;}html{font-size:15px;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");}
+html,body{height:100%;}
+html{font-size:15px;}
+body{
+  font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
 
 /* ── AUTH ── */
-.auth-overlay{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;align-items:center;justify-content:center;padding:2rem;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");}
+.auth-overlay{
+  position:fixed;inset:0;background:var(--bg);z-index:100;
+  display:flex;align-items:center;justify-content:center;padding:2rem;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
 .auth-box{width:100%;max-width:340px;animation:fadeUp 0.4s ease both;}
 .auth-wordmark{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:1.8rem;}
-.auth-title{font-family:'Inter',sans-serif;font-size:2rem;font-weight:400;color:var(--ink);line-height:1.1;margin-bottom:0.5rem;}
-.auth-title em{color:var(--rust);font-style:italic;}
-.auth-sub{font-size:0.82rem;color:var(--ink-dim);line-height:1.65;margin-bottom:2rem;}
+.auth-title{font-size:2rem;font-weight:300;color:var(--ink);line-height:1.1;margin-bottom:0.5rem;letter-spacing:-0.02em;}
+.auth-title em{color:var(--rust);font-style:normal;font-weight:600;}
+.auth-sub{font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--ink-dim);line-height:1.65;margin-bottom:2rem;}
 .auth-tabs{display:flex;gap:0;margin-bottom:1.4rem;border-bottom:1px solid var(--border);}
 .auth-tab{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;padding:0.45rem 0.9rem 0.55rem;cursor:pointer;color:var(--ink-dim);position:relative;top:1px;transition:color .15s,border-color .15s;}
 .auth-tab.active{color:var(--rust);border-bottom-color:var(--rust);}
@@ -46,11 +52,20 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);
 .main-content.visible{display:grid;height:100vh;max-height:100vh;grid-template-rows:auto 1fr auto;overflow:hidden;}
 
 /* ── TOP BAR ── */
-.top-bar{display:flex;align-items:center;gap:1rem;padding:1rem 2.5rem;border-bottom:1px solid var(--border);}
-.site-wordmark{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-dim);flex:1;}
-.site-wordmark strong{color:var(--rust);}
-.user-email{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-dim);}
-.btn-logout{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.3rem 0.7rem;border:1px solid var(--border);border-radius:4px;background:none;color:var(--ink-dim);cursor:pointer;transition:all .15s;flex-shrink:0;}
+.top-bar{
+  display:flex;align-items:center;gap:1.5rem;
+  padding:0 2.5rem;height:52px;
+  border-bottom:1px solid var(--border);
+  background:var(--surface);
+}
+.site-wordmark{
+  font-family:'DM Mono',monospace;font-size:0.78rem;font-weight:500;
+  letter-spacing:0.06em;color:var(--ink);flex:1;
+}
+.site-wordmark span{color:var(--rust);}
+.site-wordmark sub{font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-dim);vertical-align:baseline;margin-left:0.5rem;}
+.user-email{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--ink-dim);}
+.btn-logout{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.28rem 0.65rem;border:1px solid var(--border);border-radius:3px;background:none;color:var(--ink-dim);cursor:pointer;transition:all .15s;flex-shrink:0;}
 .btn-logout:hover{border-color:var(--rust);color:var(--rust);}
 
 /* ── BODY GRID ── */
@@ -59,86 +74,181 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);
 /* ── SIDEBAR ── */
 .sidebar{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0;}
 
-/* sidebar tab bar */
-.sidebar-tabbar{display:flex;flex-shrink:0;border-bottom:1px solid var(--border);}
-.stab{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.09em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;padding:0.65rem 1.1rem 0.75rem;cursor:pointer;color:var(--ink-dim);position:relative;top:1px;transition:color .15s,border-color .15s;white-space:nowrap;}
+.sidebar-tabbar{display:flex;flex-shrink:0;border-bottom:1px solid var(--border);background:var(--surface);}
+.stab{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.09em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;padding:0.62rem 1rem 0.72rem;cursor:pointer;color:var(--ink-dim);position:relative;top:1px;transition:color .15s,border-color .15s;white-space:nowrap;}
 .stab:hover{color:var(--ink-mid);}
 .stab.active{color:var(--rust);border-bottom-color:var(--rust);}
 
-/* sidebar panels */
-.sidebar-panel{flex:1;overflow-y:auto;padding:1.6rem 1.8rem;display:none;}
+.sidebar-panel{flex:1;overflow-y:auto;padding:1.5rem 1.7rem;display:none;}
 .sidebar-panel.active{display:block;}
 
-/* ── DAILY CHECKLIST styles ── */
-.day-hero{margin-bottom:1.4rem;}
-.day-name{font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:400;color:var(--ink);line-height:1;}
-.day-date{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-dim);margin-top:0.3rem;}
-.day-tally{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--ink-dim);margin-top:0.15rem;}
+/* ── TV WIDGET (inside today panel) ── */
+.tv-block{
+  margin-bottom:1.4rem;
+  border:1px solid var(--border);border-radius:8px;
+  overflow:hidden;
+}
+.tv-block-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0.52rem 0.85rem;
+  background:var(--ink);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.tv-live-badge{
+  display:flex;align-items:center;gap:0.4rem;
+  font-family:'DM Mono',monospace;font-size:0.55rem;
+  letter-spacing:0.13em;text-transform:uppercase;color:#f5ede4;
+}
+.tv-live-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:#e8685a;flex-shrink:0;
+  box-shadow:0 0 0 0 rgba(232,104,90,0.5);
+  animation:livePulse 2s ease infinite;
+}
+@keyframes livePulse{
+  0%{box-shadow:0 0 0 0 rgba(232,104,90,0.5);}
+  60%{box-shadow:0 0 0 5px rgba(232,104,90,0);}
+  100%{box-shadow:0 0 0 0 rgba(232,104,90,0);}
+}
+.tv-block-link{
+  font-family:'DM Mono',monospace;font-size:0.52rem;
+  letter-spacing:0.06em;color:var(--ink-ghost);
+  text-decoration:none;transition:color .13s;
+}
+.tv-block-link:hover{color:#f5ede4;}
+.tv-block-body{padding:0.75rem 0.9rem;background:var(--surface);}
+.tv-now-row{display:flex;align-items:center;gap:0.6rem;margin-bottom:0.45rem;}
+.tv-emoji{font-size:1.1rem;line-height:1;flex-shrink:0;}
+.tv-show{font-size:0.88rem;font-weight:500;color:var(--ink);flex:1;}
+.tv-time{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--ink-dim);flex-shrink:0;}
+.tv-next-row{
+  display:flex;align-items:center;gap:0.45rem;
+  padding-top:0.42rem;border-top:1px dashed var(--border-lt);
+}
+.tv-next-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-ghost);flex-shrink:0;}
+.tv-next-show{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-dim);}
+.tv-next-time{font-family:'DM Mono',monospace;font-size:0.54rem;color:var(--ink-ghost);margin-left:auto;}
+
+/* ── DAILY CHECKLIST ── */
+.day-hero{margin-bottom:1.3rem;}
+.day-name{font-size:1.6rem;font-weight:600;color:var(--ink);line-height:1;letter-spacing:-0.03em;}
+.day-date{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--ink-dim);margin-top:0.3rem;}
+.day-tally{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--ink-dim);margin-top:0.12rem;}
 .day-tally span{color:var(--rust);font-weight:500;}
 
-.day-banner{display:flex;gap:0.55rem;align-items:flex-start;padding:0.6rem 0.8rem;border-radius:6px;background:rgba(160,82,45,0.07);border:1px solid rgba(160,82,45,0.2);margin-bottom:0.7rem;}
-.db-icon{font-size:0.9rem;flex-shrink:0;margin-top:1px;}
-.db-text{font-size:0.76rem;color:var(--ink-mid);line-height:1.5;}
+.day-banner{display:flex;gap:0.5rem;align-items:flex-start;padding:0.55rem 0.75rem;border-radius:6px;background:rgba(160,82,45,0.07);border:1px solid rgba(160,82,45,0.18);margin-bottom:0.6rem;}
+.db-icon{font-size:0.85rem;flex-shrink:0;margin-top:1px;}
+.db-text{font-size:0.74rem;color:var(--ink-mid);line-height:1.5;}
 .db-text strong{color:var(--rust);}
 
-.chk-group{margin-bottom:1.2rem;}
-.chk-group-label{font-family:'DM Mono',monospace;font-size:0.57rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-dim);padding-bottom:0.38rem;margin-bottom:0.5rem;border-bottom:1px solid var(--border-lt);}
-.chk-item{display:flex;align-items:flex-start;gap:0.65rem;padding:0.32rem 0;cursor:pointer;user-select:none;}
+.chk-group{margin-bottom:1.1rem;}
+.chk-group-label{font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--ink-ghost);padding-bottom:0.35rem;margin-bottom:0.45rem;border-bottom:1px solid var(--border-lt);}
+.chk-item{display:flex;align-items:flex-start;gap:0.6rem;padding:0.28rem 0;cursor:pointer;user-select:none;}
 .chk-item:hover .chk-box{border-color:var(--rust-lt);}
 .chk-box{width:13px;height:13px;border:1.5px solid var(--border);border-radius:3px;flex-shrink:0;margin-top:3px;display:flex;align-items:center;justify-content:center;transition:background .12s,border-color .12s;}
 .chk-item.done .chk-box{background:var(--moss);border-color:var(--moss);}
 .chk-box svg{display:none;}
 .chk-item.done .chk-box svg{display:block;}
-.chk-label{font-size:0.79rem;color:var(--ink);line-height:1.45;}
+.chk-label{font-size:0.78rem;color:var(--ink);line-height:1.45;}
 .chk-item.done .chk-label{color:var(--ink-dim);text-decoration:line-through;text-decoration-color:var(--border);}
-.chk-note{display:block;font-family:'DM Mono',monospace;font-size:0.61rem;color:var(--ink-dim);margin-top:0.08rem;line-height:1.4;}
+.chk-note{display:block;font-family:'DM Mono',monospace;font-size:0.59rem;color:var(--ink-dim);margin-top:0.06rem;line-height:1.4;}
 .chk-item.done .chk-note{text-decoration:none;color:var(--border);}
 
-
-/* ── upcoming event block ── */
-.upcoming-block{margin-top:1.4rem;padding-top:1.2rem;border-top:1px solid var(--border-lt);}
-.upcoming-eyebrow{font-family:'DM Mono',monospace;font-size:0.57rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:0.6rem;}
-.upcoming-card{border:1px solid var(--border);border-radius:7px;padding:0.85rem 1rem;background:var(--surface);}
+/* ── upcoming event ── */
+.upcoming-block{margin-top:1.3rem;padding-top:1.1rem;border-top:1px solid var(--border-lt);}
+.upcoming-eyebrow{font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:0.55rem;}
+.upcoming-card{border:1px solid var(--border);border-radius:7px;padding:0.8rem 0.95rem;background:var(--surface);}
 .upcoming-card.is-now{border-color:rgba(160,82,45,0.35);background:rgba(160,82,45,0.05);}
-.upcoming-name{font-size:0.88rem;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;margin-bottom:0.2rem;}
-.upcoming-date{font-family:'DM Mono',monospace;font-size:0.63rem;color:var(--ink-dim);margin-bottom:0.4rem;}
-.upcoming-desc{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-dim);line-height:1.5;}
+.upcoming-name{font-size:0.86rem;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.18rem;}
+.upcoming-date{font-family:'DM Mono',monospace;font-size:0.61rem;color:var(--ink-dim);margin-bottom:0.35rem;}
+.upcoming-desc{font-family:'DM Mono',monospace;font-size:0.61rem;color:var(--ink-dim);line-height:1.5;}
 .upcoming-card.is-now .upcoming-date{color:var(--rust);}
-/* ── SEASONAL CALENDAR styles ── */
-.cal-now-label{font-family:'DM Mono',monospace;font-size:0.57rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:0.9rem;}
-.cal-month{margin-bottom:1.6rem;}
-.cal-month-head{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--rust);margin-bottom:0.6rem;padding-bottom:0.35rem;border-bottom:1px solid var(--border-lt);}
-.cal-row{display:flex;gap:0.75rem;padding:0.42rem 0;border-bottom:1px solid var(--border-lt);}
+
+/* ── SEASONAL CALENDAR ── */
+.cal-now-label{font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:0.9rem;}
+.cal-month{margin-bottom:1.5rem;}
+.cal-month-head{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--rust);margin-bottom:0.55rem;padding-bottom:0.3rem;border-bottom:1px solid var(--border-lt);}
+.cal-row{display:flex;gap:0.7rem;padding:0.38rem 0;border-bottom:1px solid var(--border-lt);}
 .cal-row:last-child{border-bottom:none;}
-.cal-row.is-now{background:rgba(160,82,45,0.05);border-radius:5px;margin:0 -0.4rem;padding:0.42rem 0.4rem;}
-.cal-date{font-family:'DM Mono',monospace;font-size:0.63rem;color:var(--ink-dim);min-width:58px;flex-shrink:0;padding-top:2px;line-height:1.3;}
-.cal-body{}
-.cal-name{font-size:0.79rem;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;}
-.cal-desc{font-family:'DM Mono',monospace;font-size:0.61rem;color:var(--ink-dim);margin-top:0.1rem;line-height:1.45;}
-.ctag{font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.05em;text-transform:uppercase;padding:0.08rem 0.38rem;border-radius:3px;vertical-align:middle;}
+.cal-row.is-now{background:rgba(160,82,45,0.05);border-radius:4px;margin:0 -0.35rem;padding:0.38rem 0.35rem;}
+.cal-date{font-family:'DM Mono',monospace;font-size:0.61rem;color:var(--ink-dim);min-width:56px;flex-shrink:0;padding-top:2px;line-height:1.3;}
+.cal-name{font-size:0.77rem;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:0.38rem;flex-wrap:wrap;}
+.cal-desc{font-family:'DM Mono',monospace;font-size:0.59rem;color:var(--ink-dim);margin-top:0.08rem;line-height:1.45;}
+.ctag{font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.05em;text-transform:uppercase;padding:0.07rem 0.35rem;border-radius:3px;vertical-align:middle;}
 .ctag-event{background:rgba(160,82,45,0.09);color:var(--rust);border:1px solid rgba(160,82,45,0.22);}
 .ctag-tourney{background:rgba(201,169,110,0.13);color:#7a5c10;border:1px solid rgba(201,169,110,0.32);}
 .ctag-shop{background:rgba(140,123,110,0.1);color:var(--dusk);border:1px solid rgba(140,123,110,0.22);}
 .ctag-weekly{background:rgba(107,124,92,0.1);color:var(--moss);border:1px solid rgba(107,124,92,0.25);}
 
-/* ── TOOLS (right panel) ── */
-.tools-area{padding:2rem 2.5rem;display:flex;flex-direction:column;overflow:hidden;min-height:0;}
-.tools-label{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:1.2rem;}
-.tool-grid{display:grid;grid-template-rows:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;flex:1;min-height:0;}
-.tool-card{background:var(--surface);padding:1.2rem 1.5rem;text-decoration:none;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto 1fr auto;gap:0.2rem 1rem;transition:background .13s;position:relative;overflow:hidden;min-height:0;}
-.tool-card::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--rust);opacity:0;transition:opacity .15s;}
-.tool-card:hover{background:var(--bg2);}
-.tool-card:hover::after{opacity:1;}
-.card-tag{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-dim);grid-column:1;align-self:start;}
-.card-arrow{font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--rust);grid-column:2;grid-row:1/5;align-self:center;opacity:0;transform:translateX(-6px);transition:opacity .15s,transform .15s;}
-.tool-card:hover .card-arrow{opacity:1;transform:translateX(0);}
-.card-title{font-family:'Inter',sans-serif;font-size:1.05rem;font-weight:500;color:var(--ink);grid-column:1;}
-.card-desc{font-size:0.76rem;color:var(--ink-mid);line-height:1.55;grid-column:1;align-self:start;}
-.card-meta{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;grid-column:1;align-self:end;padding-top:0.4rem;}
-.card-pill{font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.05em;text-transform:uppercase;padding:0.15rem 0.45rem;border-radius:99px;border:1px solid var(--border-lt);color:var(--ink-dim);background:var(--bg);}
-.card-prog{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--rust);padding:0.15rem 0.45rem;border-radius:99px;background:rgba(160,82,45,0.08);border:1px solid rgba(160,82,45,0.2);}
+/* ── TOOLS AREA ── */
+.tools-area{
+  padding:0;display:flex;flex-direction:column;overflow:hidden;min-height:0;
+  position:relative;
+}
+.tools-header{
+  padding:1.4rem 2rem 0;display:flex;align-items:baseline;justify-content:space-between;flex-shrink:0;
+}
+.tools-label{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-dim);}
+.tools-count{font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--ink-ghost);}
 
-footer{text-align:center;font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--ink-dim);letter-spacing:0.06em;padding:0.75rem 2rem;border-top:1px solid var(--border);}
+.tool-grid{
+  margin:1.2rem 2rem 0;display:grid;
+  grid-template-rows:repeat(3,1fr);
+  gap:0;border:1px solid var(--border);border-radius:10px;
+  overflow:hidden;flex:1;min-height:0;
+}
+
+/* Cards with big index number */
+.tool-card{
+  background:var(--surface);padding:1.1rem 1.4rem;
+  text-decoration:none;color:inherit;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  grid-template-rows:1fr auto;
+  gap:0 1rem;
+  border-bottom:1px solid var(--border);
+  transition:background .13s;position:relative;overflow:hidden;
+  min-height:0;
+}
+.tool-card:last-child{border-bottom:none;}
+.tool-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(160,82,45,0.06) 0%,transparent 60%);
+  opacity:0;transition:opacity .2s;
+}
+.tool-card:hover{background:var(--bg2);}
+.tool-card:hover::before{opacity:1;}
+
+.card-num{
+  font-family:'DM Mono',monospace;
+  font-size:2.2rem;font-weight:300;
+  color:var(--border);
+  line-height:1;grid-row:1/3;align-self:center;
+  transition:color .2s;width:2.4rem;text-align:left;
+  letter-spacing:-0.03em;
+}
+.tool-card:hover .card-num{color:rgba(160,82,45,0.25);}
+
+.card-main{grid-column:2;grid-row:1;display:flex;flex-direction:column;gap:0.15rem;justify-content:center;}
+.card-tag{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-dim);}
+.card-title{font-size:1rem;font-weight:600;color:var(--ink);letter-spacing:-0.02em;line-height:1.15;}
+.card-desc{font-size:0.73rem;color:var(--ink-mid);line-height:1.5;grid-column:2;grid-row:2;padding-top:0.3rem;align-self:end;}
+
+.card-side{grid-column:3;grid-row:1/3;display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;gap:0.5rem;min-width:70px;}
+.card-arrow{
+  font-family:'DM Mono',monospace;font-size:1rem;color:var(--rust);
+  opacity:0;transform:translateX(-6px);
+  transition:opacity .15s,transform .15s;
+}
+.tool-card:hover .card-arrow{opacity:1;transform:translateX(0);}
+.card-prog{
+  font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--rust);
+  background:rgba(160,82,45,0.08);border:1px solid rgba(160,82,45,0.18);
+  padding:0.13rem 0.42rem;border-radius:3px;white-space:nowrap;
+  text-align:right;
+}
+.card-pills{display:flex;flex-wrap:wrap;gap:0.25rem;justify-content:flex-end;grid-column:2;grid-row:2;padding-top:0.3rem;align-self:end;}
+.card-pill{font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.04em;text-transform:uppercase;padding:0.12rem 0.38rem;border-radius:99px;border:1px solid var(--border-lt);color:var(--ink-ghost);background:transparent;}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
 .tool-card{animation:fadeUp 0.35s ease both;}
@@ -146,18 +256,26 @@ footer{text-align:center;font-family:'DM Mono',monospace;font-size:0.6rem;color:
 .tool-card:nth-child(2){animation-delay:.12s;}
 .tool-card:nth-child(3){animation-delay:.19s;}
 
+/* ── FOOTER ── */
+footer{
+  text-align:center;font-family:'DM Mono',monospace;font-size:0.58rem;
+  color:var(--ink-ghost);letter-spacing:0.05em;padding:0.65rem 2rem;
+  border-top:1px solid var(--border);background:var(--surface);
+}
+
+/* ── MOBILE ── */
 @media(max-width:720px){
   .main-content.visible{display:flex;flex-direction:column;height:auto;max-height:none;overflow:auto;}
   .body-grid{grid-template-columns:1fr;overflow:visible;}
   .sidebar{border-right:none;border-bottom:1px solid var(--border);max-height:480px;}
-  .tools-area{padding:1.5rem;overflow:visible;}
-  .tool-grid{grid-template-rows:none;flex:none;gap:1px;}
+  .tools-area{overflow:visible;}
+  .tool-grid{margin:1rem 1.2rem;grid-template-rows:none;flex:none;}
   .tool-card{min-height:90px;}
+  .tools-header{padding:1.2rem 1.2rem 0;}
 }
 @media(max-width:420px){
-  .top-bar{padding:0.9rem 1.2rem;}
-  .sidebar-panel{padding:1.3rem 1.2rem;}
-  .tools-area{padding:1.2rem;}
+  .top-bar{padding:0 1.2rem;}
+  .sidebar-panel{padding:1.2rem 1.1rem;}
 }
 </style>
 </head>
@@ -166,9 +284,9 @@ footer{text-align:center;font-family:'DM Mono',monospace;font-size:0.6rem;color:
 <!-- AUTH OVERLAY -->
 <div class="auth-overlay" id="authOverlay">
   <div class="auth-box">
-    <div class="auth-wordmark">animal crossing · nh</div>
-    <div class="auth-title">island <em>tools.</em></div>
-    <div class="auth-sub">sign in! or make an account to begin saving data</div>
+    <div class="auth-wordmark">animal crossing · new horizons</div>
+    <div class="auth-title">island <em>tools</em></div>
+    <div class="auth-sub">sign in to sync your progress across sessions</div>
     <div class="auth-tabs">
       <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">sign in</button>
       <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')">create account</button>
@@ -183,13 +301,12 @@ footer{text-align:center;font-family:'DM Mono',monospace;font-size:0.6rem;color:
 <!-- MAIN -->
 <div class="main-content" id="mainContent">
   <div class="top-bar">
-    <div class="site-wordmark">island <strong>tools</strong> · nh</div>
+    <div class="site-wordmark">island <span>tools</span><sub>nh</sub></div>
     <div class="user-email" id="userEmail"></div>
     <button class="btn-logout" onclick="doLogout()">sign out</button>
   </div>
 
   <div class="body-grid">
-    <!-- SIDEBAR: today / calendar -->
     <div class="sidebar">
       <div class="sidebar-tabbar">
         <button class="stab active" id="stab-today" onclick="setSideTab('today')">today</button>
@@ -199,20 +316,20 @@ footer{text-align:center;font-family:'DM Mono',monospace;font-size:0.6rem;color:
       <div class="sidebar-panel" id="panel-calendar"></div>
     </div>
 
-    <!-- TOOLS -->
     <div class="tools-area">
-      <div class="tools-label">tools &amp; trackers</div>
+      <div class="tools-header">
+        <div class="tools-label">tools &amp; trackers</div>
+        <div class="tools-count">3 tools</div>
+      </div>
       <div class="tool-grid" id="toolGrid"></div>
     </div>
   </div>
 
-  <footer>data synced via back4app &nbsp;·&nbsp; made by zahra &nbsp;·&nbsp; made with html · css · js &amp; sparkle dust</footer>
+  <footer>synced via back4app &nbsp;·&nbsp; made by zahra &nbsp;·&nbsp; html · css · js &amp; sparkle dust</footer>
 </div>
 
 <script>
-// ─────────────────────────────────────────────────────────────────────────────
-// AUTH
-// ─────────────────────────────────────────────────────────────────────────────
+// ── AUTH ──
 function switchTab(t){
   document.getElementById('tabLogin').classList.toggle('active',t==='login');
   document.getElementById('tabSignup').classList.toggle('active',t==='signup');
@@ -221,7 +338,6 @@ function switchTab(t){
   document.getElementById('authOverlay').dataset.tab=t;
 }
 document.getElementById('authOverlay').dataset.tab='login';
-
 async function doAuth(){
   const tab=document.getElementById('authOverlay').dataset.tab;
   const email=document.getElementById('authEmail').value.trim();
@@ -246,9 +362,7 @@ async function doLogout(){
 ['authEmail','authPassword'].forEach(id=>
   document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();}));
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SIDEBAR TAB SWITCHER
-// ─────────────────────────────────────────────────────────────────────────────
+// ── SIDEBAR TABS ──
 function setSideTab(t){
   ['today','calendar'].forEach(k=>{
     document.getElementById('stab-'+k).classList.toggle('active',k===t);
@@ -256,22 +370,66 @@ function setSideTab(t){
   });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TOOL CARDS
-// ─────────────────────────────────────────────────────────────────────────────
+// ── TV SCHEDULE (ACNH NH) ──
+const TV_NH={
+  0:[{h:5,s:'test pattern'},{h:6,s:'news'},{h:6.25,s:'weather'},{h:6.5,s:'aerobics'},{h:7,s:'news'},{h:7.75,s:'weather'},{h:8,s:'drama'},{h:8.5,s:'nature'},{h:9,s:'nature'},{h:9.33,s:'nature'},{h:9.5,s:'nature'},{h:10,s:'action'},{h:10.5,s:'action'},{h:11,s:'cooking'},{h:11.5,s:'news'},{h:11.75,s:'weather'},{h:12,s:'comedy'},{h:12.5,s:'comedy'},{h:13,s:'drama'},{h:13.5,s:'talk'},{h:14,s:'comedy'},{h:14.5,s:'comedy'},{h:15,s:'aerobics'},{h:15.5,s:'aerobics'},{h:16,s:'cartoon'},{h:16.5,s:'cartoon'},{h:17,s:'comedy'},{h:17.5,s:'comedy'},{h:18,s:'news'},{h:18.5,s:'weather'},{h:19,s:'comedy'},{h:19.5,s:'comedy'},{h:20,s:'quiz'},{h:20.5,s:'quiz'},{h:21,s:'drama'},{h:21.5,s:'drama'},{h:22,s:'news'},{h:23,s:'comedy'},{h:23.5,s:'comedy'},{h:0,s:'talk'},{h:1,s:'movie'},{h:2,s:'movie'},{h:3,s:'test pattern'},{h:4,s:'static'}],
+  1:[{h:5,s:'test pattern'},{h:6,s:'news'},{h:6.25,s:'weather'},{h:6.5,s:'aerobics'},{h:7,s:'news'},{h:7.75,s:'weather'},{h:8,s:'drama'},{h:8.5,s:'nature'},{h:9,s:'nature'},{h:9.33,s:'nature'},{h:9.5,s:'nature'},{h:10,s:'cartoon'},{h:10.5,s:'cartoon'},{h:11,s:'cooking'},{h:11.5,s:'news'},{h:11.75,s:'weather'},{h:12,s:'comedy'},{h:12.5,s:'comedy'},{h:13,s:'drama'},{h:13.5,s:'talk'},{h:14,s:'nature'},{h:14.5,s:'nature'},{h:15,s:'aerobics'},{h:15.5,s:'aerobics'},{h:16,s:'action'},{h:16.5,s:'cooking'},{h:17,s:'comedy'},{h:17.5,s:'comedy'},{h:18,s:'news'},{h:18.5,s:'weather'},{h:19,s:'tennis'},{h:20,s:'quiz'},{h:21,s:'talk'},{h:21.5,s:'talk'},{h:22,s:'news'},{h:23,s:'nature'},{h:23.5,s:'nature'},{h:0,s:'nature'},{h:1,s:'nature'},{h:2,s:'nature'},{h:3,s:'test pattern'},{h:4,s:'static'}],
+  2:[{h:5,s:'test pattern'},{h:6,s:'news'},{h:6.25,s:'weather'},{h:6.5,s:'aerobics'},{h:7,s:'news'},{h:7.75,s:'weather'},{h:8,s:'drama'},{h:8.5,s:'nature'},{h:9,s:'nature'},{h:9.33,s:'nature'},{h:9.5,s:'nature'},{h:10,s:'action'},{h:10.5,s:'action'},{h:11,s:'cooking'},{h:11.5,s:'news'},{h:11.75,s:'weather'},{h:12,s:'comedy'},{h:12.5,s:'comedy'},{h:13,s:'drama'},{h:13.5,s:'talk'},{h:14,s:'comedy'},{h:14.5,s:'comedy'},{h:15,s:'aerobics'},{h:15.5,s:'aerobics'},{h:16,s:'cartoon'},{h:16.5,s:'cartoon'},{h:17,s:'comedy'},{h:17.5,s:'comedy'},{h:18,s:'news'},{h:18.5,s:'weather'},{h:19,s:'cooking'},{h:19.5,s:'cooking'},{h:20,s:'concert'},{h:20.5,s:'concert'},{h:21,s:'drama'},{h:21.5,s:'drama'},{h:22,s:'news'},{h:23,s:'quiz'},{h:23.5,s:'quiz'},{h:0,s:'comedy'},{h:1,s:'tennis'},{h:2,s:'tennis'},{h:3,s:'test pattern'},{h:4,s:'static'}],
+  3:[{h:5,s:'test pattern'},{h:6,s:'news'},{h:6.25,s:'weather'},{h:6.5,s:'aerobics'},{h:7,s:'news'},{h:7.75,s:'weather'},{h:8,s:'drama'},{h:8.5,s:'nature'},{h:9,s:'nature'},{h:9.33,s:'nature'},{h:9.5,s:'nature'},{h:10,s:'action'},{h:10.5,s:'action'},{h:11,s:'talk'},{h:11.5,s:'news'},{h:11.75,s:'weather'},{h:12,s:'comedy'},{h:12.5,s:'comedy'},{h:13,s:'drama'},{h:13.5,s:'talk'},{h:14,s:'comedy'},{h:14.5,s:'comedy'},{h:15,s:'aerobics'},{h:15.5,s:'aerobics'},{h:16,s:'action'},{h:16.5,s:'action'},{h:17,s:'comedy'},{h:17.5,s:'comedy'},{h:18,s:'news'},{h:18.5,s:'weather'},{h:19,s:'cartoon'},{h:19.5,s:'cartoon'},{h:20,s:'nature'},{h:20.5,s:'nature'},{h:21,s:'drama'},{h:21.5,s:'drama'},{h:22,s:'news'},{h:23,s:'comedy'},{h:23.5,s:'comedy'},{h:0,s:'comedy'},{h:1,s:'nature'},{h:2,s:'nature'},{h:3,s:'test pattern'},{h:4,s:'static'}],
+  4:[{h:5,s:'test pattern'},{h:6,s:'news'},{h:6.25,s:'weather'},{h:6.5,s:'aerobics'},{h:7,s:'news'},{h:7.75,s:'weather'},{h:8,s:'drama'},{h:8.5,s:'nature'},{h:9,s:'nature'},{h:9.33,s:'nature'},{h:9.5,s:'nature'},{h:10,s:'cartoon'},{h:10.5,s:'cartoon'},{h:11,s:'cooking'},{h:11.5,s:'news'},{h:11.75,s:'weather'},{h:12,s:'comedy'},{h:12.5,s:'comedy'},{h:13,s:'drama'},{h:13.5,s:'drama'},{h:14,s:'talk'},{h:14.5,s:'talk'},{h:15,s:'aerobics'},{h:15.5,s:'aerobics'},{h:16,s:'action'},{h:16.5,s:'action'},{h:17,s:'comedy'},{h:17.5,s:'comedy'},{h:18,s:'news'},{h:18.5,s:'weather'},{h:19,s:'tennis'},{h:19.5,s:'tennis'},{h:20,s:'tennis'},{h:21,s:'concert'},{h:21.5,s:'concert'},{h:22,s:'news'},{h:23,s:'quiz'},{h:23.5,s:'quiz'},{h:0,s:'test pattern'},{h:1,s:'static'},{h:2,s:'static'},{h:3,s:'static'},{h:4,s:'static'}],
+  5:[{h:5,s:'test pattern'},{h:6,s:'news'},{h:6.25,s:'weather'},{h:6.5,s:'aerobics'},{h:7,s:'news'},{h:7.75,s:'weather'},{h:8,s:'comedy'},{h:8.5,s:'comedy'},{h:9,s:'nature'},{h:9.5,s:'quiz'},{h:10,s:'action'},{h:10.5,s:'action'},{h:11,s:'news'},{h:11.75,s:'weather'},{h:12,s:'comedy'},{h:12.5,s:'comedy'},{h:13,s:'talk'},{h:14,s:'nature'},{h:14.5,s:'nature'},{h:15,s:'tennis'},{h:15.5,s:'tennis'},{h:16,s:'tennis'},{h:17,s:'comedy'},{h:17.5,s:'comedy'},{h:18,s:'news'},{h:19,s:'quiz'},{h:19.5,s:'quiz'},{h:20,s:'comedy'},{h:21,s:'movie'},{h:21.5,s:'movie'},{h:22,s:'movie'},{h:23,s:'news'},{h:23.5,s:'cooking'},{h:0,s:'concert'},{h:1,s:'movie'},{h:2,s:'movie'},{h:3,s:'test pattern'},{h:4,s:'static'}],
+  6:[{h:5,s:'test pattern'},{h:6,s:'news'},{h:6.25,s:'weather'},{h:6.5,s:'aerobics'},{h:7,s:'action'},{h:7.5,s:'action'},{h:8,s:'cartoon'},{h:8.5,s:'cartoon'},{h:9,s:'nature'},{h:9.5,s:'quiz'},{h:10,s:'comedy'},{h:10.5,s:'comedy'},{h:11,s:'news'},{h:11.75,s:'weather'},{h:12,s:'talk'},{h:12.5,s:'talk'},{h:13,s:'tennis'},{h:14,s:'tennis'},{h:15,s:'quiz'},{h:15.5,s:'quiz'},{h:16,s:'cooking'},{h:16.5,s:'cooking'},{h:17,s:'comedy'},{h:17.5,s:'comedy'},{h:18,s:'cartoon'},{h:18.5,s:'cartoon'},{h:19,s:'tennis'},{h:19.5,s:'tennis'},{h:20,s:'tennis'},{h:21,s:'movie'},{h:21.5,s:'movie'},{h:22,s:'movie'},{h:23,s:'news'},{h:0,s:'test pattern'},{h:1,s:'static'},{h:2,s:'static'},{h:3,s:'test pattern'},{h:4,s:'static'}],
+};
+const TV_EM={news:'📰',weather:'🌤',aerobics:'🏃','test pattern':'📡',static:'📺',drama:'🎭',nature:'🌿',action:'⚡',cartoon:'🐭',cooking:'🍳',talk:'🎙️',comedy:'😄',quiz:'🎮',concert:'🎵',movie:'🎬',tennis:'🎾'};
+function tvEm(s){const k=s.toLowerCase();for(const[n,e]of Object.entries(TV_EM)){if(k.startsWith(n))return e;}return'📺';}
+function tvFmt(h){const i=Math.floor(h),m=Math.round((h%1)*60),p=n=>String(n).padStart(2,'0'),ap=i<12?'am':'pm',h12=i===0?12:i>12?i-12:i;return m===0?`${h12}${ap}`:`${h12}:${p(m)}${ap}`;}
+
+function renderTVBlock(container){
+  const now=new Date();
+  const di=now.getDay()===0?6:now.getDay()-1;
+  const nh=now.getHours()+now.getMinutes()/60;
+  const toC=h=>h<5?h+24:h;
+  const slots=[...TV_NH[di].filter(s=>s.h>=5),...TV_NH[di].filter(s=>s.h<5)];
+  let ni=0;for(let i=0;i<slots.length;i++){if(toC(slots[i].h)<=toC(nh))ni=i;}
+  const cur=slots[ni],nxt=slots[(ni+1)%slots.length];
+  const el=document.createElement('div');
+  el.className='tv-block';
+  el.innerHTML=`
+    <div class="tv-block-head">
+      <div class="tv-live-badge">
+        <span class="tv-live-dot"></span>
+        live · on tv now
+      </div>
+      <a class="tv-block-link" href="tv-schedule.html">full schedule →</a>
+    </div>
+    <div class="tv-block-body">
+      <div class="tv-now-row">
+        <span class="tv-emoji">${tvEm(cur.s)}</span>
+        <span class="tv-show">${cur.s}</span>
+        <span class="tv-time">${tvFmt(cur.h)}</span>
+      </div>
+      <div class="tv-next-row">
+        <span class="tv-next-label">up next</span>
+        <span class="tv-next-show">${tvEm(nxt.s)} ${nxt.s}</span>
+        <span class="tv-next-time">${tvFmt(nxt.h)}</span>
+      </div>
+    </div>`;
+  container.prepend(el);
+}
+
+// ── TOOL CARDS ──
 const TOOLS=[
   {href:'turnip-tracker.html',tag:'economy',title:'turnip tracker',
-    desc:'Log weekly stalk market prices, view all-time archive, and spot sell patterns.',
-    pills:['weekly archive','pattern analysis','profit %'],progress:null},
+    desc:'Log stalk market prices, spot sell patterns, browse all-time archive.',
+    pills:['weekly archive','patterns','profit %'],progress:null},
   {href:'museum-tracker.html',tag:'collection',title:'museum tracker',
-    desc:'Track every fish, bug, sea creature, fossil, and artwork donated to Blathers.',
+    desc:'Track every fish, bug, sea creature, fossil, and artwork for Blathers.',
     pills:['fish','bugs','sea','fossils','art'],
     progress:async()=>{
       const u=Parse.User.current();if(!u)return null;
       try{
         const q=new Parse.Query('MuseumData');q.equalTo('user',u);const r=await q.first();
-        const T={fish:80,bugs:80,sea:40,fossils:73,art:43};
-        const TOTAL=Object.values(T).reduce((a,b)=>a+b,0);
+        const TOTAL=80+80+40+73+43;
         if(!r)return{done:0,total:TOTAL};
         const all=r.get('collected')||{};let done=0;
         ['fish','bugs','sea','fossils','art'].forEach(k=>{done+=(all[k]||[]).length;});
@@ -279,7 +437,7 @@ const TOOLS=[
       }catch{return null;}
     }},
   {href:'kk-tracker.html',tag:'music',title:'k.k. slider songs',
-    desc:"Track which vinyls you've collected. Flags secret request songs.",
+    desc:"Track your vinyl collection. Flags secret request-only songs.",
     pills:['107 songs','secret requests','by genre'],
     progress:async()=>{
       const u=Parse.User.current();if(!u)return null;
@@ -296,9 +454,14 @@ async function buildGrid(){
   TOOLS.forEach((tool,i)=>{
     const a=document.createElement('a');a.className='tool-card';a.href=tool.href;a.id='tc'+i;
     const ps=tool.progress?`<span class="card-prog" id="prog-${i}" style="opacity:0.4">&hellip;</span>`:'';
-    a.innerHTML=`<div class="card-tag">${tool.tag}</div><div class="card-arrow">&#8594;</div>`
-      +`<div class="card-title">${tool.title}</div><div class="card-desc">${tool.desc}</div>`
-      +`<div class="card-meta">${tool.pills.map(p=>`<span class="card-pill">${p}</span>`).join('')}${ps}</div>`;
+    a.innerHTML=`
+      <div class="card-num">0${i+1}</div>
+      <div class="card-main">
+        <div class="card-tag">${tool.tag}</div>
+        <div class="card-title">${tool.title}</div>
+      </div>
+      <div class="card-side"><div class="card-arrow">→</div>${ps}</div>
+      <div class="card-desc">${tool.desc}</div>`;
     grid.appendChild(a);
   });
   TOOLS.forEach(async(tool,i)=>{
@@ -311,100 +474,53 @@ async function buildGrid(){
   });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DAILY CHECKLIST
-// ─────────────────────────────────────────────────────────────────────────────
-// days: 0=Sun 1=Mon 2=Tue 3=Wed 4=Thu 5=Fri 6=Sat  (undefined = every day)
-// months: 0=Jan … 11=Dec  (undefined = every month)
-const TASKS = [
-  // ── every day ──
-  {id:'fossils',   group:'island',     days:null,
-    text:'Dig up all 4 fossils & take to Blathers',
-    note:'Star-shaped cracks in the ground — donate new ones, sell duplicates'},
-  {id:'moneyrock', group:'island',     days:null,
-    text:'Find and hit the money rock 8 times',
-    note:'Dig 2 holes behind you first so you don\'t bounce back — max = ~16,400 bells'},
-  {id:'glowspot',  group:'island',     days:null,
-    text:'Dig up the glowing bell spot',
-    note:'Bury up to 10,000 bells to grow a money tree (guaranteed 3× harvest)'},
-  {id:'bottle',    group:'island',     days:null,
-    text:'Pick up the DIY recipe bottle on the beach',
-    note:'One washes up each day — check early AM and again after 4pm for a second'},
-  {id:'nookshop',  group:'shops',      days:null,
-    text:'Order a K.K. song from Nook Shopping',
-    note:'Only place to buy K.K. vinyls — 1 new one available per day in the app'},
-
-  // ── sunday only ──
-  {id:'daisy',     group:'sunday',     days:[0],
-    text:'Buy turnips from Daisy Mae before noon',
-    note:'She arrives at 5am and leaves at 12pm exactly — prices vary weekly, 90–110 bells is a good buy'},
-  {id:'fireworks', group:'sunday',     days:[0], months:[7],
-    text:'Watch the fireworks show tonight',
-    note:'August only — Redd has a raffle at the plaza, Isabelle gives a new bopper hat each week'},
-
-  // ── saturday only ──
-  {id:'kkreq',     group:'saturday',   days:[6],
-    text:'Request a song from K.K. Slider at 6pm+',
-    note:'Say the exact song title to receive the vinyl — any time after 6pm counts'},
-
-  // ── monday ──
-  {id:'daisy',group:'monday',     days:[1],
-    text:'Get free turnips',
-    note:'Happy home paradise, daisy mae\'s grandmother hands out free turnips to celebrate the start of the week'},
+// ── DAILY CHECKLIST ──
+const TASKS=[
+  {id:'fossils',   group:'island',   days:null, text:'Dig up all 4 fossils & take to Blathers', note:'Star-shaped cracks in the ground — donate new ones, sell duplicates'},
+  {id:'moneyrock', group:'island',   days:null, text:'Find and hit the money rock 8 times', note:'Dig 2 holes behind you first so you don\'t bounce back — max ~16,400 bells'},
+  {id:'glowspot',  group:'island',   days:null, text:'Dig up the glowing bell spot', note:'Bury up to 10,000 bells to grow a money tree (guaranteed 3× harvest)'},
+  {id:'bottle',    group:'island',   days:null, text:'Pick up the DIY recipe bottle on the beach', note:'One washes up each day — check early AM and again after 4pm for a second'},
+  {id:'nookshop',  group:'shops',    days:null, text:'Order a K.K. song from Nook Shopping', note:'Only place to buy K.K. vinyls — 1 new one available per day in the app'},
+  {id:'daisy',     group:'sunday',   days:[0],  text:'Buy turnips from Daisy Mae before noon', note:'She arrives at 5am and leaves at 12pm exactly — 90–110 bells is a good buy'},
+  {id:'fireworks', group:'sunday',   days:[0],  months:[7], text:'Watch the fireworks show tonight', note:'August only — Redd has a raffle, Isabelle gives a new bopper hat each week'},
+  {id:'kkreq',     group:'saturday', days:[6],  text:'Request a song from K.K. Slider at 6pm+', note:'Say the exact song title to receive the vinyl — any time after 6pm counts'},
+  {id:'daisy2',    group:'monday',   days:[1],  text:'Get free turnips', note:'Daisy Mae\'s grandmother hands out free turnips to celebrate the start of the week'},
 ];
-
-const SVG = '<svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const DAY_NAMES = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
-const DAY_NAMES_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-const MON_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-function todayKey(){
-  const d=new Date();
-  return `acnh_daily_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;
-}
+const SVG='<svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const DAY_NAMES=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+const MON_NAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function todayKey(){const d=new Date();return`acnh_daily_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;}
 function loadChecked(){try{return JSON.parse(localStorage.getItem(todayKey())||'[]');}catch{return[];}}
 function saveChecked(arr){localStorage.setItem(todayKey(),JSON.stringify(arr));}
 
 function renderToday(){
   const now=new Date(), dow=now.getDay(), mo=now.getMonth();
   const checked=loadChecked();
-
   const todayTasks=TASKS.filter(t=>{
-    if(t.days && !t.days.includes(dow)) return false;
-    if(t.months && !t.months.includes(mo)) return false;
+    if(t.days&&!t.days.includes(dow))return false;
+    if(t.months&&!t.months.includes(mo))return false;
     return true;
   });
-
   const done=todayTasks.filter(t=>checked.includes(t.id)).length;
   const total=todayTasks.length;
-
-  // special banners
   const banners=[];
-  if(dow===0 && mo!==7) banners.push({icon:'🌿',text:'<strong>Daisy Mae</strong> is visiting until noon — buy turnips before 12pm!'});
-  if(dow===0 && mo===7) banners.push({icon:'🎆',text:'<strong>Fireworks Sunday</strong> + <strong>Daisy Mae</strong> until noon. Redd has a raffle tonight and Isabelle is handing out bopper hats.'});
-  if(dow===6) banners.push({icon:'🎸',text:'<strong>K.K. Slider</strong> performs from 6pm. Request any song by exact title to receive the vinyl.'});
-
-  // group tasks preserving source order within each group
-  const groupOrder=[], groupMap={};
+  if(dow===0&&mo!==7)banners.push({icon:'🌿',text:'<strong>Daisy Mae</strong> is visiting until noon — buy turnips before 12pm!'});
+  if(dow===0&&mo===7)banners.push({icon:'🎆',text:'<strong>Fireworks Sunday</strong> + <strong>Daisy Mae</strong> until noon. Redd\'s raffle tonight.'});
+  if(dow===6)banners.push({icon:'🎸',text:'<strong>K.K. Slider</strong> performs from 6pm. Request any song by exact title.'});
+  const groupOrder=[],groupMap={};
   todayTasks.forEach(t=>{
     if(!groupMap[t.group]){groupMap[t.group]=[];groupOrder.push(t.group);}
     groupMap[t.group].push(t);
   });
-
   let html=`<div class="day-hero">
     <div class="day-name">${DAY_NAMES[dow]}</div>
     <div class="day-date">${MON_NAMES[mo]} ${now.getDate()}, ${now.getFullYear()}</div>
-    <div class="day-tally"><span>${done}</span> / ${total} done &nbsp;&middot;&nbsp; resets at midnight</div>
+    <div class="day-tally"><span>${done}</span> / ${total} done &nbsp;·&nbsp; resets at midnight</div>
   </div>`;
-
-  banners.forEach(b=>{
-    html+=`<div class="day-banner"><div class="db-icon">${b.icon}</div><div class="db-text">${b.text}</div></div>`;
-  });
-
+  banners.forEach(b=>{html+=`<div class="day-banner"><div class="db-icon">${b.icon}</div><div class="db-text">${b.text}</div></div>`;});
   groupOrder.forEach(group=>{
-    const tasks=groupMap[group];
     html+=`<div class="chk-group"><div class="chk-group-label">${group}</div>`;
-    tasks.forEach(t=>{
+    groupMap[group].forEach(t=>{
       const isDone=checked.includes(t.id);
       html+=`<div class="chk-item${isDone?' done':''}" onclick="toggleTask('${t.id}')">
         <div class="chk-box">${SVG}</div>
@@ -413,94 +529,65 @@ function renderToday(){
     });
     html+='</div>';
   });
-
   const panelEl=document.getElementById('panel-today');
   panelEl.innerHTML=html;
+  renderTVBlock(panelEl);
   renderUpcoming(panelEl);
 }
 
 function toggleTask(id){
-  const arr=loadChecked(), pos=arr.indexOf(id);
-  if(pos>=0) arr.splice(pos,1); else arr.push(id);
-  saveChecked(arr);
-  renderToday();
+  const arr=loadChecked(),pos=arr.indexOf(id);
+  if(pos>=0)arr.splice(pos,1);else arr.push(id);
+  saveChecked(arr);renderToday();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SEASONAL CALENDAR
-// ─────────────────────────────────────────────────────────────────────────────
+// ── SEASONAL CALENDAR ──
 const EVENTS=[
-  // Jan
-  {mo:0,  d:'Jan 1',        tag:'event',   name:"New Year's Day",          desc:"Villagers gather outside. Zodiac figurine + Kadomatsu in Nook Shopping."},
-  {mo:0,  d:'Jan 11',       tag:'tourney', name:'Fishing Tourney',          desc:"C.J. hosts 9am–6pm. Catch fish for points, redeem for prizes & trophies."},
-  {mo:0,  d:'Jan 25–Feb 3', tag:'shop',    name:'Setsubun items',           desc:"Bean-Tossing Kit available in Nook Shopping."},
-  // Feb
-  {mo:1,  d:'Feb 1–14',     tag:'shop',    name:"Valentine's Day items",    desc:"Chocolate Heart & Heart Bouquet in Nook Shopping."},
-  {mo:1,  d:'Feb ~28',      tag:'event',   name:'Festivale',                desc:"Pavé visits. Collect rainbow feathers from villagers, trade for Festivale furniture. Date follows Carnival — check in-game."},
-  // Mar
-  {mo:2,  d:'Mar 10–17',    tag:'shop',    name:'Shamrock Day items',       desc:"Shamrock Rug, Shamrock Soda available in Nook Shopping."},
-  // Apr
-  {mo:3,  d:'Apr ~Easter',  tag:'event',   name:'Bunny Day',                desc:"Zipper T. Bunny visits. Collect 6 egg types around island. Date follows Easter — check in-game."},
-  {mo:3,  d:'Apr 12',       tag:'tourney', name:'Fishing Tourney',          desc:"C.J. hosts 9am–6pm."},
-  {mo:3,  d:'Apr 15–22',    tag:'shop',    name:'Nature Day items',         desc:"Cool Globe available in Nook Shopping."},
-  {mo:3,  d:'Apr 29–May 7', tag:'event',   name:'May Day',                  desc:"Get a May Day ticket from Tom Nook. Fly to the maze island, meet Rover for his briefcase or photo."},
-  // May
-  {mo:4,  d:'May 1–31',     tag:'shop',    name:"Mother's Day items",       desc:"Thank-You Mom Mug & Carnations in Nook Shopping."},
-  // Jun
-  {mo:5,  d:'Jun 1–30',     tag:'event',   name:'Wedding Season',           desc:"Visit Harv's island. Take photos for Cyrus & Reese to earn Heart Crystals once per day."},
-  {mo:5,  d:'Jun 28',       tag:'tourney', name:'Bug-Off',                  desc:"Flick hosts 9am–6pm. Catch bugs for points, redeem for Bug-Off trophies."},
-  // Jul
-  {mo:6,  d:'Jul 12',       tag:'tourney', name:'Fishing Tourney',          desc:"C.J. hosts 9am–6pm."},
-  {mo:6,  d:'Jul 26',       tag:'tourney', name:'Bug-Off',                  desc:"Flick hosts 9am–6pm."},
-  // Aug
-  {mo:7,  d:'Every Sunday', tag:'weekly',  name:'Fireworks Sundays',        desc:"All of August. Redd's raffle at the plaza. Isabelle gives a different bopper hat each week (4 total)."},
-  {mo:7,  d:'Aug 23',       tag:'tourney', name:'Bug-Off',                  desc:"Flick hosts 9am–6pm."},
-  // Sep
-  {mo:8,  d:'Sep 27',       tag:'tourney', name:'Bug-Off',                  desc:"Flick hosts 9am–6pm — last Bug-Off of the year."},
-  // Oct
-  {mo:9,  d:'Oct 11',       tag:'tourney', name:'Fishing Tourney',          desc:"C.J. hosts 9am–6pm — last Fishing Tourney of the year."},
-  {mo:9,  d:'Oct 1–31',     tag:'shop',    name:'Halloween prep items',     desc:"Spooky Series furniture & candy in Nook Shopping all month."},
-  {mo:9,  d:'Oct 31',       tag:'event',   name:'Halloween',                desc:"Jack visits the plaza at night. Collect Candy & Lollipops from villagers, trade for Spooky furniture & reactions."},
-  // Nov
-  {mo:10, d:'Nov 1–30',     tag:'shop',    name:'Mushroom season',          desc:"Shake trees to find mushroom furniture. Rare, round, and flat mushrooms for DIY recipes."},
-  // Dec
-  {mo:11, d:'Dec 1–24',     tag:'shop',    name:'Festive DIY season',       desc:"Shake cedar trees daily for ornaments — crafting material for seasonal DIY recipes."},
-  {mo:11, d:'Dec 24',       tag:'event',   name:'Toy Day',                  desc:"Jingle the reindeer visits. Give wrapped presents to all your villagers for Toy Day furniture."},
-  {mo:11, d:'Dec 31',       tag:'event',   name:"New Year's Eve",           desc:"Isabelle & Tom Nook appear outside Resident Services. Midnight fireworks countdown with villagers."},
+  {mo:0,d:'Jan 1',tag:'event',name:"New Year's Day",desc:"Villagers gather outside. Zodiac figurine + Kadomatsu in Nook Shopping."},
+  {mo:0,d:'Jan 11',tag:'tourney',name:'Fishing Tourney',desc:"C.J. hosts 9am–6pm. Catch fish for points, redeem for prizes & trophies."},
+  {mo:0,d:'Jan 25–Feb 3',tag:'shop',name:'Setsubun items',desc:"Bean-Tossing Kit available in Nook Shopping."},
+  {mo:1,d:'Feb 1–14',tag:'shop',name:"Valentine's Day items",desc:"Chocolate Heart & Heart Bouquet in Nook Shopping."},
+  {mo:1,d:'Feb ~28',tag:'event',name:'Festivale',desc:"Pavé visits. Collect rainbow feathers, trade for Festivale furniture."},
+  {mo:2,d:'Mar 10–17',tag:'shop',name:'Shamrock Day items',desc:"Shamrock Rug, Shamrock Soda available in Nook Shopping."},
+  {mo:3,d:'Apr ~Easter',tag:'event',name:'Bunny Day',desc:"Zipper T. Bunny visits. Collect 6 egg types around island."},
+  {mo:3,d:'Apr 12',tag:'tourney',name:'Fishing Tourney',desc:"C.J. hosts 9am–6pm."},
+  {mo:3,d:'Apr 15–22',tag:'shop',name:'Nature Day items',desc:"Cool Globe available in Nook Shopping."},
+  {mo:3,d:'Apr 29–May 7',tag:'event',name:'May Day',desc:"Get a May Day ticket from Tom Nook. Fly to the maze island, meet Rover."},
+  {mo:4,d:'May 1–31',tag:'shop',name:"Mother's Day items",desc:"Thank-You Mom Mug & Carnations in Nook Shopping."},
+  {mo:5,d:'Jun 1–30',tag:'event',name:'Wedding Season',desc:"Visit Harv's island. Earn Heart Crystals once per day."},
+  {mo:5,d:'Jun 28',tag:'tourney',name:'Bug-Off',desc:"Flick hosts 9am–6pm. Catch bugs for points."},
+  {mo:6,d:'Jul 12',tag:'tourney',name:'Fishing Tourney',desc:"C.J. hosts 9am–6pm."},
+  {mo:6,d:'Jul 26',tag:'tourney',name:'Bug-Off',desc:"Flick hosts 9am–6pm."},
+  {mo:7,d:'Every Sunday',tag:'weekly',name:'Fireworks Sundays',desc:"All of August. Redd's raffle at the plaza. Isabelle gives a new bopper hat each week."},
+  {mo:7,d:'Aug 23',tag:'tourney',name:'Bug-Off',desc:"Flick hosts 9am–6pm."},
+  {mo:8,d:'Sep 27',tag:'tourney',name:'Bug-Off',desc:"Flick hosts 9am–6pm — last Bug-Off of the year."},
+  {mo:9,d:'Oct 11',tag:'tourney',name:'Fishing Tourney',desc:"C.J. hosts 9am–6pm — last of the year."},
+  {mo:9,d:'Oct 1–31',tag:'shop',name:'Halloween prep items',desc:"Spooky Series furniture & candy in Nook Shopping all month."},
+  {mo:9,d:'Oct 31',tag:'event',name:'Halloween',desc:"Jack visits the plaza at night. Collect Candy & Lollipops, trade for Spooky items."},
+  {mo:10,d:'Nov 1–30',tag:'shop',name:'Mushroom season',desc:"Shake trees to find mushroom furniture."},
+  {mo:11,d:'Dec 1–24',tag:'shop',name:'Festive DIY season',desc:"Shake cedar trees daily for ornaments."},
+  {mo:11,d:'Dec 24',tag:'event',name:'Toy Day',desc:"Jingle the reindeer visits. Give wrapped presents to all villagers."},
+  {mo:11,d:'Dec 31',tag:'event',name:"New Year's Eve",desc:"Isabelle & Tom Nook appear outside. Midnight fireworks countdown."},
 ];
-
 const MONTH_NAMES_FULL=['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-
 function getUpcomingEvent(){
-  const now=new Date(), mo=now.getMonth(), day=now.getDate();
-  // Parse a rough month+day from the event date string to find next/current
-  // We store month index on each event already — find soonest one
-  // Strategy: find events in current month with day >= today, then next months
-  // For events with date ranges like "Oct 1–31" or fixed like "Oct 31"
-  // We'll do a simple pass: current month first, then wrap
+  const now=new Date(),mo=now.getMonth();
   const order=[...Array(12)].map((_,i)=>(mo+i)%12);
   for(const m of order){
-    const evs=EVENTS.filter(e=>e.mo===m && (e.tag==='event'||e.tag==='tourney'||e.tag==='weekly'));
-    if(!evs.length) continue;
-    // if same month, prefer ones that haven't fully passed
-    // just return the first event in the month (they're ordered)
-    const ev=evs[0];
-    const isNow=(m===mo);
-    return{ev, isNow};
+    const evs=EVENTS.filter(e=>e.mo===m&&(e.tag==='event'||e.tag==='tourney'||e.tag==='weekly'));
+    if(!evs.length)continue;
+    return{ev:evs[0],isNow:(m===mo)};
   }
   return null;
 }
-
 function renderUpcoming(panelEl){
-  const result=getUpcomingEvent();
-  if(!result) return;
-  const {ev, isNow}=result;
-  const eyebrow=isNow?'happening now / soon':'coming up next';
+  const result=getUpcomingEvent();if(!result)return;
+  const{ev,isNow}=result;
   const tagHtml=`<span class="ctag ctag-${ev.tag}">${ev.tag}</span>`;
   panelEl.insertAdjacentHTML('beforeend',`
     <div class="upcoming-block">
-      <div class="upcoming-eyebrow">${eyebrow}</div>
+      <div class="upcoming-eyebrow">${isNow?'happening now / soon':'coming up next'}</div>
       <div class="upcoming-card${isNow?' is-now':''}">
         <div class="upcoming-name">${tagHtml}${ev.name}</div>
         <div class="upcoming-date">${ev.d}</div>
@@ -509,35 +596,24 @@ function renderUpcoming(panelEl){
     </div>`);
 }
 function renderCalendar(){
-  const now=new Date(), curMo=now.getMonth();
-  // show current month first, wrap around full year
+  const now=new Date(),curMo=now.getMonth();
   const order=[...Array(12)].map((_,i)=>(curMo+i)%12);
-
   let html=`<div class="cal-now-label">starting from ${MONTH_NAMES_FULL[curMo].toLowerCase()}</div>`;
-
   order.forEach(mo=>{
-    const evs=EVENTS.filter(e=>e.mo===mo);
-    if(!evs.length) return;
-    const isThisMo=(mo===curMo);
+    const evs=EVENTS.filter(e=>e.mo===mo);if(!evs.length)return;
     html+=`<div class="cal-month"><div class="cal-month-head">${MONTH_NAMES_FULL[mo]}</div>`;
     evs.forEach(e=>{
-      html+=`<div class="cal-row${isThisMo?' is-now':''}">
+      html+=`<div class="cal-row${mo===curMo?' is-now':''}">
         <div class="cal-date">${e.d}</div>
-        <div class="cal-body">
-          <div class="cal-name"><span class="ctag ctag-${e.tag}">${e.tag}</span>${e.name}</div>
-          <div class="cal-desc">${e.desc}</div>
-        </div>
+        <div class="cal-body"><div class="cal-name"><span class="ctag ctag-${e.tag}">${e.tag}</span>${e.name}</div><div class="cal-desc">${e.desc}</div></div>
       </div>`;
     });
     html+='</div>';
   });
-
   document.getElementById('panel-calendar').innerHTML=html;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────────────────────────────────────────
+// ── INIT ──
 async function showMain(){
   document.getElementById('authOverlay').style.display='none';
   document.getElementById('mainContent').classList.add('visible');
@@ -547,11 +623,7 @@ async function showMain(){
   renderCalendar();
   await buildGrid();
 }
-
-(async()=>{
-  const u=Parse.User.current();
-  if(u) await showMain();
-})();
+(async()=>{const u=Parse.User.current();if(u)await showMain();})();
 </script>
 </body>
 </html>

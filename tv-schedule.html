@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>tv schedule · island tools</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#f0ebe3;--bg2:#e8e1d6;--surface:#ede6da;--border:#c9bfb0;--border-lt:#d9d1c4;
+  --rust:#a0522d;--rust-lt:#c47a4a;--moss:#6b7c5c;--clay:#b5714e;--wheat:#c9a96e;
+  --dusk:#8c7b6e;--ink:#3b3028;--ink-mid:#6b5c50;--ink-dim:#9e8f83;--ink-ghost:#c5b8ad;
+  --glow:rgba(160,82,45,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth}
+body{
+  font-family:'DM Mono',monospace;
+  background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:5rem;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* ── HEADER ── */
+.header{max-width:820px;margin:0 auto;padding:2.8rem 2rem 0}
+.header-top{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;
+  padding-bottom:2rem;border-bottom:1px solid var(--border);
+}
+.eyebrow{
+  font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--ink-dim);margin-bottom:0.55rem;
+  display:flex;align-items:center;gap:0.55rem;
+}
+.eyebrow::before{content:'';display:inline-block;width:20px;height:1px;background:var(--ink-ghost)}
+.page-title{
+  font-family:'Inter',sans-serif;font-size:2.1rem;font-weight:400;color:var(--ink);
+  line-height:1.1;letter-spacing:-0.015em;
+}
+.page-title em{color:var(--rust)}
+.back-link{
+  font-size:0.64rem;letter-spacing:0.06em;color:var(--ink-dim);text-decoration:none;
+  border:1px solid var(--border);padding:0.38rem 0.8rem;border-radius:4px;
+  transition:all .15s;white-space:nowrap;margin-top:0.3rem;align-self:flex-start;
+  display:inline-flex;align-items:center;gap:0.4rem;
+}
+.back-link:hover{color:var(--rust);border-color:rgba(160,82,45,0.35);background:rgba(160,82,45,0.04)}
+
+/* ── STICKY DAY NAV ── */
+.day-nav-wrap{
+  position:sticky;top:0;z-index:20;
+  background:var(--bg);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  border-bottom:1px solid var(--border);
+}
+.day-nav{
+  max-width:820px;margin:0 auto;padding:0 2rem;
+  display:flex;overflow-x:auto;scrollbar-width:none;
+}
+.day-nav::-webkit-scrollbar{display:none}
+.day-btn{
+  font-family:'DM Mono',monospace;font-size:0.67rem;letter-spacing:0.09em;
+  text-transform:uppercase;color:var(--ink-dim);background:none;border:none;
+  border-bottom:2px solid transparent;padding:0.82rem 1.1rem 0.92rem;
+  cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s;
+  position:relative;top:1px;
+}
+.day-btn:hover{color:var(--ink-mid)}
+.day-btn.active{color:var(--rust);border-bottom-color:var(--rust)}
+.today-dot{
+  display:none;width:4px;height:4px;border-radius:50%;
+  background:var(--wheat);margin-left:5px;vertical-align:middle;margin-bottom:1px;
+}
+.is-today .today-dot{display:inline-block}
+
+/* ── WRAP ── */
+.main{max-width:820px;margin:0 auto;padding:2rem}
+
+/* ── NOW BANNER ── */
+.now-banner{
+  display:grid;grid-template-columns:1fr auto;gap:0.6rem 1.2rem;
+  padding:1.2rem 1.5rem;margin-bottom:2.5rem;border-radius:10px;
+  background:linear-gradient(135deg,rgba(160,82,45,0.08) 0%,rgba(197,161,110,0.06) 100%);
+  border:1px solid rgba(160,82,45,0.25);
+  box-shadow:0 2px 18px var(--glow);
+  animation:fadeUp .4s ease both;
+}
+.now-banner.hidden{display:none}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.now-top{display:flex;align-items:center;gap:0.85rem;grid-column:1}
+.now-badge{
+  font-size:0.53rem;letter-spacing:0.13em;text-transform:uppercase;
+  background:var(--rust);color:#f5ede4;padding:0.22rem 0.62rem;border-radius:3px;flex-shrink:0;
+}
+.now-emoji{font-size:1.7rem;line-height:1}
+.now-name{
+  font-family:'Inter',sans-serif;font-size:1.18rem;font-weight:600;
+  color:var(--rust);
+}
+.now-time{
+  font-size:0.62rem;color:var(--ink-dim);text-align:right;grid-column:2;align-self:center;
+  line-height:1.8;
+}
+.now-time strong{display:block;font-size:0.82rem;color:var(--ink-mid);font-weight:500}
+.now-next{
+  grid-column:1/-1;display:flex;align-items:center;gap:0.55rem;flex-wrap:wrap;
+  padding-top:0.7rem;border-top:1px solid var(--border-lt);
+  font-size:0.62rem;color:var(--ink-dim);
+}
+.now-next-eyebrow{
+  font-size:0.54rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-ghost);
+}
+.now-next-show{color:var(--ink-mid)}
+
+/* ── SCHEDULE ── */
+.schedule{display:flex;flex-direction:column}
+
+.hour-header{
+  display:flex;align-items:center;gap:0.8rem;
+  padding:1.6rem 0 0.6rem;
+}
+.hour-header:first-child{padding-top:0}
+.hour-label{
+  font-family:'Inter',sans-serif;font-size:1rem;font-weight:400;
+  color:var(--ink-dim);min-width:68px;letter-spacing:-0.01em;flex-shrink:0;
+}
+.hour-rule{flex:1;height:1px;background:linear-gradient(to right,var(--border-lt),transparent)}
+
+/* Slot row */
+.slot{
+  display:grid;grid-template-columns:68px 1fr;gap:0 0.85rem;
+  padding:0.5rem 0.5rem 0.5rem 0;border-radius:7px;
+  transition:background .13s;
+}
+.slot:hover{background:rgba(160,82,45,0.04)}
+.slot.is-now{
+  background:linear-gradient(135deg,rgba(160,82,45,0.08) 0%,rgba(197,161,110,0.04) 100%);
+  border-radius:8px;margin:0 -0.6rem;padding:0.75rem 0.6rem;
+  border:1px solid rgba(160,82,45,0.18);
+  box-shadow:0 1px 8px var(--glow);
+}
+.slot.is-past{opacity:0.4}
+.slot.is-next{opacity:0.72}
+
+.slot-time{
+  font-size:0.65rem;color:var(--ink-dim);padding-top:4px;
+  letter-spacing:0.02em;line-height:1.35;text-align:right;
+  padding-right:0.6rem;border-right:1px solid var(--border-lt);
+}
+.slot.is-now .slot-time{color:var(--rust-lt);border-color:rgba(160,82,45,0.3)}
+.slot.is-next .slot-time{color:var(--ink-mid)}
+
+.slot-body{padding-left:0.1rem}
+.slot-show{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap}
+.slot-emoji{font-size:1rem;line-height:1;flex-shrink:0}
+.slot-name{
+  font-family:'Inter',sans-serif;font-size:0.9rem;font-weight:400;color:var(--ink);
+  text-transform:capitalize;
+}
+.slot.is-now .slot-name{color:var(--rust);font-weight:600}
+.slot.is-next .slot-name{color:var(--ink-mid)}
+.slot.is-past .slot-name{color:var(--ink-dim)}
+.badge{
+  font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;
+  padding:0.12rem 0.42rem;border-radius:3px;flex-shrink:0;
+}
+.badge-now{background:var(--rust);color:#f5ede4}
+.badge-next{background:var(--bg2);color:var(--ink-dim);border:1px solid var(--border)}
+
+.slot-cms{
+  display:flex;flex-wrap:wrap;gap:0.28rem;margin-top:0.28rem;
+  padding-left:1.5rem;
+}
+.cm-chip{
+  font-size:0.56rem;letter-spacing:0.02em;
+  color:var(--ink-ghost);background:var(--bg2);
+  border:1px solid var(--border-lt);
+  padding:0.1rem 0.45rem 0.1rem 0.35rem;border-radius:99px;
+  display:flex;align-items:center;gap:0.28rem;
+}
+.cm-chip-t{color:var(--wheat);font-size:0.52rem}
+
+/* ── LEGEND ── */
+.legend{
+  margin-top:3rem;padding:1.3rem 1.5rem;
+  border:1px solid var(--border-lt);border-radius:10px;
+  background:var(--surface);
+}
+.legend-title{
+  font-size:0.57rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--ink-dim);margin-bottom:0.9rem;
+}
+.legend-items{display:flex;flex-wrap:wrap;gap:0.5rem 2rem}
+.legend-item{font-size:0.63rem;color:var(--ink-dim);display:flex;align-items:center;gap:0.35rem}
+
+footer{
+  text-align:center;font-family:'DM Mono',monospace;font-size:0.62rem;
+  color:var(--ink-dim);letter-spacing:0.05em;padding:2rem;
+  max-width:820px;margin:0 auto;border-top:1px solid var(--border);
+}
+footer a{color:var(--rust);text-decoration:none}
+
+@media(max-width:560px){
+  .header,.main{padding-left:1rem;padding-right:1rem}
+  .day-nav{padding:0 1rem}
+  .page-title{font-size:1.7rem}
+  .slot-time{font-size:0.6rem}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="eyebrow">island tools · nh</div>
+      <div class="page-title">tv <em>schedule.</em></div>
+    </div>
+    <a class="back-link" href="index.html">← home</a>
+  </div>
+</div>
+
+<div class="day-nav-wrap">
+  <nav class="day-nav" id="dayNav"></nav>
+</div>
+
+<div class="main">
+  <div id="nowBanner" class="now-banner hidden"></div>
+  <div id="schedule" class="schedule"></div>
+  <div class="legend">
+    <div class="legend-title">commercial guide</div>
+    <div class="legend-items">
+      <div class="legend-item">💪 <span>abs commercial</span></div>
+      <div class="legend-item">🍎 <span>fruit juice commercial</span></div>
+      <div class="legend-item">🚗 <span>car commercial</span></div>
+      <div class="legend-item">🐱 <span>cat food commercial</span></div>
+      <div class="legend-item">🌬️ <span>windmills commercial</span></div>
+      <div class="legend-item">🛸 <span>ufo signal</span></div>
+      <div class="legend-item">🌤 <span>weather segment</span></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  data from <a href="https://nookipedia.com/wiki/TV" target="_blank">nookipedia.com</a>
+  &nbsp;·&nbsp; made by zahra w/ html, css, js &amp; sparkle dust
+</footer>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// ACNH (New Horizons) TV Schedule Data
+// Source: nookipedia.com/wiki/TV
+// h = hour (float; e.g. 6.25 = 6:15, 6.5 = 6:30, 6.75 = 6:45)
+// cms = commercials/intermissions at minute offsets within that slot
+// ─────────────────────────────────────────────────────────────────────────────
+const CM = {abs:'💪 abs',fruit:'🍎 fruit juice',car:'🚗 car',cat:'🐱 cat food',wind:'🌬️ windmills',ufo:'🛸 ufo signal',weather:'🌤 weather'};
+
+const S = {
+  0:[ // ── Monday ──
+    {h:5,    show:'test pattern',   cms:[]},
+    {h:6,    show:'news',           cms:[]},
+    {h:6.25, show:'weather',        cms:[]},
+    {h:6.5,  show:'aerobics',       cms:[{m:59,c:'abs'}]},
+    {h:7,    show:'news',           cms:[{m:59,c:'abs'}]},
+    {h:7.75, show:'weather',        cms:[]},
+    {h:8,    show:'drama',          cms:[{m:29,c:'abs'}]},
+    {h:8.5,  show:'nature',         cms:[]},
+    {h:9,    show:'nature',         cms:[{m:18,c:'car'},{m:19,c:'fruit'}]},
+    {h:9.33, show:'nature',         cms:[{m:29,c:'abs'}]},
+    {h:9.5,  show:'nature',         cms:[{m:59,c:'abs'}]},
+    {h:10,   show:'action',         cms:[{m:29,c:'fruit'}]},
+    {h:10.5, show:'action',         cms:[{m:59,c:'wind'}]},
+    {h:11,   show:'cooking',        cms:[{m:29,c:'fruit'}]},
+    {h:11.5, show:'news',           cms:[{m:59,c:'car'}]},
+    {h:11.75,show:'weather',        cms:[]},
+    {h:12,   show:'comedy',         cms:[{m:29,c:'fruit'}]},
+    {h:12.5, show:'comedy',         cms:[{m:59,c:'abs'}]},
+    {h:13,   show:'drama',          cms:[{m:29,c:'wind'}]},
+    {h:13.5, show:'talk',           cms:[{m:59,c:'cat'}]},
+    {h:14,   show:'comedy',         cms:[{m:29,c:'fruit'}]},
+    {h:14.5, show:'comedy',         cms:[{m:59,c:'abs'}]},
+    {h:15,   show:'aerobics',       cms:[{m:29,c:'wind'}]},
+    {h:15.5, show:'aerobics',       cms:[{m:59,c:'car'}]},
+    {h:16,   show:'cartoon',        cms:[{m:29,c:'cat'}]},
+    {h:16.5, show:'cartoon',        cms:[{m:59,c:'wind'}]},
+    {h:17,   show:'comedy',         cms:[{m:29,c:'car'}]},
+    {h:17.5, show:'comedy',         cms:[{m:59,c:'fruit'}]},
+    {h:18,   show:'news',           cms:[]},
+    {h:18.5, show:'weather',        cms:[{m:59,c:'wind'}]},
+    {h:19,   show:'comedy',         cms:[{m:29,c:'car'}]},
+    {h:19.5, show:'comedy',         cms:[{m:59,c:'cat'}]},
+    {h:20,   show:'quiz',           cms:[{m:29,c:'fruit'}]},
+    {h:20.5, show:'quiz',           cms:[{m:57,c:'fruit'},{m:58,c:'car'},{m:59,c:'wind'}]},
+    {h:21,   show:'drama',          cms:[{m:29,c:'car'}]},
+    {h:21.5, show:'drama',          cms:[{m:59,c:'fruit'}]},
+    {h:22,   show:'news',           cms:[{m:45,c:'weather'},{m:59,c:'abs'}]},
+    {h:23,   show:'comedy',         cms:[{m:29,c:'wind'}]},
+    {h:23.5, show:'comedy',         cms:[{m:55,c:'abs'}]},
+    {h:0,    show:'talk',           cms:[{m:57,c:'abs'}]},
+    {h:1,    show:'movie',          cms:[]},
+    {h:2,    show:'movie',          cms:[{m:45,c:'abs'}]},
+    {h:3,    show:'test pattern',   cms:[]},
+    {h:4,    show:'static',         cms:[]},
+  ],
+  1:[ // ── Tuesday ──
+    {h:5,    show:'test pattern',   cms:[]},
+    {h:6,    show:'news',           cms:[]},
+    {h:6.25, show:'weather',        cms:[]},
+    {h:6.5,  show:'aerobics',       cms:[{m:59,c:'fruit'}]},
+    {h:7,    show:'news',           cms:[{m:59,c:'abs'}]},
+    {h:7.75, show:'weather',        cms:[]},
+    {h:8,    show:'drama',          cms:[{m:29,c:'abs'}]},
+    {h:8.5,  show:'nature',         cms:[]},
+    {h:9,    show:'nature',         cms:[{m:18,c:'car'},{m:19,c:'fruit'}]},
+    {h:9.33, show:'nature',         cms:[{m:29,c:'abs'}]},
+    {h:9.5,  show:'nature',         cms:[{m:59,c:'abs'}]},
+    {h:10,   show:'cartoon',        cms:[{m:29,c:'fruit'}]},
+    {h:10.5, show:'cartoon',        cms:[{m:59,c:'wind'}]},
+    {h:11,   show:'cooking',        cms:[{m:29,c:'car'}]},
+    {h:11.5, show:'news',           cms:[{m:59,c:'abs'}]},
+    {h:11.75,show:'weather',        cms:[]},
+    {h:12,   show:'comedy',         cms:[{m:29,c:'fruit'}]},
+    {h:12.5, show:'comedy',         cms:[{m:59,c:'abs'}]},
+    {h:13,   show:'drama',          cms:[{m:29,c:'wind'}]},
+    {h:13.5, show:'talk',           cms:[{m:59,c:'wind'}]},
+    {h:14,   show:'nature',         cms:[{m:29,c:'car'}]},
+    {h:14.5, show:'nature',         cms:[{m:59,c:'abs'}]},
+    {h:15,   show:'aerobics',       cms:[{m:29,c:'cat'}]},
+    {h:15.5, show:'aerobics',       cms:[{m:59,c:'car'}]},
+    {h:16,   show:'action',         cms:[{m:29,c:'cat'}]},
+    {h:16.5, show:'cooking',        cms:[{m:59,c:'wind'}]},
+    {h:17,   show:'comedy',         cms:[{m:29,c:'cat'}]},
+    {h:17.5, show:'comedy',         cms:[{m:59,c:'fruit'}]},
+    {h:18,   show:'news',           cms:[]},
+    {h:18.5, show:'weather',        cms:[{m:59,c:'wind'}]},
+    {h:19,   show:'tennis',         cms:[]},
+    {h:20,   show:'quiz',           cms:[{m:57,c:'fruit'},{m:58,c:'abs'},{m:59,c:'car'}]},
+    {h:21,   show:'talk',           cms:[{m:29,c:'wind'}]},
+    {h:21.5, show:'talk',           cms:[{m:59,c:'cat'}]},
+    {h:22,   show:'news',           cms:[{m:45,c:'weather'},{m:59,c:'car'}]},
+    {h:23,   show:'nature',         cms:[{m:29,c:'wind'}]},
+    {h:23.5, show:'nature',         cms:[{m:55,c:'abs'}]},
+    {h:0,    show:'nature',         cms:[{m:57,c:'abs'}]},
+    {h:1,    show:'nature',         cms:[]},
+    {h:2,    show:'nature',         cms:[{m:45,c:'abs'}]},
+    {h:3,    show:'test pattern',   cms:[]},
+    {h:4,    show:'static',         cms:[]},
+  ],
+  2:[ // ── Wednesday ──
+    {h:5,    show:'test pattern',   cms:[]},
+    {h:6,    show:'news',           cms:[]},
+    {h:6.25, show:'weather',        cms:[]},
+    {h:6.5,  show:'aerobics',       cms:[{m:59,c:'car'}]},
+    {h:7,    show:'news',           cms:[{m:59,c:'abs'}]},
+    {h:7.75, show:'weather',        cms:[]},
+    {h:8,    show:'drama',          cms:[{m:29,c:'abs'}]},
+    {h:8.5,  show:'nature',         cms:[]},
+    {h:9,    show:'nature',         cms:[{m:18,c:'car'},{m:19,c:'fruit'}]},
+    {h:9.33, show:'nature',         cms:[{m:29,c:'abs'}]},
+    {h:9.5,  show:'nature',         cms:[{m:59,c:'abs'}]},
+    {h:10,   show:'action',         cms:[{m:29,c:'cat'}]},
+    {h:10.5, show:'action',         cms:[{m:59,c:'wind'}]},
+    {h:11,   show:'cooking',        cms:[{m:29,c:'fruit'}]},
+    {h:11.5, show:'news',           cms:[{m:59,c:'car'}]},
+    {h:11.75,show:'weather',        cms:[]},
+    {h:12,   show:'comedy',         cms:[{m:29,c:'fruit'}]},
+    {h:12.5, show:'comedy',         cms:[{m:59,c:'abs'}]},
+    {h:13,   show:'drama',          cms:[{m:29,c:'wind'}]},
+    {h:13.5, show:'talk',           cms:[{m:59,c:'wind'}]},
+    {h:14,   show:'comedy',         cms:[{m:29,c:'fruit'},{m:58,c:'car'}]},
+    {h:14.5, show:'comedy',         cms:[]},
+    {h:15,   show:'aerobics',       cms:[{m:29,c:'fruit'}]},
+    {h:15.5, show:'aerobics',       cms:[{m:59,c:'car'}]},
+    {h:16,   show:'cartoon',        cms:[{m:29,c:'cat'}]},
+    {h:16.5, show:'cartoon',        cms:[{m:59,c:'wind'}]},
+    {h:17,   show:'comedy',         cms:[{m:29,c:'fruit'}]},
+    {h:17.5, show:'comedy',         cms:[{m:59,c:'car'}]},
+    {h:18,   show:'news',           cms:[]},
+    {h:18.5, show:'weather',        cms:[{m:59,c:'wind'}]},
+    {h:19,   show:'cooking',        cms:[{m:29,c:'car'}]},
+    {h:19.5, show:'cooking',        cms:[{m:59,c:'cat'}]},
+    {h:20,   show:'concert',        cms:[{m:29,c:'car'}]},
+    {h:20.5, show:'concert',        cms:[{m:57,c:'cat'},{m:58,c:'wind'},{m:59,c:'abs'}]},
+    {h:21,   show:'drama',          cms:[{m:29,c:'car'}]},
+    {h:21.5, show:'drama',          cms:[{m:59,c:'cat'}]},
+    {h:22,   show:'news',           cms:[{m:45,c:'weather'},{m:59,c:'abs'}]},
+    {h:23,   show:'quiz',           cms:[{m:29,c:'wind'}]},
+    {h:23.5, show:'quiz',           cms:[{m:55,c:'abs'}]},
+    {h:0,    show:'comedy',         cms:[{m:57,c:'abs'}]},
+    {h:1,    show:'tennis',         cms:[]},
+    {h:2,    show:'tennis',         cms:[{m:45,c:'abs'}]},
+    {h:3,    show:'test pattern',   cms:[]},
+    {h:4,    show:'static',         cms:[]},
+  ],
+  3:[ // ── Thursday ──
+    {h:5,    show:'test pattern',   cms:[]},
+    {h:6,    show:'news',           cms:[]},
+    {h:6.25, show:'weather',        cms:[]},
+    {h:6.5,  show:'aerobics',       cms:[{m:59,c:'abs'}]},
+    {h:7,    show:'news',           cms:[{m:59,c:'abs'}]},
+    {h:7.75, show:'weather',        cms:[]},
+    {h:8,    show:'drama',          cms:[{m:29,c:'abs'}]},
+    {h:8.5,  show:'nature',         cms:[]},
+    {h:9,    show:'nature',         cms:[{m:18,c:'car'},{m:19,c:'fruit'}]},
+    {h:9.33, show:'nature',         cms:[{m:29,c:'abs'}]},
+    {h:9.5,  show:'nature',         cms:[{m:59,c:'abs'}]},
+    {h:10,   show:'action',         cms:[{m:29,c:'cat'}]},
+    {h:10.5, show:'action',         cms:[{m:59,c:'car'}]},
+    {h:11,   show:'talk',           cms:[{m:29,c:'car'}]},
+    {h:11.5, show:'news',           cms:[{m:59,c:'abs'}]},
+    {h:11.75,show:'weather',        cms:[]},
+    {h:12,   show:'comedy',         cms:[{m:29,c:'fruit'}]},
+    {h:12.5, show:'comedy',         cms:[{m:59,c:'abs'}]},
+    {h:13,   show:'drama',          cms:[{m:29,c:'wind'}]},
+    {h:13.5, show:'talk',           cms:[{m:59,c:'wind'}]},
+    {h:14,   show:'comedy',         cms:[{m:29,c:'fruit'}]},
+    {h:14.5, show:'comedy',         cms:[{m:59,c:'abs'}]},
+    {h:15,   show:'aerobics',       cms:[{m:29,c:'cat'}]},
+    {h:15.5, show:'aerobics',       cms:[{m:59,c:'car'}]},
+    {h:16,   show:'action',         cms:[{m:29,c:'cat'}]},
+    {h:16.5, show:'action',         cms:[{m:59,c:'wind'}]},
+    {h:17,   show:'comedy',         cms:[{m:29,c:'cat'}]},
+    {h:17.5, show:'comedy',         cms:[{m:59,c:'fruit'}]},
+    {h:18,   show:'news',           cms:[]},
+    {h:18.5, show:'weather',        cms:[{m:59,c:'wind'}]},
+    {h:19,   show:'cartoon',        cms:[{m:29,c:'car'}]},
+    {h:19.5, show:'cartoon',        cms:[{m:59,c:'cat'}]},
+    {h:20,   show:'nature',         cms:[{m:29,c:'car'}]},
+    {h:20.5, show:'nature',         cms:[{m:57,c:'cat'},{m:58,c:'wind'},{m:59,c:'abs'}]},
+    {h:21,   show:'drama',          cms:[{m:29,c:'wind'}]},
+    {h:21.5, show:'drama',          cms:[{m:59,c:'wind'}]},
+    {h:22,   show:'news',           cms:[{m:45,c:'weather'},{m:59,c:'car'}]},
+    {h:23,   show:'comedy',         cms:[{m:29,c:'cat'}]},
+    {h:23.5, show:'comedy',         cms:[{m:55,c:'abs'}]},
+    {h:0,    show:'comedy',         cms:[{m:57,c:'abs'}]},
+    {h:1,    show:'nature',         cms:[]},
+    {h:2,    show:'nature',         cms:[{m:45,c:'abs'}]},
+    {h:3,    show:'test pattern',   cms:[]},
+    {h:4,    show:'static',         cms:[]},
+  ],
+  4:[ // ── Friday ──
+    {h:5,    show:'test pattern',   cms:[]},
+    {h:6,    show:'news',           cms:[]},
+    {h:6.25, show:'weather',        cms:[]},
+    {h:6.5,  show:'aerobics',       cms:[{m:59,c:'fruit'}]},
+    {h:7,    show:'news',           cms:[{m:59,c:'abs'}]},
+    {h:7.75, show:'weather',        cms:[]},
+    {h:8,    show:'drama',          cms:[{m:29,c:'abs'}]},
+    {h:8.5,  show:'nature',         cms:[]},
+    {h:9,    show:'nature',         cms:[{m:18,c:'car'},{m:19,c:'fruit'}]},
+    {h:9.33, show:'nature',         cms:[{m:29,c:'abs'}]},
+    {h:9.5,  show:'nature',         cms:[{m:59,c:'abs'}]},
+    {h:10,   show:'cartoon',        cms:[{m:29,c:'cat'}]},
+    {h:10.5, show:'cartoon',        cms:[{m:59,c:'wind'}]},
+    {h:11,   show:'cooking',        cms:[{m:29,c:'fruit'}]},
+    {h:11.5, show:'news',           cms:[{m:59,c:'car'}]},
+    {h:11.75,show:'weather',        cms:[]},
+    {h:12,   show:'comedy',         cms:[{m:29,c:'fruit'}]},
+    {h:12.5, show:'comedy',         cms:[{m:59,c:'abs'}]},
+    {h:13,   show:'drama',          cms:[{m:29,c:'wind'}]},
+    {h:13.5, show:'drama',          cms:[{m:58,c:'fruit'},{m:59,c:'wind'}]},
+    {h:14,   show:'talk',           cms:[{m:29,c:'cat'}]},
+    {h:14.5, show:'talk',           cms:[{m:59,c:'car'}]},
+    {h:15,   show:'aerobics',       cms:[{m:29,c:'fruit'}]},
+    {h:15.5, show:'aerobics',       cms:[{m:59,c:'car'}]},
+    {h:16,   show:'action',         cms:[{m:29,c:'cat'}]},
+    {h:16.5, show:'action',         cms:[{m:59,c:'wind'}]},
+    {h:17,   show:'comedy',         cms:[{m:29,c:'cat'}]},
+    {h:17.5, show:'comedy',         cms:[{m:58,c:'fruit'},{m:59,c:'car'}]},
+    {h:18,   show:'news',           cms:[]},
+    {h:18.5, show:'weather',        cms:[{m:59,c:'wind'}]},
+    {h:19,   show:'tennis',         cms:[{m:57,c:'abs'}]},
+    {h:19.5, show:'tennis',         cms:[]},
+    {h:20,   show:'tennis',         cms:[{m:57,c:'wind'},{m:58,c:'cat'},{m:59,c:'car'}]},
+    {h:21,   show:'concert',        cms:[{m:29,c:'wind'}]},
+    {h:21.5, show:'concert',        cms:[{m:59,c:'fruit'}]},
+    {h:22,   show:'news',           cms:[{m:45,c:'weather'},{m:59,c:'car'}]},
+    {h:23,   show:'quiz',           cms:[{m:29,c:'fruit'}]},
+    {h:23.5, show:'quiz',           cms:[{m:55,c:'wind'}]},
+    {h:0,    show:'test pattern',   cms:[]},
+    {h:1,    show:'static',         cms:[]},
+    {h:2,    show:'static',         cms:[]},
+    {h:3,    show:'static · ufo at 3:33', cms:[{m:33,c:'ufo'}]},
+    {h:4,    show:'static',         cms:[]},
+  ],
+  5:[ // ── Saturday ──
+    {h:5,    show:'test pattern',   cms:[]},
+    {h:6,    show:'news',           cms:[]},
+    {h:6.25, show:'weather',        cms:[]},
+    {h:6.5,  show:'aerobics',       cms:[{m:59,c:'car'}]},
+    {h:7,    show:'news',           cms:[{m:59,c:'car'}]},
+    {h:7.75, show:'weather',        cms:[]},
+    {h:8,    show:'comedy',         cms:[{m:29,c:'wind'}]},
+    {h:8.5,  show:'comedy',         cms:[]},
+    {h:9,    show:'nature',         cms:[{m:18,c:'car'},{m:19,c:'fruit'},{m:29,c:'abs'}]},
+    {h:9.5,  show:'quiz',           cms:[{m:59,c:'abs'}]},
+    {h:10,   show:'action',         cms:[{m:29,c:'fruit'}]},
+    {h:10.5, show:'action',         cms:[{m:59,c:'wind'}]},
+    {h:11,   show:'news',           cms:[]},
+    {h:11.75,show:'weather',        cms:[{m:59,c:'abs'}]},
+    {h:12,   show:'comedy',         cms:[{m:29,c:'fruit'}]},
+    {h:12.5, show:'comedy',         cms:[{m:59,c:'abs'}]},
+    {h:13,   show:'talk',           cms:[{m:29,c:'abs'}]},
+    {h:14,   show:'nature',         cms:[{m:29,c:'cat'}]},
+    {h:14.5, show:'nature',         cms:[{m:58,c:'fruit'},{m:59,c:'car'}]},
+    {h:15,   show:'tennis',         cms:[]},
+    {h:15.5, show:'tennis',         cms:[{m:50,c:'cat'}]},
+    {h:16,   show:'tennis',         cms:[{m:59,c:'car'}]},
+    {h:17,   show:'comedy',         cms:[{m:29,c:'cat'}]},
+    {h:17.5, show:'comedy',         cms:[{m:59,c:'wind'}]},
+    {h:18,   show:'news',           cms:[{m:45,c:'weather'},{m:59,c:'wind'}]},
+    {h:19,   show:'quiz',           cms:[{m:29,c:'car'}]},
+    {h:19.5, show:'quiz',           cms:[{m:59,c:'cat'}]},
+    {h:20,   show:'comedy',         cms:[{m:57,c:'fruit'},{m:58,c:'car'},{m:59,c:'cat'}]},
+    {h:21,   show:'movie',          cms:[{m:54,c:'car'}]},
+    {h:21.5, show:'movie',          cms:[]},
+    {h:22,   show:'movie',          cms:[{m:44,c:'car'},{m:45,c:'weather'}]},
+    {h:23,   show:'news',           cms:[{m:29,c:'abs'}]},
+    {h:23.5, show:'cooking',        cms:[{m:55,c:'wind'}]},
+    {h:0,    show:'concert',        cms:[{m:57,c:'abs'}]},
+    {h:1,    show:'movie',          cms:[]},
+    {h:2,    show:'movie',          cms:[{m:45,c:'abs'}]},
+    {h:3,    show:'test pattern',   cms:[]},
+    {h:4,    show:'static',         cms:[]},
+  ],
+  6:[ // ── Sunday ──
+    {h:5,    show:'test pattern',   cms:[]},
+    {h:6,    show:'news',           cms:[]},
+    {h:6.25, show:'weather',        cms:[]},
+    {h:6.5,  show:'aerobics',       cms:[{m:59,c:'fruit'}]},
+    {h:7,    show:'action',         cms:[{m:29,c:'fruit'}]},
+    {h:7.5,  show:'action',         cms:[{m:59,c:'cat'}]},
+    {h:8,    show:'cartoon',        cms:[{m:29,c:'car'}]},
+    {h:8.5,  show:'cartoon',        cms:[{m:59,c:'cat'}]},
+    {h:9,    show:'nature',         cms:[{m:29,c:'abs'}]},
+    {h:9.5,  show:'quiz',           cms:[{m:59,c:'cat'}]},
+    {h:10,   show:'comedy',         cms:[{m:29,c:'cat'}]},
+    {h:10.5, show:'comedy',         cms:[{m:59,c:'wind'}]},
+    {h:11,   show:'news',           cms:[]},
+    {h:11.75,show:'weather',        cms:[{m:59,c:'abs'}]},
+    {h:12,   show:'talk',           cms:[{m:29,c:'cat'}]},
+    {h:12.5, show:'talk',           cms:[{m:59,c:'abs'}]},
+    {h:13,   show:'tennis',         cms:[]},
+    {h:14,   show:'tennis',         cms:[]},
+    {h:15,   show:'quiz',           cms:[{m:29,c:'cat'}]},
+    {h:15.5, show:'quiz',           cms:[{m:59,c:'car'}]},
+    {h:16,   show:'cooking',        cms:[{m:29,c:'cat'}]},
+    {h:16.5, show:'cooking',        cms:[{m:59,c:'fruit'}]},
+    {h:17,   show:'comedy',         cms:[{m:29,c:'car'}]},
+    {h:17.5, show:'comedy',         cms:[{m:59,c:'wind'}]},
+    {h:18,   show:'cartoon',        cms:[{m:29,c:'fruit'}]},
+    {h:18.5, show:'cartoon',        cms:[]},
+    {h:19,   show:'tennis',         cms:[]},
+    {h:19.5, show:'tennis',         cms:[]},
+    {h:20,   show:'tennis',         cms:[{m:57,c:'wind'},{m:58,c:'cat'},{m:59,c:'car'}]},
+    {h:21,   show:'movie',          cms:[]},
+    {h:21.5, show:'movie',          cms:[]},
+    {h:22,   show:'movie',          cms:[{m:44,c:'cat'},{m:45,c:'weather'}]},
+    {h:23,   show:'news',           cms:[{m:55,c:'car'}]},
+    {h:0,    show:'test pattern',   cms:[]},
+    {h:1,    show:'static',         cms:[]},
+    {h:2,    show:'static',         cms:[{m:45,c:'abs'}]},
+    {h:3,    show:'test pattern',   cms:[]},
+    {h:4,    show:'static',         cms:[]},
+  ],
+};
+
+// ── EMOJIS ──
+const EMOJI = {
+  news:'📰',weather:'🌤',aerobics:'🏃','test pattern':'📡',static:'📺',
+  drama:'🎭',nature:'🌿',action:'⚡',cartoon:'🐭',cooking:'🍳',
+  talk:'🎙️',comedy:'😄',quiz:'🎮',concert:'🎵',movie:'🎬',tennis:'🎾',
+};
+function getEmoji(name){
+  const k=name.toLowerCase().trim();
+  for(const[n,e]of Object.entries(EMOJI)){if(k.startsWith(n))return e}
+  return'📺';
+}
+const CM_LABEL={abs:'💪 abs',fruit:'🍎 fruit juice',car:'🚗 car',cat:'🐱 cat food',wind:'🌬️ windmills',ufo:'🛸 ufo signal',weather:'🌤 weather'};
+const DAY_NAMES=['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+
+function fmtH(h){
+  const intH=Math.floor(h);
+  const mins=Math.round((h%1)*60);
+  const pad=n=>String(n).padStart(2,'0');
+  const ampm=intH<12?'am':'pm';
+  const h12=intH===0?12:intH>12?intH-12:intH;
+  return mins===0?`${h12} ${ampm}`:`${h12}:${pad(mins)} ${ampm}`;
+}
+
+// overnight slots (0-4am) sort after 23:xx
+function sortedSlots(d){
+  return[...S[d].filter(s=>s.h>=5),...S[d].filter(s=>s.h<5)];
+}
+
+const now=new Date();
+const todayIdx=now.getDay()===0?6:now.getDay()-1;
+const nowH=now.getHours()+now.getMinutes()/60;
+let viewDay=todayIdx;
+
+function toComp(h){return h<5?h+24:h}
+function getNowIdx(slots){
+  const nh=toComp(nowH);
+  let idx=0;
+  for(let i=0;i<slots.length;i++){if(toComp(slots[i].h)<=nh)idx=i}
+  return idx;
+}
+
+function buildNav(){
+  const nav=document.getElementById('dayNav');
+  nav.innerHTML='';
+  DAY_NAMES.forEach((name,i)=>{
+    const b=document.createElement('button');
+    b.className='day-btn'+(i===viewDay?' active':'')+(i===todayIdx?' is-today':'');
+    b.innerHTML=name+(i===todayIdx?'<span class="today-dot"></span>':'');
+    b.onclick=()=>{viewDay=i;buildNav();render()};
+    nav.appendChild(b);
+  });
+}
+
+function renderBanner(){
+  const el=document.getElementById('nowBanner');
+  if(viewDay!==todayIdx){el.classList.add('hidden');return}
+  el.classList.remove('hidden');
+  const slots=sortedSlots(todayIdx);
+  const ni=getNowIdx(slots);
+  const cur=slots[ni], nxt=slots[(ni+1)%slots.length];
+  el.innerHTML=`
+    <div class="now-top">
+      <span class="now-badge">on now</span>
+      <span class="now-emoji">${getEmoji(cur.show)}</span>
+      <span class="now-name">${cur.show}</span>
+    </div>
+    <div class="now-time">
+      <strong>${fmtH(cur.h)}</strong>
+      since
+    </div>
+    <div class="now-next">
+      <span class="now-next-eyebrow">up next</span>
+      <span style="color:var(--border)">·</span>
+      <span class="now-next-show">${getEmoji(nxt.show)} ${nxt.show} <span style="color:var(--ink-ghost)">at ${fmtH(nxt.h)}</span></span>
+    </div>`;
+}
+
+function renderSchedule(){
+  const list=document.getElementById('schedule');
+  list.innerHTML='';
+  const slots=sortedSlots(viewDay);
+  const ni=viewDay===todayIdx?getNowIdx(slots):-1;
+  let lastIntH=null;
+
+  slots.forEach((slot,i)=>{
+    const intH=Math.floor(slot.h);
+    if(intH!==lastIntH){
+      lastIntH=intH;
+      const hd=document.createElement('div');
+      hd.className='hour-header';
+      hd.innerHTML=`<div class="hour-label">${fmtH(intH)}</div><div class="hour-rule"></div>`;
+      list.appendChild(hd);
+    }
+
+    const isNow=i===ni;
+    const isNext=i===ni+1;
+    const isPast=ni>=0&&i<ni;
+    const d=document.createElement('div');
+    d.className='slot'+(isNow?' is-now':isNext?' is-next':isPast?' is-past':'');
+    if(isNow)d.id='now-slot';
+
+    const badge=isNow?'<span class="badge badge-now">now</span>':isNext?'<span class="badge badge-next">next</span>':'';
+    const cmHtml=slot.cms.length
+      ?`<div class="slot-cms">${slot.cms.map(c=>`<span class="cm-chip"><span class="cm-chip-t">:${String(c.m).padStart(2,'0')}</span>${CM_LABEL[c.c]||c.c}</span>`).join('')}</div>`:'';
+
+    d.innerHTML=`
+      <div class="slot-time">${fmtH(slot.h)}</div>
+      <div class="slot-body">
+        <div class="slot-show">
+          <span class="slot-emoji">${getEmoji(slot.show)}</span>
+          <span class="slot-name">${slot.show}</span>
+          ${badge}
+        </div>
+        ${cmHtml}
+      </div>`;
+    list.appendChild(d);
+  });
+
+  if(viewDay===todayIdx){
+    setTimeout(()=>{
+      const el=document.getElementById('now-slot');
+      if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+    },150);
+  }
+}
+
+function render(){renderBanner();renderSchedule()}
+buildNav();
+render();
+</script>
+</body>
+</html>
