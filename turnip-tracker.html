@@ -5,178 +5,186 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>turnip tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
-<script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+<script src="https://unpkg.com/parse/dist/parse.min.js"></script>
 <script>
   Parse.initialize("G9QH61WfFxbMqM8pfxMTlkBQDkDkHornk0MRX6Zb", "9oUG5sdMcxYQwTe5XqdNDw8gXmyLmwsN3v3vUom2");
   Parse.serverURL = "https://parseapi.back4app.com/";
 </script>
 <style>
-  :root{
-    --bg:#f0ebe3;--bg2:#e8e1d6;--surface:#ede6da;--border:#c9bfb0;--border-lt:#d9d1c4;
-    --rust:#a0522d;--rust-lt:#c47a4a;--moss:#6b7c5c;--clay:#b5714e;--wheat:#c9a96e;
-    --dusk:#8c7b6e;--ink:#3b3028;--ink-mid:#6b5c50;--ink-dim:#9e8f83;
-    --loss-bg:#f5ddd5;--loss-bd:#c47a4a;--gain-bg:#dde6d5;--gain-bd:#6b7c5c;--spike-bg:#f2e5d0;--spike-bd:#c9a96e;
-  }
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-  html{font-size:15px;}
-  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:4rem;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");}
+:root{
+  --bg:#f0ebe3;--bg2:#e8e1d6;--surface:#ede6da;--border:#c9bfb0;--border-lt:#d9d1c4;
+  --rust:#a0522d;--rust-lt:#c47a4a;--moss:#6b7c5c;--clay:#b5714e;--wheat:#c9a96e;
+  --dusk:#8c7b6e;--ink:#3b3028;--ink-mid:#6b5c50;--ink-dim:#9e8f83;--ink-ghost:#bfb3a8;
+  --loss-bg:#f5ddd5;--loss-bd:#c47a4a;--gain-bg:#dde6d5;--gain-bd:#6b7c5c;--spike-bg:#f2e5d0;--spike-bd:#c9a96e;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:15px;}
+body{
+  font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:4rem;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+}
+header{padding:3rem 2rem 0;border-bottom:1px solid var(--border);max-width:900px;margin:0 auto;}
+.header-top{display:flex;align-items:baseline;gap:1.2rem;flex-wrap:wrap;padding-bottom:1.5rem;}
+.site-title{font-size:1.05rem;font-weight:600;color:var(--ink);letter-spacing:-0.02em;}
+.site-title span{color:var(--rust);font-weight:400;font-size:0.88rem;}
+.site-meta{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);letter-spacing:0.06em;text-transform:uppercase;}
+.nav-links{margin-left:auto;display:flex;gap:1rem;align-items:center;}
+.back-link{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);text-decoration:none;letter-spacing:0.04em;border-bottom:1px solid var(--border);padding-bottom:1px;transition:color 0.15s;}
+.back-link:hover{color:var(--rust);border-color:var(--rust);}
+.user-chip{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-dim);}
+.tab-nav{display:flex;overflow-x:auto;scrollbar-width:none;margin-top:1.2rem;}
+.tab-nav::-webkit-scrollbar{display:none;}
+.tab-btn{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--ink-dim);background:none;border:none;border-bottom:2px solid transparent;padding:0.6rem 1rem 0.7rem;cursor:pointer;white-space:nowrap;transition:color 0.15s,border-color 0.15s;position:relative;top:1px;}
+.tab-btn:hover{color:var(--ink-mid);}
+.tab-btn.active{color:var(--rust);border-bottom-color:var(--rust);}
+.wrap{max-width:900px;margin:0 auto;padding:2rem;}
+.sec-label{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:0.9rem;}
 
-  header{padding:3rem 2rem 0;border-bottom:1px solid var(--border);max-width:860px;margin:0 auto;}
-  .header-top{display:flex;align-items:baseline;gap:1.2rem;flex-wrap:wrap;padding-bottom:1.5rem;}
-  .site-title{font-family:'DM Mono',monospace;font-weight:400;font-size:1.05rem;color:var(--ink);}
-  .site-title span{color:var(--rust);font-size:0.9rem;}
-  .site-meta{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--ink-dim);letter-spacing:0.04em;text-transform:uppercase;}
-  .nav-links{margin-left:auto;display:flex;gap:1rem;align-items:center;}
-  .back-link{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--ink-dim);text-decoration:none;letter-spacing:0.04em;border-bottom:1px solid var(--border);padding-bottom:1px;transition:color 0.15s;}
-  .back-link:hover{color:var(--rust);border-color:var(--rust);}
-  .user-chip{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);}
+/* BUY PRICE */
+.buy-section{display:flex;align-items:center;gap:1.4rem;flex-wrap:wrap;margin-bottom:1.6rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.3rem;}
+.buy-section label{font-size:0.85rem;color:var(--ink-mid);flex:1 1 180px;line-height:1.4;}
+.buy-section label small{display:block;font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--ink-dim);margin-top:0.2rem;}
+.field-wrap{display:flex;align-items:center;border:1px solid var(--border);border-radius:6px;background:var(--bg);overflow:hidden;transition:border-color 0.15s;}
+.field-wrap:focus-within{border-color:var(--rust);}
+.field-prefix{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--ink-dim);padding:0 0.7rem;border-right:1px solid var(--border-lt);user-select:none;background:var(--surface);}
+input[type="number"]{font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:500;width:90px;padding:0.5rem 0.75rem;border:none;background:transparent;color:var(--ink);outline:none;-moz-appearance:textfield;}
+input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;}
+.buy-saved-badge{font-family:'DM Mono',monospace;font-size:0.57rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--moss);background:rgba(107,124,92,0.1);border:1px solid rgba(107,124,92,0.25);padding:0.18rem 0.5rem;border-radius:99px;opacity:0;transition:opacity 0.3s;}
+.buy-saved-badge.show{opacity:1;}
 
-  .tab-nav{display:flex;overflow-x:auto;scrollbar-width:none;margin-top:1.2rem;}
-  .tab-nav::-webkit-scrollbar{display:none;}
-  .tab-btn{font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.07em;text-transform:uppercase;
-    color:var(--ink-dim);background:none;border:none;border-bottom:2px solid transparent;
-    padding:0.6rem 1rem 0.7rem;cursor:pointer;white-space:nowrap;transition:color 0.15s,border-color 0.15s;position:relative;top:1px;}
-  .tab-btn:hover{color:var(--ink-mid);}
-  .tab-btn.active{color:var(--rust);border-bottom-color:var(--rust);}
+/* PRICE GRID */
+.grid-days{display:grid;grid-template-columns:repeat(6,1fr);gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:0.8rem;}
+.day-col{border-right:1px solid var(--border-lt);}
+.day-col:last-child{border-right:none;}
+.day-head{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-dim);text-align:center;padding:0.5rem 0.3rem;background:var(--bg2);border-bottom:1px solid var(--border-lt);}
+.day-slot{padding:0.45rem 0.35rem;border-bottom:1px solid var(--border-lt);display:flex;flex-direction:column;align-items:stretch;gap:0.15rem;}
+.day-slot:last-child{border-bottom:none;}
+.slot-period{font-family:'DM Mono',monospace;font-size:0.56rem;color:var(--ink-dim);text-align:center;letter-spacing:0.06em;text-transform:uppercase;}
+.slot-input{font-family:'DM Mono',monospace;font-size:0.88rem;text-align:center;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--ink);padding:0.28rem 0.15rem;width:100%;outline:none;transition:background 0.15s,border-color 0.15s;-moz-appearance:textfield;}
+.slot-input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.slot-input:focus{background:var(--surface);border-color:var(--border);}
+.slot-input.gain{background:var(--gain-bg);color:var(--moss);border-color:var(--gain-bd);}
+.slot-input.loss{background:var(--loss-bg);color:var(--clay);border-color:var(--loss-bd);}
+.slot-input.spike{background:var(--spike-bg);color:var(--rust);border-color:var(--spike-bd);font-weight:500;}
+.slot-trend{font-size:0.62rem;text-align:center;line-height:1;min-height:0.85rem;color:var(--ink-ghost);}
+.slot-trend.arr-up{color:var(--moss);}
+.slot-trend.arr-down{color:var(--clay);}
+.slot-trend.arr-spike{color:var(--rust);}
+.slot-forecast{font-family:'DM Mono',monospace;font-size:0.52rem;color:var(--ink-ghost);text-align:center;line-height:1.3;min-height:0.85rem;}
+.slot-forecast.f-spike{color:var(--rust);}
+.slot-forecast.f-gain{color:var(--moss);}
+.slot-forecast.f-loss{color:var(--clay);}
 
-  .wrap{max-width:860px;margin:0 auto;padding:2rem;}
-  .sec-label{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:1rem;}
+/* BUTTONS */
+.btn-row{display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;margin-bottom:1.8rem;}
+button.btn-primary{font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:0.07em;text-transform:uppercase;padding:0.5rem 1.1rem;border-radius:5px;border:none;cursor:pointer;background:var(--rust);color:#f5ede4;transition:background 0.15s;}
+button.btn-primary:hover{background:var(--rust-lt);}
+button.btn-secondary{font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:0.07em;text-transform:uppercase;padding:0.5rem 1.1rem;border-radius:5px;border:1px solid var(--border);cursor:pointer;background:var(--surface);color:var(--ink-mid);transition:all 0.15s;}
+button.btn-secondary:hover{background:var(--bg2);border-color:var(--dusk);}
+.save-status{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-dim);margin-left:auto;}
+.save-status.ok{color:var(--moss);}
+.save-status.err{color:var(--clay);}
+hr{border:none;border-top:1px solid var(--border-lt);margin:1.5rem 0;}
 
-  /* buy price */
-  .buy-row{display:flex;align-items:center;gap:1.4rem;flex-wrap:wrap;margin-bottom:1.8rem;}
-  .buy-row label{font-size:0.85rem;font-weight:500;color:var(--ink-mid);flex:1 1 160px;}
-  .field-wrap{display:flex;align-items:center;border:1px solid var(--border);border-radius:6px;background:var(--surface);overflow:hidden;transition:border-color 0.15s;}
-  .field-wrap:focus-within{border-color:var(--rust);}
-  .field-prefix{font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--ink-dim);padding:0 0.7rem;border-right:1px solid var(--border-lt);user-select:none;}
-  input[type="number"]{font-family:'DM Mono',monospace;font-size:1rem;font-weight:500;width:100px;
-    padding:0.55rem 0.75rem;border:none;background:transparent;color:var(--ink);outline:none;-moz-appearance:textfield;}
-  input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;}
+/* STATS */
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--border);margin-bottom:1.4rem;}
+.stat-cell{background:var(--surface);padding:0.9rem 1rem;}
+.stat-lbl{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:0.3rem;}
+.stat-val{font-family:'DM Mono',monospace;font-size:1.2rem;font-weight:500;color:var(--ink);line-height:1;}
+.stat-val.up{color:var(--moss);}
+.stat-val.down{color:var(--clay);}
+.stat-val.gold{color:var(--rust);}
+.stat-sub{font-family:'DM Mono',monospace;font-size:0.54rem;color:var(--ink-dim);margin-top:0.2rem;}
 
-  /* PRICE GRID */
-  .grid-days{display:grid;grid-template-columns:repeat(6,1fr);gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-  .day-col{border-right:1px solid var(--border-lt);}
-  .day-col:last-child{border-right:none;}
-  .day-head{font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:0.08em;text-transform:uppercase;
-    color:var(--ink-dim);text-align:center;padding:0.55rem 0.3rem;background:var(--bg2);border-bottom:1px solid var(--border-lt);}
-  .day-slot{padding:0.5rem 0.4rem;border-bottom:1px solid var(--border-lt);display:flex;flex-direction:column;align-items:stretch;gap:0.2rem;}
-  .day-slot:last-child{border-bottom:none;}
-  .slot-period{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--ink-dim);text-align:center;letter-spacing:0.06em;text-transform:uppercase;}
-  .slot-input{font-family:'DM Mono',monospace;font-size:0.88rem;text-align:center;border:1px solid transparent;
-    border-radius:4px;background:transparent;color:var(--ink);padding:0.28rem 0.2rem;width:100%;outline:none;
-    transition:background 0.15s,border-color 0.15s;-moz-appearance:textfield;}
-  .slot-input::-webkit-inner-spin-button{-webkit-appearance:none;}
-  .slot-input:focus{background:var(--surface);border-color:var(--border);}
-  .slot-input.gain{background:var(--gain-bg);color:var(--moss);border-color:var(--gain-bd);}
-  .slot-input.loss{background:var(--loss-bg);color:var(--clay);border-color:var(--loss-bd);}
-  .slot-input.spike{background:var(--spike-bg);color:var(--rust);border-color:var(--spike-bd);font-weight:500;}
+/* TIP */
+.tip{font-size:0.79rem;color:var(--ink-mid);line-height:1.75;border-left:3px solid var(--border);padding:0.45rem 0 0.45rem 0.9rem;margin-bottom:1.5rem;}
+.tip strong{color:var(--rust);font-weight:600;}
 
-  /* FORECAST RANGE below each input */
-  .slot-forecast{font-family:'DM Mono',monospace;font-size:0.56rem;color:var(--ink-dim);text-align:center;line-height:1.2;min-height:0.9rem;}
-  .slot-forecast.f-spike{color:var(--rust);}
-  .slot-forecast.f-gain{color:var(--moss);}
-  .slot-forecast.f-loss{color:var(--clay);}
+/* CHART */
+.chart-box{border:1px solid var(--border);border-radius:8px;background:var(--surface);padding:1.1rem 1.3rem 0.8rem;margin-bottom:1.4rem;}
+canvas#chart{width:100%!important;height:150px!important;display:block;}
 
-  /* stats */
-  .stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--border);}
-  .stat-cell{background:var(--surface);padding:1rem 1.1rem;display:flex;flex-direction:column;gap:0.35rem;}
-  .stat-lbl{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-dim);}
-  .stat-val{font-family:'DM Mono',monospace;font-size:1.3rem;font-weight:500;color:var(--ink);line-height:1;}
-  .stat-val.up{color:var(--moss);}.stat-val.down{color:var(--clay);}.stat-val.gold{color:var(--rust);}
+/* PROB BARS */
+.prob-list{display:flex;flex-direction:column;gap:0.42rem;margin:0.7rem 0 1.4rem;}
+.p-row{display:flex;align-items:center;gap:0.7rem;}
+.p-name{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-mid);width:88px;flex-shrink:0;}
+.p-track{flex:1;height:5px;background:var(--border-lt);border-radius:99px;overflow:hidden;}
+.p-fill{height:100%;border-radius:99px;transition:width 0.55s cubic-bezier(0.34,1.4,0.64,1);}
+.p-fill.large-spike{background:var(--rust-lt);}
+.p-fill.small-spike{background:var(--wheat);}
+.p-fill.decreasing{background:var(--clay);}
+.p-fill.fluctuating{background:var(--moss);}
+.p-pct{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-dim);width:32px;text-align:right;flex-shrink:0;}
 
-  /* FORECAST PANEL */
-  .forecast-panel{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:1.4rem;}
-  .forecast-header{background:var(--bg2);padding:0.75rem 1.1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
-  .forecast-title{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-dim);}
-  .forecast-body{padding:0;}
+/* FORECAST PANEL */
+.forecast-panel{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.forecast-head{background:var(--bg2);padding:0.65rem 1.1rem;border-bottom:1px solid var(--border);}
+.forecast-head-title{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-dim);}
+.pattern-row{border-bottom:1px solid var(--border-lt);}
+.pattern-row:last-child{border-bottom:none;}
+.pattern-toggle{display:flex;align-items:center;gap:0.75rem;padding:0.72rem 1.1rem 0.58rem;cursor:pointer;user-select:none;}
+.pattern-toggle:hover{background:rgba(0,0,0,0.015);}
+.pbadge{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.17rem 0.52rem;border-radius:99px;border:1px solid;flex-shrink:0;}
+.pbadge.large-spike{background:rgba(160,82,45,0.1);color:var(--rust);border-color:rgba(160,82,45,0.3);}
+.pbadge.small-spike{background:rgba(201,169,110,0.15);color:#8a6830;border-color:rgba(201,169,110,0.4);}
+.pbadge.decreasing{background:rgba(181,113,78,0.1);color:var(--clay);border-color:rgba(181,113,78,0.3);}
+.pbadge.fluctuating{background:rgba(107,124,92,0.1);color:var(--moss);border-color:rgba(107,124,92,0.3);}
+.pprob{font-family:'DM Mono',monospace;font-size:0.68rem;font-weight:500;color:var(--ink);}
+.ppeak{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-dim);flex:1;}
+.ppeak strong{color:var(--rust);}
+.pchev{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--ink-ghost);transition:transform 0.2s;flex-shrink:0;}
+.pattern-row.open .pchev{transform:rotate(90deg);}
+.pattern-detail{display:none;padding:0.5rem 1.1rem 0.9rem;}
+.pattern-row.open .pattern-detail{display:block;}
+.pattern-advice{font-family:'DM Mono',monospace;font-size:0.63rem;color:var(--ink-mid);line-height:1.65;margin-bottom:0.75rem;padding:0.5rem 0.75rem;border-radius:5px;background:var(--bg2);border-left:3px solid var(--border);}
+.pattern-advice strong{color:var(--ink);font-weight:500;}
+.pattern-advice.adv-spike{border-left-color:var(--rust);}
+.pattern-advice.adv-gain{border-left-color:var(--moss);}
+.pattern-advice.adv-loss{border-left-color:var(--clay);}
 
-  /* Pattern rows */
-  .pattern-forecast{border-bottom:1px solid var(--border-lt);}
-  .pattern-forecast:last-child{border-bottom:none;}
-  .pattern-header{display:flex;align-items:center;gap:0.8rem;padding:0.75rem 1.1rem 0.5rem;cursor:pointer;}
-  .pattern-badge{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.07em;text-transform:uppercase;
-    padding:0.2rem 0.6rem;border-radius:99px;border:1px solid;}
-  .pattern-badge.large-spike{background:rgba(160,82,45,0.1);color:var(--rust);border-color:rgba(160,82,45,0.3);}
-  .pattern-badge.small-spike{background:rgba(201,169,110,0.15);color:#8a6830;border-color:rgba(201,169,110,0.4);}
-  .pattern-badge.decreasing{background:rgba(181,113,78,0.1);color:var(--clay);border-color:rgba(181,113,78,0.3);}
-  .pattern-badge.fluctuating{background:rgba(107,124,92,0.1);color:var(--moss);border-color:rgba(107,124,92,0.3);}
-  .pattern-prob{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--ink);font-weight:500;margin-left:auto;}
-  .pattern-peak{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);}
-  .pattern-chevron{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--ink-dim);transition:transform 0.2s;}
-  .pattern-forecast.open .pattern-chevron{transform:rotate(90deg);}
+/* MINI GRID */
+.mini-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;border:1px solid var(--border-lt);border-radius:6px;overflow:hidden;background:var(--border-lt);}
+.mini-day{background:var(--surface);}
+.mini-dhead{font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-dim);text-align:center;padding:0.26rem 0.15rem;background:var(--bg2);border-bottom:1px solid var(--border-lt);}
+.mini-slot{padding:0.26rem 0.18rem;border-bottom:1px solid var(--border-lt);display:flex;flex-direction:column;align-items:center;gap:0.07rem;}
+.mini-slot:last-child{border-bottom:none;}
+.mini-period{font-family:'DM Mono',monospace;font-size:0.46rem;color:var(--ink-ghost);text-transform:uppercase;}
+.mini-known{font-family:'DM Mono',monospace;font-size:0.7rem;font-weight:500;color:var(--ink);}
+.mini-range{font-family:'DM Mono',monospace;font-size:0.5rem;color:var(--ink-dim);text-align:center;line-height:1.35;}
+.mini-range.r-spike{color:var(--rust);font-weight:500;}
+.mini-range.r-gain{color:var(--moss);}
+.mini-range.r-loss{color:var(--clay);}
+.mini-bar-wrap{width:100%;height:3px;background:var(--border-lt);border-radius:99px;overflow:hidden;margin-top:0.1rem;}
+.mini-bar{height:100%;border-radius:99px;}
+.mini-bar.b-spike{background:var(--rust-lt);}
+.mini-bar.b-gain{background:var(--moss);}
+.mini-bar.b-loss{background:var(--clay);}
 
-  .pattern-chart-wrap{padding:0.4rem 1.1rem 0.85rem;display:none;}
-  .pattern-forecast.open .pattern-chart-wrap{display:block;}
-
-  /* Mini forecast chart (day columns) */
-  .mini-forecast-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;border:1px solid var(--border-lt);border-radius:6px;overflow:hidden;background:var(--border-lt);}
-  .mini-day{background:var(--surface);}
-  .mini-day-head{font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-dim);text-align:center;padding:0.3rem 0.2rem;background:var(--bg2);border-bottom:1px solid var(--border-lt);}
-  .mini-slot{padding:0.3rem 0.25rem;border-bottom:1px solid var(--border-lt);display:flex;flex-direction:column;align-items:center;gap:0.1rem;}
-  .mini-slot:last-child{border-bottom:none;}
-  .mini-period{font-family:'DM Mono',monospace;font-size:0.5rem;color:var(--ink-dim);text-transform:uppercase;}
-  .mini-known{font-family:'DM Mono',monospace;font-size:0.75rem;font-weight:500;color:var(--ink);}
-  .mini-range{font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--ink-dim);text-align:center;line-height:1.3;}
-  .mini-range.r-spike{color:var(--rust);}
-  .mini-range.r-gain{color:var(--moss);}
-  .mini-range.r-loss{color:var(--clay);}
-  .mini-bar-wrap{width:100%;height:3px;background:var(--border-lt);border-radius:99px;overflow:hidden;margin-top:0.15rem;}
-  .mini-bar{height:100%;border-radius:99px;}
-  .mini-bar.b-spike{background:var(--rust-lt);}
-  .mini-bar.b-gain{background:var(--moss);}
-  .mini-bar.b-loss{background:var(--clay);}
-
-  /* Prob bars */
-  .prob-list{display:flex;flex-direction:column;gap:0.5rem;margin:0.6rem 0;}
-  .p-row{display:flex;align-items:center;gap:0.7rem;}
-  .p-name{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-mid);width:90px;flex-shrink:0;}
-  .p-track{flex:1;height:5px;background:var(--border-lt);border-radius:99px;overflow:hidden;}
-  .p-fill{height:100%;border-radius:99px;transition:width 0.55s cubic-bezier(0.34,1.4,0.64,1);}
-  .p-fill.large-spike{background:var(--rust-lt);}
-  .p-fill.small-spike{background:var(--wheat);}
-  .p-fill.decreasing{background:var(--clay);}
-  .p-fill.fluctuating{background:var(--moss);}
-  .p-pct{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);width:30px;text-align:right;flex-shrink:0;}
-
-  /* chart */
-  .chart-box{border:1px solid var(--border);border-radius:8px;background:var(--surface);padding:1.2rem 1.4rem 1rem;margin-bottom:1.4rem;}
-  canvas#chart{width:100%!important;height:140px!important;display:block;}
-
-  .tip{font-size:0.82rem;color:var(--ink-mid);line-height:1.65;border-left:2px solid var(--border);padding-left:0.9rem;margin-bottom:1.5rem;}
-  .tip strong{color:var(--rust);font-weight:600;}
-
-  /* archive */
-  .archive-list{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-  .archive-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:0;border-bottom:1px solid var(--border-lt);background:var(--surface);}
-  .archive-row:last-child{border-bottom:none;}
-  .archive-row.header{background:var(--bg2);}
-  .arc-cell{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--ink-mid);padding:0.7rem 0.9rem;display:flex;align-items:center;}
-  .archive-row.header .arc-cell{font-size:0.62rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--ink-dim);}
-  .arc-cell.gold{color:var(--rust);font-weight:500;}
-  .arc-cell.up{color:var(--moss);}.arc-cell.down{color:var(--clay);}
-  .arc-del{background:none;border:none;cursor:pointer;color:var(--ink-dim);font-size:0.8rem;padding:0.7rem 0.9rem;transition:color 0.15s;}
-  .arc-del:hover{color:var(--clay);}
-  .archive-empty{font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--ink-dim);padding:2rem;text-align:center;border:1px solid var(--border-lt);border-radius:8px;}
-
-  .btn-row{display:flex;gap:0.6rem;margin-top:1rem;flex-wrap:wrap;align-items:center;}
-  button.btn-primary{font-family:'Inter',sans-serif;font-weight:500;font-size:0.78rem;padding:0.5rem 1.1rem;border-radius:5px;border:none;cursor:pointer;background:var(--rust);color:#f5ede4;transition:background 0.15s;}
-  button.btn-primary:hover{background:var(--rust-lt);}
-  button.btn-secondary{font-family:'Inter',sans-serif;font-weight:500;font-size:0.78rem;padding:0.5rem 1.1rem;border-radius:5px;border:1px solid var(--border);cursor:pointer;background:var(--surface);color:var(--ink-mid);transition:all 0.15s;}
-  button.btn-secondary:hover{background:var(--bg2);border-color:var(--dusk);color:var(--ink);}
-  .save-status{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--ink-dim);}
-
-  hr{border:none;border-top:1px solid var(--border-lt);margin:1.5rem 0;}
-  footer{text-align:center;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);letter-spacing:0.06em;padding:0 2rem;max-width:860px;margin:2rem auto 0;}
-  @media(max-width:580px){
-    .stat-strip{grid-template-columns:repeat(2,1fr);}
-    header{padding:2rem 1.2rem 0;}.wrap{padding:1.5rem 1.2rem;}
-    .archive-row{grid-template-columns:1fr 1fr 1fr;}
-    .arc-cell:nth-child(4){display:none;}
-    .mini-forecast-grid{grid-template-columns:repeat(3,1fr);}
-  }
+/* ARCHIVE */
+.archive-list{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.archive-row{display:grid;grid-template-columns:1.2fr 0.8fr 0.8fr 0.8fr auto;border-bottom:1px solid var(--border-lt);background:var(--surface);}
+.archive-row:last-child{border-bottom:none;}
+.archive-row.hdr{background:var(--bg2);}
+.arc-cell{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--ink-mid);padding:0.65rem 0.85rem;display:flex;align-items:center;}
+.archive-row.hdr .arc-cell{font-size:0.57rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-dim);}
+.arc-cell.gold{color:var(--rust);font-weight:500;}
+.arc-cell.up{color:var(--moss);}
+.arc-cell.down{color:var(--clay);}
+.arc-del{background:none;border:none;cursor:pointer;color:var(--ink-ghost);font-size:0.8rem;padding:0.65rem 0.85rem;transition:color 0.15s;}
+.arc-del:hover{color:var(--clay);}
+.archive-empty{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--ink-dim);padding:2.5rem;text-align:center;border:1px solid var(--border-lt);border-radius:8px;}
+footer{text-align:center;font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--ink-dim);letter-spacing:0.06em;padding:0 2rem;max-width:900px;margin:2rem auto 0;}
+@media(max-width:600px){
+  .stat-strip{grid-template-columns:repeat(2,1fr);}
+  header{padding:2rem 1.2rem 0;}.wrap{padding:1.5rem 1.2rem;}
+  .archive-row{grid-template-columns:1fr 1fr 1fr;}
+  .archive-row .arc-cell:nth-child(4){display:none;}
+  .mini-grid{grid-template-columns:repeat(3,1fr);}
+}
 </style>
 </head>
 <body>
+
 <header>
   <div class="header-top">
     <div class="site-title">turnip tracker <span>/ stalk market</span></div>
@@ -193,256 +201,321 @@
 </header>
 
 <div class="wrap">
-  <!-- CURRENT WEEK -->
   <div id="tabCurrent">
-    <div class="sec-label" style="margin-bottom:1.3rem">sunday buy price</div>
-    <div class="buy-row">
-      <label>what did Daisy Mae charge you?</label>
-      <div class="field-wrap">
-        <span class="field-prefix">bells</span>
-        <input type="number" id="buyPrice" min="90" max="110" placeholder="90" oninput="recalculate()"/>
+
+    <div class="sec-label">sunday buy price</div>
+    <div class="buy-section">
+      <label>
+        what did Daisy Mae charge you?
+        <small>visits 5am–noon on sundays · typical range 90–110 bells</small>
+      </label>
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <div class="field-wrap">
+          <span class="field-prefix">bells</span>
+          <input type="number" id="buyPrice" min="90" max="110" placeholder="100" oninput="onBuyInput()"/>
+        </div>
+        <span class="buy-saved-badge" id="buySavedBadge">saved</span>
       </div>
     </div>
-    <hr/>
-    <div class="sec-label" style="margin-top:1.5rem">weekly sell prices</div>
+
+    <div class="sec-label">weekly sell prices</div>
     <div class="grid-days" id="priceGrid"></div>
+
     <div class="btn-row">
       <button class="btn-primary" onclick="saveWeek()">save week</button>
-      <button class="btn-secondary" onclick="resetCurrent()">reset</button>
+      <button class="btn-secondary" onclick="resetCurrent()">reset week</button>
       <span class="save-status" id="saveStatus"></span>
     </div>
+
     <hr/>
 
-    <!-- SUMMARY STATS -->
-    <div class="sec-label" style="margin-top:0.5rem">this week</div>
-    <div class="stat-strip" style="margin-bottom:1.4rem">
-      <div class="stat-cell"><div class="stat-lbl">best price</div><div class="stat-val gold" id="statBest">—</div></div>
-      <div class="stat-cell"><div class="stat-lbl">worst price</div><div class="stat-val down" id="statWorst">—</div></div>
-      <div class="stat-cell"><div class="stat-lbl">best profit</div><div class="stat-val up" id="statProfit">—</div></div>
-      <div class="stat-cell"><div class="stat-lbl">best window</div><div class="stat-val" id="statBestDay" style="font-size:0.9rem">—</div></div>
+    <div class="sec-label">this week at a glance</div>
+    <div class="stat-strip">
+      <div class="stat-cell">
+        <div class="stat-lbl">best price</div>
+        <div class="stat-val gold" id="statBest">—</div>
+        <div class="stat-sub" id="statBestDay"></div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-lbl">worst price</div>
+        <div class="stat-val down" id="statWorst">—</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-lbl">best profit</div>
+        <div class="stat-val" id="statProfit">—</div>
+        <div class="stat-sub" id="statProfitBells"></div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-lbl">forecast peak</div>
+        <div class="stat-val gold" id="statForecastPeak">—</div>
+        <div class="stat-sub" id="statForecastWhen"></div>
+      </div>
     </div>
 
-    <!-- TIP -->
-    <div class="tip" id="tipBox">enter your sunday buy price and this week's sell prices to begin analysis.</div>
+    <div class="tip" id="tipBox">enter your sunday buy price and this week's sell prices to unlock pattern prediction.</div>
 
-    <!-- PRICE CHART -->
     <div class="chart-box">
-      <div class="sec-label" style="margin-bottom:0.7rem">price curve + forecast range</div>
+      <div class="sec-label" style="margin-bottom:0.7rem">price curve + forecast band</div>
       <canvas id="chart"></canvas>
     </div>
 
-    <!-- PATTERN FORECAST PANEL -->
-    <div class="sec-label">pattern prediction</div>
-    <div class="prob-list" id="probBars" style="margin-bottom:1rem">
+    <div class="sec-label">pattern probabilities</div>
+    <div class="prob-list" id="probBars">
       <div class="p-row"><div class="p-name">large spike</div><div class="p-track"><div class="p-fill large-spike" id="barLS" style="width:0%"></div></div><div class="p-pct" id="pctLS">—</div></div>
       <div class="p-row"><div class="p-name">small spike</div><div class="p-track"><div class="p-fill small-spike" id="barSS" style="width:0%"></div></div><div class="p-pct" id="pctSS">—</div></div>
       <div class="p-row"><div class="p-name">decreasing</div><div class="p-track"><div class="p-fill decreasing" id="barDec" style="width:0%"></div></div><div class="p-pct" id="pctDec">—</div></div>
       <div class="p-row"><div class="p-name">fluctuating</div><div class="p-track"><div class="p-fill fluctuating" id="barFluc" style="width:0%"></div></div><div class="p-pct" id="pctFluc">—</div></div>
     </div>
 
-    <!-- DETAILED PATTERN FORECASTS -->
+    <div class="sec-label">price forecasts by pattern</div>
     <div class="forecast-panel">
-      <div class="forecast-header">
-        <span class="forecast-title">price forecasts by pattern</span>
+      <div class="forecast-head">
+        <span class="forecast-head-title">tap any pattern to expand slot-by-slot ranges · ★ marks forecast peak</span>
       </div>
-      <div class="forecast-body" id="forecastBody"></div>
+      <div id="forecastBody"></div>
     </div>
+
   </div>
 
-  <!-- ARCHIVE -->
   <div id="tabArchive" style="display:none">
     <div class="sec-label">all-time stalk market history</div>
     <div id="archiveContainer"></div>
   </div>
 </div>
 
-<footer>data synced via back4app<br>made by zahra w/ html,css,js & some sparkle dust</footer>
+<footer>data synced via back4app &nbsp;·&nbsp; made by zahra w/ html, css, js &amp; some sparkle dust</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
-// ─────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
 // ACNH TURNIP PREDICTION ENGINE
-// Based on reverse-engineered game algorithm (Treeki / Mike Bryant)
-// Patterns: 0=large spike, 1=decreasing, 2=small spike, 3=fluctuating
-// ─────────────────────────────────────────────────────
+// Algorithm based on Treeki/Mike Bryant reverse-engineering of ACNH price code
+// Reference: turnipprophet.io community documentation
+//
+// PATTERNS:
+//   0 = Large Spike  — peak 200–600% of buy, 3 consec. rises, Mon PM–Thu PM
+//   1 = Decreasing   — 85–90% Mon AM, drops 3–5%/step, min ~27 bells
+//   2 = Small Spike  — peak 140–200%, 4 rises or ↑↓↑↑, Mon AM–Thu PM
+//   3 = Fluctuating  — exactly 7 high slots (90–140%), 60–80% lows
+// ═══════════════════════════════════════════════════════════════════════════
 
-const PATTERN_NAMES={0:'large spike',1:'decreasing',2:'small spike',3:'fluctuating'};
-const PATTERN_KEYS={0:'large-spike',1:'decreasing',2:'small-spike',3:'fluctuating'};
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
 
-// Generate all possible price sequences for a given pattern
-// Returns array of {min, max} for each of the 12 sell slots
-function predictPattern(buyPrice, pattern, knownPrices){
-  const b=buyPrice;
-  // We'll generate min/max bounds for each slot by simulating the pattern ranges
-  // This implements the ACNH generation rules from the decompiled game code
+// Generate envelope of [min,max] for each of 12 sell slots under a given pattern.
+// Sweeps parameter space (N samples) and filters against known prices (±15 bell tolerance).
+function generatePattern(buy, pattern, known){
+  if(!buy) return Array(12).fill({min:null,max:null,known:false});
+  const N=350;
+  const slots=Array.from({length:12},()=>({min:Infinity,max:-Infinity}));
 
-  const slots=Array.from({length:12},(_,i)=>({min:Infinity,max:-Infinity}));
+  for(let s=0;s<N;s++){
+    const t=s/(N-1); // 0..1
+    let px=[];
 
-  const SAMPLES=200; // Monte Carlo samples across parameter space
-
-  for(let s=0;s<SAMPLES;s++){
-    let prices=[];
-
-    if(pattern===0){ // LARGE SPIKE
-      // Decreasing phase 1: slots 0-X (randomly 0-6)
-      const peakStart=Math.floor(lerp(s,SAMPLES,0,7));
-      let rate=lerp(s,SAMPLES,0.6,0.8);
-      for(let i=0;i<peakStart;i++){
-        const lo=Math.max(1,Math.round(rate*b-10));
-        const hi=Math.max(1,Math.round(rate*b));
-        prices.push(randMid(lo,hi,s+i));
-        rate-=lerp(s,SAMPLES,0.04,0.1);
+    if(pattern===0){
+      // ── LARGE SPIKE ──
+      // Decreasing pre-phase: Mon AM = 85–90%, drops 3–5%/step
+      const startRate=0.85+t*0.05;
+      const decay=0.03+t*0.02;
+      // Spike can start slots 1–7 (Mon PM through Thu PM)
+      const spikeStart=1+Math.round(t*6);
+      let rate=startRate;
+      for(let i=0;i<spikeStart&&px.length<12;i++){
+        px.push(Math.round(rate*buy));
+        rate=Math.max(0.3,rate-decay);
       }
-      // Spike: 3 consecutive slots going up then down
-      if(peakStart<12){
-        const sp0=randMid(Math.round(0.9*b-10),Math.round(1.4*b),s);
-        const sp1=randMid(Math.round(1.4*b-10),Math.round(2.0*b),s+1);
-        const sp2=randMid(Math.round(2.0*b-10),Math.round(6.0*b),s+2);
-        const sp3=randMid(Math.round(1.4*b-10),Math.round(2.0*b),s+3);
-        const sp4=randMid(Math.round(0.9*b-10),Math.round(1.4*b),s+4);
-        const spike=[sp0,sp1,sp2,sp3,sp4];
-        for(let sp of spike){if(prices.length<12)prices.push(sp);}
+      // Spike body: slot0=90–140%, slot1=140–200%, slot2=200–600% (peak), slot3=140–200%, slot4=90–140%
+      if(px.length<12){
+        const peakMult=2.0+t*4.0;
+        [
+          Math.round(clamp(0.9+t*0.5,0.9,1.4)*buy),
+          Math.round(clamp(1.4+t*0.6,1.4,2.0)*buy),
+          Math.round(clamp(peakMult,2.0,6.0)*buy),
+          Math.round(clamp(1.4+t*0.3,1.4,2.0)*buy),
+          Math.round(clamp(0.9+t*0.2,0.9,1.4)*buy)
+        ].forEach(v=>{if(px.length<12)px.push(v);});
       }
-      // Fill remainder with decreasing
-      rate=lerp(s,SAMPLES,0.6,0.8);
-      while(prices.length<12){
-        prices.push(Math.max(10,Math.round(rate*b-randMid(0,10,s+prices.length))));
-        rate-=0.04;
-      }
+      // Post-spike: decreasing ~60–80%
+      rate=0.6+t*0.2;
+      while(px.length<12){px.push(Math.max(10,Math.round(rate*buy)));rate=Math.max(0.3,rate-0.04);}
 
-    } else if(pattern===1){ // DECREASING
-      let rate=lerp(s,SAMPLES,0.85,0.9);
-      const decay=lerp(s,SAMPLES,0.03,0.05);
+    } else if(pattern===1){
+      // ── DECREASING ──
+      const startRate=0.85+t*0.05;
+      const decay=0.03+t*0.02;
+      let rate=startRate;
       for(let i=0;i<12;i++){
-        const lo=Math.max(10,Math.round((rate-decay)*b));
-        const hi=Math.max(10,Math.round(rate*b));
-        prices.push(randMid(lo,hi,s+i));
-        rate-=decay;
+        px.push(Math.max(10,Math.round(rate*buy)));
+        rate=Math.max(0.27,rate-decay);
       }
 
-    } else if(pattern===2){ // SMALL SPIKE
-      const peakStart=Math.floor(lerp(s,SAMPLES,0,7));
-      let rate=lerp(s,SAMPLES,0.6,0.8);
-      for(let i=0;i<peakStart;i++){
-        prices.push(Math.max(10,Math.round(randMid(rate-0.05,rate,s+i)*b)));
-        rate-=lerp(s,SAMPLES,0.04,0.1);
+    } else if(pattern===2){
+      // ── SMALL SPIKE ──
+      // Spike can start slots 0–7 (Mon AM through Thu PM)
+      const spikeStart=Math.round(t*7);
+      let rate=0.4+t*0.5;
+      const decay=0.03+t*0.02;
+      for(let i=0;i<spikeStart&&px.length<12;i++){
+        px.push(Math.max(10,Math.round(rate*buy)));
+        rate=Math.max(0.27,rate-decay);
       }
-      if(peakStart<12){
-        const sp0=randMid(Math.round(0.9*b-10),Math.round(1.4*b),s);
-        const sp1=randMid(Math.round(1.4*b-10),Math.round(2.0*b),s+1);
-        const sp2=randMid(Math.round(1.4*b-10),Math.round(2.0*b),s+2);
-        const sp3=randMid(Math.round(0.9*b-10),Math.round(1.4*b),s+3);
-        const spike=[sp0,sp1,sp2,sp3];
-        for(let sp of spike){if(prices.length<12)prices.push(sp);}
+      // Spike body: 90–140% start, peak 140–200%
+      // Two shapes: ↑↑↑↑ or ↑↓↑↑ (zigzag)
+      const zigzag=(s%3===1);
+      if(px.length<12){
+        const peakMult=1.4+t*0.6;
+        const p0=Math.round((0.9+t*0.2)*buy);
+        const p1=zigzag?Math.round((0.85+t*0.1)*buy):Math.round((1.0+t*0.2)*buy);
+        const p2=Math.round(clamp(peakMult*buy,1.4*buy,2.0*buy));
+        const p3=Math.round(clamp((peakMult-0.3)*buy,1.1*buy,1.7*buy));
+        [p0,p1,p2,p3].forEach(v=>{if(px.length<12)px.push(v);});
       }
-      rate=lerp(s,SAMPLES,0.6,0.8);
-      while(prices.length<12){
-        prices.push(Math.max(10,Math.round((rate-0.04)*b)));
-        rate-=0.04;
-      }
+      rate=0.6+t*0.1;
+      while(px.length<12){px.push(Math.max(10,Math.round(rate*buy)));rate=Math.max(0.27,rate-0.04);}
 
-    } else { // FLUCTUATING (pattern 3)
+    } else {
+      // ── FLUCTUATING ──
+      // Exactly 7 high slots (90–140%), spread in 1–3 bursts; lows at 60–80%
+      const highMult=0.9+t*0.5;
+      const lowStart=0.6+t*0.2;
+      const lowDecay=0.04+t*0.06;
+      let highsLeft=7, inHigh=true, phaseLen=0;
+      const maxPhaseLen=2+Math.round(t*2);
+      let rate=lowStart;
       for(let i=0;i<12;i++){
-        // Alternating low/high phases
-        const phase=Math.floor(i/2)%2;
-        const lo=phase===0?Math.round(0.6*b):Math.round(0.8*b);
-        const hi=phase===0?Math.round(0.8*b):Math.round(1.1*b);
-        prices.push(randMid(lo,hi,s+i));
+        if(highsLeft>0&&inHigh){
+          px.push(Math.round(clamp(highMult*(0.9+0.1*((i+s)%3/3)),0.6,1.4)*buy));
+          highsLeft--;phaseLen++;
+          if(phaseLen>=maxPhaseLen){inHigh=false;phaseLen=0;rate=lowStart;}
+        } else if(!inHigh){
+          px.push(Math.max(10,Math.round(rate*buy)));
+          rate=Math.max(0.3,rate-lowDecay);phaseLen++;
+          if(phaseLen>=2&&highsLeft>0){inHigh=true;phaseLen=0;}
+        } else {
+          px.push(Math.max(10,Math.round(rate*buy)));
+        }
       }
     }
 
-    prices=prices.slice(0,12);
+    px=px.slice(0,12);
 
-    // Check compatibility with known prices
-    let compatible=true;
+    // Filter: known price must be within ±15 of predicted
+    let ok=true;
     for(let i=0;i<12;i++){
-      if(knownPrices[i]!==null){
-        // Known price must be within 10% of predicted (allow for rounding)
-        if(Math.abs(prices[i]-knownPrices[i])>12){compatible=false;break;}
-      }
+      if(known[i]!==null&&Math.abs((px[i]||0)-known[i])>15){ok=false;break;}
     }
-    if(!compatible)continue;
+    if(!ok)continue;
 
-    // Update min/max
     for(let i=0;i<12;i++){
-      if(prices[i]!==undefined){
-        slots[i].min=Math.min(slots[i].min,prices[i]);
-        slots[i].max=Math.max(slots[i].max,prices[i]);
+      if(px[i]!==undefined){
+        slots[i].min=Math.min(slots[i].min,px[i]);
+        slots[i].max=Math.max(slots[i].max,px[i]);
       }
     }
   }
 
-  // Replace Infinity with nulls for slots with no compatible predictions
-  return slots.map((s,i)=>{
-    if(knownPrices[i]!==null) return {min:knownPrices[i],max:knownPrices[i],known:true};
-    if(s.min===Infinity) return {min:null,max:null,known:false};
-    return {min:s.min,max:s.max,known:false};
+  return slots.map((sl,i)=>{
+    if(known[i]!==null) return{min:known[i],max:known[i],known:true};
+    if(sl.min===Infinity) return{min:null,max:null,known:false};
+    return{min:sl.min,max:sl.max,known:false};
   });
 }
 
-function lerp(i,n,lo,hi){return lo+(hi-lo)*(i/(n-1));}
-function randMid(lo,hi,seed){
-  // deterministic "random" for reproducibility across samples
-  const r=((Math.sin(seed*127.1+lo*311.7)*43758.5453)%1+1)%1;
-  return Math.round(lo+(hi-lo)*r);
-}
-
-// Compute pattern probabilities using constraint filtering
-function computeProbabilities(buyPrice, knownPrices){
-  if(!buyPrice) return {0:25,1:25,2:25,3:25};
-
-  // Base rates from game code (approximate)
-  const baseRates={0:0.25,1:0.25,2:0.25,3:0.25};
+// Probability scoring using base transition rates + compatibility filtering
+function computeProbabilities(buy, known){
+  if(!buy) return{0:35,1:25,2:30,3:10};
+  // Game base rates (no prior week info; roughly: large spike ~35%, small ~30%, dec ~25%, fluc ~10%)
+  const base={0:0.35,1:0.25,2:0.30,3:0.10};
+  const N=200;
   const scores={};
 
   for(const p of[0,1,2,3]){
-    const preds=predictPattern(buyPrice,p,knownPrices);
-    // Score by how many known prices are compatible
-    let compatible=true;
-    let penalty=0;
-    for(let i=0;i<12;i++){
-      if(knownPrices[i]!==null){
-        if(preds[i].min===null){compatible=false;break;}
-        const margin=30;
-        const lo=preds[i].min-margin, hi=preds[i].max+margin;
-        if(knownPrices[i]<lo||knownPrices[i]>hi) penalty++;
+    let hits=0;
+    for(let s=0;s<N;s++){
+      const t=s/(N-1);
+      let px=[];
+      if(p===0){
+        const sr=0.85+t*0.05,dc=0.03+t*0.02,ss=1+Math.round(t*6);
+        let rate=sr;
+        for(let i=0;i<ss&&px.length<12;i++){px.push(Math.round(rate*buy));rate=Math.max(0.3,rate-dc);}
+        const pm=2.0+t*4.0;
+        [Math.round((0.9+t*0.5)*buy),Math.round((1.4+t*0.6)*buy),Math.round(pm*buy),Math.round((1.4+t*0.3)*buy),Math.round((0.9+t*0.2)*buy)].forEach(v=>{if(px.length<12)px.push(v);});
+        rate=0.6+t*0.2;while(px.length<12){px.push(Math.max(10,Math.round(rate*buy)));rate=Math.max(0.3,rate-0.04);}
+      } else if(p===1){
+        let rate=0.85+t*0.05,dc=0.03+t*0.02;
+        for(let i=0;i<12;i++){px.push(Math.max(10,Math.round(rate*buy)));rate=Math.max(0.27,rate-dc);}
+      } else if(p===2){
+        const ss=Math.round(t*7);let rate=0.4+t*0.5,dc=0.03+t*0.02;
+        for(let i=0;i<ss&&px.length<12;i++){px.push(Math.max(10,Math.round(rate*buy)));rate=Math.max(0.27,rate-dc);}
+        const pm=1.4+t*0.6;
+        [Math.round((0.9+t*0.2)*buy),Math.round((1.0+t*0.2)*buy),Math.round(pm*buy),Math.round((pm-0.3)*buy)].forEach(v=>{if(px.length<12)px.push(v);});
+        rate=0.6+t*0.1;while(px.length<12){px.push(Math.max(10,Math.round(rate*buy)));rate=Math.max(0.27,rate-0.04);}
+      } else {
+        const hm=0.9+t*0.5,ls=0.6+t*0.2,ld=0.04+t*0.06;
+        let hl=7,inH=true,pl=0,mpl=2+Math.round(t*2),rate=ls;
+        for(let i=0;i<12;i++){
+          if(hl>0&&inH){px.push(Math.round(clamp(hm,0.6,1.4)*buy));hl--;pl++;if(pl>=mpl){inH=false;pl=0;rate=ls;}}
+          else if(!inH){px.push(Math.max(10,Math.round(rate*buy)));rate=Math.max(0.3,rate-ld);pl++;if(pl>=2&&hl>0){inH=true;pl=0;}}
+          else px.push(Math.max(10,Math.round(rate*buy)));
+        }
       }
+      px=px.slice(0,12);
+      let ok=true;
+      for(let i=0;i<12;i++){if(known[i]!==null&&Math.abs((px[i]||0)-known[i])>15){ok=false;break;}}
+      if(ok)hits++;
     }
-    scores[p]=compatible?Math.max(0,baseRates[p]-penalty*0.08):0.01;
+    scores[p]=base[p]*(hits/N);
   }
 
   const total=Object.values(scores).reduce((a,b)=>a+b,0)||1;
   const result={};
-  for(const p of[0,1,2,3]) result[p]=Math.round((scores[p]/total)*100);
+  for(const p of[0,1,2,3]) result[p]=Math.max(1,Math.round((scores[p]/total)*100));
   return result;
 }
 
-// ─────────────────────────────────────────────────────
-// APP STATE
-// ─────────────────────────────────────────────────────
+// Advice per pattern
+const PATTERNS={
+  0:{name:'large spike',key:'large-spike',advClass:'adv-spike',
+    advice:(fmax,fslot)=>`<strong>Large spike</strong> — prices shoot up 200–600% then drop sharply. Look for 3 consecutive increases (⬆⬆⬆). ${fslot!=null?`Spike projected to start around <strong>${LABELS[fslot]}</strong>.`:''} Peak can reach up to <strong>${fmax} bells</strong>. Sell at the 3rd rise or the moment prices exceed 200% of your buy price — the crash follows immediately.`},
+  1:{name:'decreasing',key:'decreasing',advClass:'adv-loss',
+    advice:()=>`<strong>Decreasing pattern</strong> — prices start at 85–90% and drop steadily 3–5% every slot. They will not recover. Minimum floor is roughly 27 bells. Sell now to minimize loss, or check a friend's island — maybe they have a spike going.`},
+  2:{name:'small spike',key:'small-spike',advClass:'adv-spike',
+    advice:(fmax)=>`<strong>Small spike</strong> — prices rise to 140–200% of buy price. Pattern is either 4 straight rises (⬆⬆⬆⬆) or a slight dip then rise (⬆↓⬆⬆). Peak around <strong>${fmax} bells</strong>. If two back-to-back prices look similarly high, sell immediately — the drop follows quickly.`},
+  3:{name:'fluctuating',key:'fluctuating',advClass:'adv-gain',
+    advice:(fmax)=>`<strong>Fluctuating</strong> — exactly 7 high-price slots (90–140%) distributed in 1–3 bursts with low phases between them. Peak up to <strong>${fmax} bells</strong>. All high slots are roughly equal, so sell as soon as you're in profit — don't gamble waiting for higher unless you can track which burst you're in.`}
+};
+
+// ═══════════════════════════════════════════════════════════════
+// APP STATE & INIT
+// ═══════════════════════════════════════════════════════════════
 const DAYS=['mon','tue','wed','thu','fri','sat'];
 const PERIODS=['am','pm'];
 const LABELS=DAYS.flatMap(d=>PERIODS.map(p=>`${d} ${p}`));
 let chartInstance=null;
 let currentWeekObj=null;
+let saveTimer=null;
 
 (async()=>{
   const u=Parse.User.current();
   if(!u){window.location.href='index.html';return;}
   document.getElementById('userChip').textContent=u.get('email')||u.get('username');
+  // 1. Load data first (populates currentWeekObj + sets buyPrice input)
   await loadCurrentWeek();
+  // 2. Build grid AFTER load so it can restore saved slot values
   buildGrid();
+  // 3. Run prediction with restored data
   recalculate();
 })();
 
 function switchTab(tab,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('tabCurrent').style.display=tab==='current'?'block':'none';
-  document.getElementById('tabArchive').style.display=tab==='archive'?'block':'none';
+  document.getElementById('tabCurrent').style.display=tab==='current'?'':'none';
+  document.getElementById('tabArchive').style.display=tab==='archive'?'':'none';
   if(tab==='archive') renderArchive();
 }
 
+// ── GRID BUILD ──
 function buildGrid(){
   const grid=document.getElementById('priceGrid');
   grid.innerHTML='';
@@ -451,11 +524,14 @@ function buildGrid(){
     let inner=`<div class="day-head">${day}</div>`;
     PERIODS.forEach((period,pi)=>{
       const key=`p_${di}_${pi}`;
-      const val=currentWeekObj?.prices?.[key]||'';
+      // Restore from saved data
+      const savedPrices=currentWeekObj?.get('prices');
+      const val=(savedPrices&&savedPrices[key]!=null)?savedPrices[key]:'';
       inner+=`<div class="day-slot">
         <div class="slot-period">${period}</div>
         <input class="slot-input" type="number" id="${key}" min="1" max="999" placeholder="—"
-          value="${val}" oninput="recalculate()"/>
+          value="${val}" oninput="onSlotInput()"/>
+        <div class="slot-trend" id="tr_${di}_${pi}"></div>
         <div class="slot-forecast" id="fc_${di}_${pi}"></div>
       </div>`;
     });
@@ -463,31 +539,45 @@ function buildGrid(){
   });
 }
 
+// ── LOAD ──
 async function loadCurrentWeek(){
   const u=Parse.User.current();
-  const weekId=getCurrentWeekId();
+  const weekId=getWeekId();
   try{
     const q=new Parse.Query('TurnipWeek');
-    q.equalTo('user',u);q.equalTo('weekId',weekId);
+    q.equalTo('user',u);
+    q.equalTo('weekId',weekId);
     currentWeekObj=await q.first()||null;
-    if(currentWeekObj?.get('buyPrice'))
-      document.getElementById('buyPrice').value=currentWeekObj.get('buyPrice');
-  }catch(e){console.error(e);}
+    if(currentWeekObj){
+      const buy=currentWeekObj.get('buyPrice');
+      if(buy!=null) document.getElementById('buyPrice').value=buy;
+    }
+  }catch(e){console.error('load error:',e);}
 }
 
-function getCurrentWeekId(){
+function getWeekId(){
   const now=new Date();
-  const day=now.getDay();
+  const day=now.getDay(); // 0=Sun
   const diff=now.getDate()-day+(day===0?-6:1);
-  const mon=new Date(new Date().setDate(diff));
+  const mon=new Date(now.getFullYear(),now.getMonth(),diff);
   return `${mon.getFullYear()}-${String(mon.getMonth()+1).padStart(2,'0')}-${String(mon.getDate()).padStart(2,'0')}`;
+}
+
+// ── INPUT HANDLERS ──
+function onBuyInput(){debounceSave();recalculate();}
+function onSlotInput(){debounceSave();recalculate();}
+
+function debounceSave(){
+  setStatus('unsaved…','');
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>saveWeek(),1200);
 }
 
 function getPriceMap(){
   const map={};
   DAYS.forEach((_,di)=>PERIODS.forEach((_,pi)=>{
     const v=document.getElementById(`p_${di}_${pi}`)?.value;
-    if(v) map[`p_${di}_${pi}`]=parseInt(v);
+    if(v&&v!=='') map[`p_${di}_${pi}`]=parseInt(v);
   }));
   return map;
 }
@@ -495,320 +585,354 @@ function getPriceMap(){
 function getKnownPrices(){
   return DAYS.flatMap((_,di)=>PERIODS.map((_,pi)=>{
     const v=document.getElementById(`p_${di}_${pi}`)?.value;
-    return v?parseInt(v):null;
+    return(v&&v!=='')?parseInt(v):null;
   }));
 }
 
+// ── SAVE ──
 async function saveWeek(){
   const u=Parse.User.current();if(!u)return;
   const buy=parseInt(document.getElementById('buyPrice').value)||null;
   const prices=getPriceMap();
-  const weekId=getCurrentWeekId();
-  setStatus('saving…');
+  // Don't write an empty record
+  if(buy==null&&Object.keys(prices).length===0){setStatus('','');return;}
+  setStatus('saving…','');
   try{
     let obj=currentWeekObj;
     if(!obj){
-      const TurnipWeek=Parse.Object.extend('TurnipWeek');
-      obj=new TurnipWeek();
-      obj.set('user',u);obj.set('weekId',weekId);
+      const TW=Parse.Object.extend('TurnipWeek');
+      obj=new TW();
+      obj.set('user',u);
+      obj.set('weekId',getWeekId());
       obj.setACL(new Parse.ACL(u));
     }
-    if(buy)obj.set('buyPrice',buy);
+    // Always persist buy price (the core bug fix — was conditional before)
+    if(buy!=null) obj.set('buyPrice',buy);
     obj.set('prices',prices);
-    const vals=Object.values(prices).filter(Boolean);
-    if(vals.length){obj.set('bestPrice',Math.max(...vals));obj.set('worstPrice',Math.min(...vals));}
+    const vals=Object.values(prices).map(Number).filter(v=>v>0);
+    if(vals.length){
+      obj.set('bestPrice',Math.max(...vals));
+      obj.set('worstPrice',Math.min(...vals));
+    }
     await obj.save();
     currentWeekObj=obj;
-    setStatus('saved ✓');setTimeout(()=>setStatus(''),2000);
-  }catch(e){setStatus('error: '+e.message);}
+    setStatus('saved ✓','ok');
+    // Flash buy-saved badge
+    if(buy!=null){
+      const b=document.getElementById('buySavedBadge');
+      b.classList.add('show');
+      setTimeout(()=>b.classList.remove('show'),2200);
+    }
+    setTimeout(()=>setStatus('',''),3000);
+  }catch(e){
+    setStatus('error: '+e.message,'err');
+  }
 }
-function setStatus(msg){document.getElementById('saveStatus').textContent=msg;}
+
+function setStatus(msg,cls){
+  const el=document.getElementById('saveStatus');
+  el.textContent=msg;
+  el.className='save-status'+(cls?' '+cls:'');
+}
 
 async function resetCurrent(){
-  if(!confirm('reset this week?'))return;
+  if(!confirm('clear this week\'s data?'))return;
+  clearTimeout(saveTimer);
   DAYS.forEach((_,di)=>PERIODS.forEach((_,pi)=>{
     const el=document.getElementById(`p_${di}_${pi}`);
     if(el){el.value='';el.className='slot-input';}
+    const tr=document.getElementById(`tr_${di}_${pi}`);if(tr){tr.textContent='';tr.className='slot-trend';}
+    const fc=document.getElementById(`fc_${di}_${pi}`);if(fc){fc.textContent='';fc.className='slot-forecast';}
   }));
   document.getElementById('buyPrice').value='';
-  resetStats();
+  resetUI();
   if(currentWeekObj){try{await currentWeekObj.destroy();currentWeekObj=null;}catch(e){}}
+  setStatus('reset','');setTimeout(()=>setStatus('',''),2000);
 }
 
-// ─────────────────────────────────────────────────────
-// RECALCULATE — main update function
-// ─────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// RECALCULATE
+// ═══════════════════════════════════════════════════════════════
 function recalculate(){
   const buy=parseInt(document.getElementById('buyPrice').value)||null;
   const known=getKnownPrices();
   const filled=known.filter(p=>p!==null);
 
-  // Colour-code inputs
-  DAYS.forEach((_,di)=>PERIODS.forEach((_,pi)=>{
+  // Colour inputs + trend arrows
+  known.forEach((v,idx)=>{
+    const di=Math.floor(idx/2),pi=idx%2;
     const el=document.getElementById(`p_${di}_${pi}`);
-    const v=parseInt(el.value);
+    const tr=document.getElementById(`tr_${di}_${pi}`);
+    if(!el)return;
     el.className='slot-input';
-    if(buy&&v){const pct=(v-buy)/buy;if(pct>=0.5)el.classList.add('spike');else if(pct>0)el.classList.add('gain');else el.classList.add('loss');}
-  }));
+    if(tr){tr.textContent='';tr.className='slot-trend';}
+    if(v===null||!el.value)return;
+    if(buy){
+      const pct=(v-buy)/buy;
+      if(pct>=0.5) el.classList.add('spike');
+      else if(pct>0) el.classList.add('gain');
+      else el.classList.add('loss');
+    }
+    // Trend arrow vs previous non-null slot
+    if(idx>0&&known[idx-1]!=null&&tr){
+      const prev=known[idx-1];
+      if(v>prev*1.5){tr.textContent='⬆⬆';tr.classList.add('arr-spike');}
+      else if(v>prev){tr.textContent='⬆';tr.classList.add('arr-up');}
+      else if(v<prev){tr.textContent='⬇';tr.classList.add('arr-down');}
+      else{tr.textContent='→';}
+    }
+  });
 
-  if(!filled.length&&!buy){resetStats();return;}
+  if(!buy&&!filled.length){resetUI();return;}
 
   // Summary stats
   if(filled.length){
     const best=Math.max(...filled),worst=Math.min(...filled);
     const bestIdx=known.indexOf(best);
-    document.getElementById('statBest').textContent=best;
-    document.getElementById('statWorst').textContent=worst;
+    document.getElementById('statBest').textContent=best+' Bells';
+    document.getElementById('statBestDay').textContent=LABELS[bestIdx]||'';
+    document.getElementById('statWorst').textContent=worst+' Bells';
     if(buy){
-      const p=(((best-buy)/buy)*100).toFixed(1);
-      document.getElementById('statProfit').textContent=(p>0?'+':'')+p+'%';
-    }else document.getElementById('statProfit').textContent='—';
-    document.getElementById('statBestDay').textContent=LABELS[bestIdx]||'—';
+      const diff=best-buy;
+      const pct=((diff/buy)*100).toFixed(1);
+      const profEl=document.getElementById('statProfit');
+      profEl.textContent=(diff>=0?'+':'')+pct+'%';
+      profEl.className='stat-val'+(diff>0?' up':' down');
+      document.getElementById('statProfitBells').textContent=(diff>=0?'+':'')+diff+' bells/turnip';
+    }
+  } else {
+    ['statBest','statWorst'].forEach(id=>document.getElementById(id).textContent='—');
+    ['statBestDay','statProfitBells'].forEach(id=>document.getElementById(id).textContent='');
+    document.getElementById('statProfit').textContent='—';
+    document.getElementById('statProfit').className='stat-val';
   }
 
-  if(!buy){resetStats();return;}
+  if(!buy) return;
 
-  // Pattern probabilities
+  // Compute probabilities
   const probs=computeProbabilities(buy,known);
   updateProbBars(probs);
 
-  // Per-pattern forecasts
+  // Per-pattern envelopes
   const forecasts={};
-  for(const p of[0,1,2,3]){
-    forecasts[p]=predictPattern(buy,p,known);
-  }
+  for(const p of[0,1,2,3]) forecasts[p]=generatePattern(buy,p,known);
 
-  // Aggregate min/max across all patterns (weighted by probability)
+  // Aggregate envelope (union of all patterns with prob>5%)
   const aggMin=Array(12).fill(Infinity);
   const aggMax=Array(12).fill(-Infinity);
   for(const p of[0,1,2,3]){
-    if(probs[p]<3)continue;
+    if(probs[p]<5) continue;
     forecasts[p].forEach((s,i)=>{
-      if(s.min!==null){aggMin[i]=Math.min(aggMin[i],s.min);aggMax[i]=Math.max(aggMax[i],s.max);}
+      if(s.min!==null){
+        aggMin[i]=Math.min(aggMin[i],s.min);
+        aggMax[i]=Math.max(aggMax[i],s.max);
+      }
     });
   }
 
-  // Update inline slot forecasts
-  DAYS.forEach((_,di)=>PERIODS.forEach((_,pi)=>{
-    const idx=di*2+pi;
-    const el=document.getElementById(`fc_${di}_${pi}`);
-    if(!el)return;
-    if(known[idx]!==null){el.textContent='';return;}
-    if(aggMin[idx]===Infinity){el.textContent='';return;}
+  // Inline slot forecasts (unknown slots only)
+  known.forEach((_,idx)=>{
+    const di=Math.floor(idx/2),pi=idx%2;
+    const fc=document.getElementById(`fc_${di}_${pi}`);
+    if(!fc) return;
+    if(known[idx]!==null){fc.textContent='';fc.className='slot-forecast';return;}
+    if(aggMin[idx]===Infinity){fc.textContent='';return;}
     const lo=aggMin[idx],hi=aggMax[idx];
-    let cls='';
-    if(buy&&hi>=buy*1.5)cls='f-spike';
-    else if(buy&&lo>=buy)cls='f-gain';
-    else cls='f-loss';
-    el.className=`slot-forecast ${cls}`;
-    el.textContent=`${lo}–${hi}`;
-  }));
+    let cls='f-loss';
+    if(hi>=buy*1.5) cls='f-spike';
+    else if(lo>=buy) cls='f-gain';
+    fc.className='slot-forecast '+cls;
+    fc.textContent=lo===hi?`~${lo}`:`${lo}–${hi}`;
+  });
 
-  // Draw chart with forecast bands
+  // Forecast peak stat cell
+  const validMaxes=aggMax.filter(v=>v!==-Infinity);
+  if(validMaxes.length){
+    const fp=Math.max(...validMaxes);
+    const fpi=aggMax.indexOf(fp);
+    document.getElementById('statForecastPeak').textContent=fp+' Bells';
+    document.getElementById('statForecastWhen').textContent=LABELS[fpi]||'';
+  }
+
   drawChart(known,buy,aggMin,aggMax);
-
-  // Render forecast panel
   renderForecastPanel(forecasts,probs,known,buy);
-
-  // Tip
-  updateTip(known,buy,probs);
+  updateTip(known,buy,probs,forecasts);
 }
 
 function updateProbBars(probs){
   const map={0:['barLS','pctLS'],2:['barSS','pctSS'],1:['barDec','pctDec'],3:['barFluc','pctFluc']};
-  for(const [p,[bid,pid]] of Object.entries(map)){
+  for(const[p,[bid,pid]] of Object.entries(map)){
     const v=probs[p]||0;
     document.getElementById(bid).style.width=v+'%';
     document.getElementById(pid).textContent=v+'%';
   }
 }
 
-function renderForecastPanel(forecasts,probs,known,buy){
-  const body=document.getElementById('forecastBody');
-  body.innerHTML='';
-  // Sort patterns by probability descending
-  const sorted=[0,2,1,3].sort((a,b)=>(probs[b]||0)-(probs[a]||0));
-
-  sorted.forEach(p=>{
-    const name=PATTERN_NAMES[p];
-    const key=PATTERN_KEYS[p];
-    const prob=probs[p]||0;
-    const slots=forecasts[p];
-    const maxPrice=Math.max(...slots.map(s=>s.max||0));
-
-    const div=document.createElement('div');
-    div.className='pattern-forecast';
-    div.innerHTML=`
-      <div class="pattern-header" onclick="togglePattern(this)">
-        <span class="pattern-badge ${key}">${name}</span>
-        <span class="pattern-prob">${prob}%</span>
-        <span class="pattern-peak">${maxPrice>0?'peak up to '+maxPrice+' bells':''}</span>
-        <span class="pattern-chevron">›</span>
-      </div>
-      <div class="pattern-chart-wrap">
-        <div class="mini-forecast-grid" id="mini-${p}"></div>
-      </div>`;
-    body.appendChild(div);
-
-    // Build mini grid
-    const grid=div.querySelector(`#mini-${p}`);
-    DAYS.forEach((day,di)=>{
-      const dcol=document.createElement('div');dcol.className='mini-day';
-      let inner=`<div class="mini-day-head">${day}</div>`;
-      PERIODS.forEach((_,pi)=>{
-        const idx=di*2+pi;
-        const s=slots[idx];
-        if(s.known){
-          inner+=`<div class="mini-slot">
-            <div class="mini-period">${PERIODS[pi]}</div>
-            <div class="mini-known">${s.min}</div>
-            <div class="mini-bar-wrap"><div class="mini-bar" style="width:100%;background:var(--border)"></div></div>
-          </div>`;
-        } else if(s.min===null){
-          inner+=`<div class="mini-slot">
-            <div class="mini-period">${PERIODS[pi]}</div>
-            <div class="mini-range">—</div>
-          </div>`;
-        } else {
-          const lo=s.min,hi=s.max;
-          let cls='r-loss',bc='b-loss';
-          if(buy&&hi>=buy*1.5){cls='r-spike';bc='b-spike';}
-          else if(buy&&lo>=buy){cls='r-gain';bc='b-gain';}
-          const barW=buy?Math.min(100,Math.round((hi/buy)*50))+'%':'50%';
-          inner+=`<div class="mini-slot">
-            <div class="mini-period">${PERIODS[pi]}</div>
-            <div class="mini-range ${cls}">${lo}<br>–${hi}</div>
-            <div class="mini-bar-wrap"><div class="mini-bar ${bc}" style="width:${barW}"></div></div>
-          </div>`;
-        }
-      });
-      dcol.innerHTML=inner;grid.appendChild(dcol);
-    });
-
-    // Auto-open the top pattern
-    if(sorted[0]===p) div.classList.add('open');
-  });
-}
-
-function togglePattern(header){
-  const row=header.parentElement;
-  row.classList.toggle('open');
-}
-
-function updateTip(known,buy,probs){
-  const filled=known.filter(p=>p!==null);
-  const parts=[];
-  if(!buy){parts.push('enter your sunday buy price to unlock pattern prediction and profit analysis.');
-  }else if(!filled.length){parts.push(`buy price set at <strong>${buy} bells</strong>. enter sell prices as the week unfolds.`);
-  }else{
-    const best=Math.max(...filled);
-    const bestIdx=known.indexOf(best);
-    const bestDay=LABELS[bestIdx];
-    const profit=best-buy;
-    if(profit>0) parts.push(`best recorded price is <strong>${best} bells</strong> on ${bestDay} — that's +${profit} bells per turnip (+${((profit/buy)*100).toFixed(0)}%).`);
-    else parts.push(`prices are below your buy price of ${buy}. current best is ${best} bells.`);
-
-    const topPattern=Object.entries(probs).sort((a,b)=>b[1]-a[1])[0];
-    if(topPattern[1]>40) parts.push(`most likely pattern: <strong>${PATTERN_NAMES[topPattern[0]]}</strong> (${topPattern[1]}%).`);
-    if(probs[0]>35||probs[2]>35) parts.push('spike pattern likely — check forecasts below for peak windows before selling.');
+function updateTip(known,buy,probs,forecasts){
+  const filled=known.filter(v=>v!==null);
+  const sorted=Object.entries(probs).sort((a,b)=>b[1]-a[1]);
+  const topP=parseInt(sorted[0][0]),topPct=sorted[0][1];
+  const pat=PATTERNS[topP];
+  const fSlots=forecasts[topP];
+  const fmax=Math.max(...fSlots.map(s=>s.max||0));
+  const fmaxIdx=fSlots.findIndex(s=>!s.known&&s.max===fmax);
+  let tip='';
+  if(!filled.length){
+    tip=`buy price set at <strong>${buy} bells</strong>. enter sell prices as the week unfolds — predictions update in real time.`;
+  } else {
+    tip=pat.advice(fmax,fmaxIdx>=0?fmaxIdx:null);
+    if(topPct<50) tip+=` <em style="color:var(--ink-dim)">(${topPct}% confidence — more data will sharpen this.)</em>`;
   }
-  document.getElementById('tipBox').innerHTML=parts.join(' ');
+  document.getElementById('tipBox').innerHTML=tip;
 }
 
 function drawChart(known,buy,aggMin,aggMax){
   const ctx=document.getElementById('chart').getContext('2d');
   if(chartInstance)chartInstance.destroy();
-
   const pc=known.map(v=>{
-    if(v===null||!buy)return'#8a9e7e';
-    if(v>=buy*1.5)return'#a0522d';
-    if(v>buy)return'#6b7c5c';
-    return'#b5714e';
+    if(v===null||!buy) return '#c9bfb0';
+    if(v>=buy*1.5) return '#a0522d';
+    if(v>buy) return '#6b7c5c';
+    return '#b5714e';
   });
-
-  const minBand=aggMin.map(v=>v===Infinity?NaN:v);
-  const maxBand=aggMax.map(v=>v===-Infinity?NaN:v);
-
   chartInstance=new Chart(ctx,{type:'line',data:{labels:LABELS,datasets:[
-    // Forecast max band
-    {label:'forecast max',data:maxBand,borderColor:'rgba(160,82,45,0.15)',backgroundColor:'rgba(160,82,45,0.06)',
-      borderWidth:1,borderDash:[3,3],pointRadius:0,tension:0.3,fill:'+1',spanGaps:true},
-    // Forecast min band
-    {label:'forecast min',data:minBand,borderColor:'rgba(160,82,45,0.15)',backgroundColor:'transparent',
-      borderWidth:1,borderDash:[3,3],pointRadius:0,tension:0.3,fill:false,spanGaps:true},
-    // Buy price line
-    ...(buy?[{label:'buy',data:Array(12).fill(buy),borderColor:'#c9bfb0',borderDash:[4,4],borderWidth:1.5,pointRadius:0,tension:0}]:[]),
-    // Actual prices
-    {label:'sell',data:known.map(p=>p??NaN),borderColor:'#a0522d',backgroundColor:'rgba(160,82,45,0.08)',
-      borderWidth:2,pointBackgroundColor:pc,pointBorderColor:pc,pointRadius:4,pointHoverRadius:6,
-      tension:0.3,fill:true,spanGaps:false}
+    {label:'forecast high',data:aggMax.map(v=>v===-Infinity?NaN:v),borderColor:'rgba(160,82,45,0.2)',backgroundColor:'rgba(160,82,45,0.08)',borderWidth:1.5,borderDash:[3,3],pointRadius:0,tension:0.4,fill:'+1',spanGaps:true},
+    {label:'forecast low',data:aggMin.map(v=>v===Infinity?NaN:v),borderColor:'rgba(160,82,45,0.2)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[3,3],pointRadius:0,tension:0.4,fill:false,spanGaps:true},
+    ...(buy?[{label:'buy price',data:Array(12).fill(buy),borderColor:'rgba(201,191,176,0.5)',borderDash:[4,4],borderWidth:1.5,pointRadius:0,tension:0,fill:false}]:[]),
+    {label:'sell',data:known.map(p=>p??NaN),borderColor:'#a0522d',backgroundColor:'rgba(160,82,45,0.07)',borderWidth:2,pointBackgroundColor:pc,pointBorderColor:pc,pointRadius:5,pointHoverRadius:7,tension:0.3,fill:true,spanGaps:false}
   ]},options:{responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},
-      tooltip:{backgroundColor:'#3b3028',titleColor:'#c9bfb0',bodyColor:'#f0ebe3',
-        titleFont:{family:'DM Mono',size:11},bodyFont:{family:'DM Mono',size:11},
-        callbacks:{label:c=>{
-          if(c.dataset.label==='sell'&&!isNaN(c.parsed.y))return`${c.parsed.y} bells`;
-          if(c.dataset.label==='forecast max'&&!isNaN(c.parsed.y))return`forecast max: ${c.parsed.y}`;
-          if(c.dataset.label==='forecast min'&&!isNaN(c.parsed.y))return`forecast min: ${c.parsed.y}`;
-          return null;
-        }}}},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#3b3028',titleColor:'#c9bfb0',bodyColor:'#f0ebe3',padding:10,titleFont:{family:'DM Mono',size:11},bodyFont:{family:'DM Mono',size:11},
+      callbacks:{label:c=>{
+        if(c.dataset.label==='sell'&&!isNaN(c.parsed.y))return`${c.parsed.y} bells`;
+        if(c.dataset.label==='forecast high'&&!isNaN(c.parsed.y))return`forecast high: ${c.parsed.y}`;
+        if(c.dataset.label==='forecast low'&&!isNaN(c.parsed.y))return`forecast low: ${c.parsed.y}`;
+        if(c.dataset.label==='buy price')return`buy: ${c.parsed.y} bells`;
+        return null;
+      }}}},
     scales:{
       x:{ticks:{font:{family:'DM Mono',size:10},color:'#9e8f83',maxRotation:0},grid:{display:false},border:{display:false}},
-      y:{ticks:{font:{family:'DM Mono',size:10},color:'#9e8f83'},grid:{color:'rgba(201,191,176,0.35)'},border:{display:false}}
+      y:{ticks:{font:{family:'DM Mono',size:10},color:'#9e8f83'},grid:{color:'rgba(201,191,176,0.3)'},border:{display:false},suggestedMin:0}
     }}});
 }
 
-function resetStats(){
-  ['statBest','statWorst','statProfit','statBestDay'].forEach(id=>document.getElementById(id).textContent='—');
-  document.getElementById('tipBox').innerHTML='enter your sunday buy price and this week\'s sell prices to begin analysis.';
+function renderForecastPanel(forecasts,probs,known,buy){
+  const body=document.getElementById('forecastBody');
+  body.innerHTML='';
+  const sorted=[0,2,1,3].sort((a,b)=>(probs[b]||0)-(probs[a]||0));
+
+  sorted.forEach((p,rank)=>{
+    const pat=PATTERNS[p];
+    const slots=forecasts[p];
+    const prob=probs[p]||0;
+    const fmax=Math.max(...slots.map(s=>s.max||0));
+    const fmaxIdx=slots.findIndex(s=>!s.known&&s.max===fmax);
+
+    const peakLabel=fmax>0
+      ?(fmaxIdx>=0?`peak ~${fmax} bells (${LABELS[fmaxIdx]})`:`peak ~${fmax} bells`)
+      :`no compatible sequence found`;
+
+    const advText=pat.advice(fmax,fmaxIdx>=0?fmaxIdx:null);
+
+    const div=document.createElement('div');
+    div.className='pattern-row'+(rank===0?' open':'');
+    div.innerHTML=`
+      <div class="pattern-toggle" onclick="this.parentElement.classList.toggle('open')">
+        <span class="pbadge ${pat.key}">${pat.name}</span>
+        <span class="pprob">${prob}%</span>
+        <span class="ppeak">${peakLabel}</span>
+        <span class="pchev">›</span>
+      </div>
+      <div class="pattern-detail">
+        <div class="pattern-advice ${pat.advClass}">${advText}</div>
+        <div class="mini-grid" id="mg_${p}"></div>
+      </div>`;
+    body.appendChild(div);
+
+    const mg=div.querySelector(`#mg_${p}`);
+    DAYS.forEach((day,di)=>{
+      const dcol=document.createElement('div');dcol.className='mini-day';
+      let inner=`<div class="mini-dhead">${day}</div>`;
+      PERIODS.forEach((_,pi)=>{
+        const idx=di*2+pi;
+        const s=slots[idx];
+        const isPeak=(idx===fmaxIdx);
+        if(!s||s.min===null){
+          inner+=`<div class="mini-slot"><div class="mini-period">${PERIODS[pi]}</div><div class="mini-range" style="color:var(--ink-ghost)">—</div></div>`;
+        } else if(s.known){
+          inner+=`<div class="mini-slot">
+            <div class="mini-period">${PERIODS[pi]}</div>
+            <div class="mini-known">${s.min}</div>
+            <div class="mini-bar-wrap"><div class="mini-bar" style="width:100%;background:var(--border)"></div></div>
+          </div>`;
+        } else {
+          const lo=s.min,hi=s.max;
+          let rcls='r-loss',bcls='b-loss';
+          if(buy&&hi>=buy*1.5){rcls='r-spike';bcls='b-spike';}
+          else if(buy&&lo>=buy){rcls='r-gain';bcls='b-gain';}
+          const barW=buy?Math.min(100,Math.round((hi/(buy*3))*100))+'%':'35%';
+          inner+=`<div class="mini-slot"${isPeak?' style="background:rgba(160,82,45,0.06)"':''}>
+            <div class="mini-period">${PERIODS[pi]}${isPeak?' ★':''}</div>
+            <div class="mini-range ${rcls}">${lo===hi?`~${lo}`:`${lo}<br>–${hi}`}</div>
+            <div class="mini-bar-wrap"><div class="mini-bar ${bcls}" style="width:${barW}"></div></div>
+          </div>`;
+        }
+      });
+      dcol.innerHTML=inner;mg.appendChild(dcol);
+    });
+  });
+}
+
+function resetUI(){
+  ['statBest','statWorst','statForecastPeak'].forEach(id=>document.getElementById(id).textContent='—');
+  ['statBestDay','statProfitBells','statForecastWhen'].forEach(id=>document.getElementById(id).textContent='');
+  document.getElementById('statProfit').textContent='—';
+  document.getElementById('statProfit').className='stat-val';
+  document.getElementById('tipBox').innerHTML='enter your sunday buy price and this week\'s sell prices to unlock pattern prediction.';
   document.getElementById('forecastBody').innerHTML='';
   if(chartInstance){chartInstance.destroy();chartInstance=null;}
-  // Clear inline forecasts
-  DAYS.forEach((_,di)=>PERIODS.forEach((_,pi)=>{
-    const el=document.getElementById(`fc_${di}_${pi}`);
-    if(el)el.textContent='';
-  }));
   updateProbBars({0:0,1:0,2:0,3:0});
 }
 
-// ─────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
 // ARCHIVE
-// ─────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
 async function renderArchive(){
-  const container=document.getElementById('archiveContainer');
-  container.innerHTML='<div class="archive-empty">loading…</div>';
+  const c=document.getElementById('archiveContainer');
+  c.innerHTML='<div class="archive-empty">loading…</div>';
   const u=Parse.User.current();if(!u)return;
   try{
     const q=new Parse.Query('TurnipWeek');
     q.equalTo('user',u);q.descending('weekId');q.limit(200);
-    const results=await q.find();
-    if(!results.length){container.innerHTML='<div class="archive-empty">no archived weeks yet. save your first week above.</div>';return;}
+    const rs=await q.find();
+    if(!rs.length){c.innerHTML='<div class="archive-empty">no archived weeks yet. prices auto-save as you type.</div>';return;}
     let html=`<div class="archive-list">
-      <div class="archive-row header">
+      <div class="archive-row hdr">
         <div class="arc-cell">week of</div><div class="arc-cell">buy</div>
         <div class="arc-cell">best sell</div><div class="arc-cell">profit</div><div></div>
       </div>`;
-    results.forEach(r=>{
-      const wid=r.get('weekId')||'—',buy=r.get('buyPrice')||'—',best=r.get('bestPrice')||'—';
-      const profit=(buy&&best&&buy!=='—'&&best!=='—')?((best-buy)/buy*100).toFixed(1)+'%':'—';
+    rs.forEach(r=>{
+      const wid=r.get('weekId')||'—';
+      const buy=r.get('buyPrice');
+      const best=r.get('bestPrice');
+      const profit=(buy&&best)?((best-buy)/buy*100).toFixed(1)+'%':'—';
       const pc=profit!=='—'?(parseFloat(profit)>0?'up':'down'):'';
       html+=`<div class="archive-row">
-        <div class="arc-cell">${wid}</div><div class="arc-cell">${buy}</div>
-        <div class="arc-cell gold">${best}</div><div class="arc-cell ${pc}">${profit}</div>
-        <button class="arc-del" onclick="deleteWeek('${r.id}',this)">×</button>
+        <div class="arc-cell">${wid}</div>
+        <div class="arc-cell">${buy?buy+' Bells':'—'}</div>
+        <div class="arc-cell gold">${best?best+' Bells':'—'}</div>
+        <div class="arc-cell ${pc}">${profit}</div>
+        <button class="arc-del" onclick="deleteWeek('${r.id}',this)" title="delete">×</button>
       </div>`;
     });
-    html+='</div>';
-    container.innerHTML=html;
-  }catch(e){container.innerHTML='<div class="archive-empty">failed to load archive.</div>';}
+    c.innerHTML=html+'</div>';
+  }catch(e){c.innerHTML=`<div class="archive-empty">failed to load: ${e.message}</div>`;}
 }
 
 async function deleteWeek(id,btn){
   if(!confirm('delete this week from archive?'))return;
   btn.disabled=true;
   try{
-    const q=new Parse.Query('TurnipWeek');
-    const obj=await q.get(id);
+    const obj=await new Parse.Query('TurnipWeek').get(id);
     await obj.destroy();
     btn.closest('.archive-row').remove();
   }catch(e){btn.disabled=false;}
