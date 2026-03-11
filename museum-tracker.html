@@ -14,11 +14,12 @@
   :root{--bg:#f0ebe3;--bg2:#e8e1d6;--surface:#ede6da;--border:#c9bfb0;--border-lt:#d9d1c4;
     --rust:#a0522d;--rust-lt:#c47a4a;--moss:#6b7c5c;--clay:#b5714e;--wheat:#c9a96e;
     --dusk:#8c7b6e;--ink:#3b3028;--ink-mid:#6b5c50;--ink-dim:#9e8f83;
-    --done-bg:#dde6d5;--done-tx:#4a5e3a;--urgent-bg:#f5e8d5;--urgent-tx:#8a4a1a;}
+    --done-bg:#dde6d5;--done-tx:#4a5e3a;--urgent-bg:#f5e8d5;--urgent-tx:#8a4a1a;
+    --now-bg:#fff8e8;--now-tx:#7a5810;}
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}html{font-size:15px;}
   body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:4rem;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");}
-  header{padding:3rem 2rem 0;border-bottom:1px solid var(--border);max-width:900px;margin:0 auto;}
+  header{padding:3rem 2rem 0;border-bottom:1px solid var(--border);max-width:960px;margin:0 auto;}
   .header-top{display:flex;align-items:baseline;gap:1.2rem;flex-wrap:wrap;padding-bottom:1.5rem;}
   .site-title{font-family:'DM Mono',monospace;font-weight:400;font-size:1.05rem;color:var(--ink);}
   .site-title span{color:var(--rust);font-size:0.9rem;}
@@ -27,8 +28,6 @@
   .back-link{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--ink-dim);text-decoration:none;letter-spacing:0.04em;border-bottom:1px solid var(--border);padding-bottom:1px;transition:color 0.15s;}
   .back-link:hover{color:var(--rust);border-color:var(--rust);}
   .user-chip{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);}
-
-  /* PRIMARY TABS */
   .primary-tab-nav{display:flex;gap:0;margin-top:1.2rem;}
   .primary-tab-btn{font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.07em;text-transform:uppercase;
     color:var(--ink-dim);background:none;border:none;border-bottom:2px solid transparent;
@@ -37,11 +36,10 @@
   .primary-tab-btn.active{color:var(--rust);border-bottom-color:var(--rust);}
   .primary-tab-btn .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--wheat);margin-right:0.5rem;vertical-align:middle;position:relative;top:-1px;}
   .primary-tab-btn.active .dot{background:var(--rust);}
-
-  .wrap{max-width:900px;margin:0 auto;padding:2rem;}
+  .wrap{max-width:960px;margin:0 auto;padding:2rem;}
   .primary-panel{display:none;}.primary-panel.active{display:block;}
 
-  /* THIS MONTH PANEL */
+  /* THIS MONTH */
   .month-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.6rem;flex-wrap:wrap;gap:1rem;}
   .month-label{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-dim);}
   .month-name{font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--rust);font-weight:500;}
@@ -52,9 +50,39 @@
   .month-sec-badge{font-family:'DM Mono',monospace;font-size:0.6rem;background:var(--urgent-bg);color:var(--urgent-tx);border:1px solid var(--wheat);border-radius:99px;padding:0.1rem 0.55rem;}
   .month-sec-badge.all-done{background:var(--done-bg);color:var(--done-tx);border-color:#b0c9a0;}
   .month-all-done{font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--done-tx);background:var(--done-bg);border:1px solid #b0c9a0;border-radius:6px;padding:0.75rem 1rem;text-align:center;}
+  /* toggle caught */
+  .toggle-caught-btn{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.06em;padding:0.3rem 0.75rem;border:1px solid var(--border);border-radius:4px;background:none;color:var(--ink-dim);cursor:pointer;transition:all 0.15s;}
+  .toggle-caught-btn:hover,.toggle-caught-btn.active{border-color:var(--rust);color:var(--rust);background:rgba(160,82,45,0.06);}
 
-  /* COLLECTION (sub-tab) PANEL */
-  .sec-label{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:1rem;}
+  /* "active right now" toggle */
+  .now-toggle-btn{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.06em;padding:0.3rem 0.75rem;border:1px solid var(--border);border-radius:4px;background:none;color:var(--ink-dim);cursor:pointer;transition:all 0.15s;}
+  .now-toggle-btn.active{border-color:var(--wheat);color:var(--now-tx);background:var(--now-bg);}
+
+  /* month table */
+  .critter-table{width:100%;border-collapse:collapse;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .critter-table thead tr{background:var(--bg2);}
+  .critter-table th{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-dim);padding:0.55rem 0.75rem;text-align:left;font-weight:400;border-bottom:1px solid var(--border);}
+  .critter-table td{font-size:0.8rem;padding:0.5rem 0.75rem;border-bottom:1px solid var(--border-lt);vertical-align:top;}
+  .critter-table tr:last-child td{border-bottom:none;}
+  .critter-table tbody tr{cursor:pointer;transition:background 0.1s;}
+  .critter-table tbody tr:hover{background:var(--bg2);}
+  .critter-table tbody tr.done-row td{background:var(--done-bg);}
+  .critter-table tbody tr.done-row td .ct-name{color:var(--done-tx);text-decoration:line-through;text-decoration-color:rgba(74,94,58,0.4);}
+  .critter-table tbody tr.done-row td{color:#7a9e6a;}
+  .critter-table tbody tr.now-row{background:var(--now-bg);}
+  .critter-table tbody tr.now-row.done-row{background:var(--done-bg);}
+  .ct-check{width:14px;height:14px;border:1.5px solid var(--border);border-radius:3px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.12s,border-color 0.12s;}
+  .done-row .ct-check{background:var(--moss);border-color:var(--moss);}
+  .ct-check svg{display:none;}.done-row .ct-check svg{display:block;}
+  .ct-name{font-weight:500;color:var(--ink);}
+  .ct-shadow,.ct-loc,.ct-time{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);}
+  .ct-bells{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--wheat);}
+  .badge-leaving{font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.04em;text-transform:uppercase;background:rgba(160,82,45,0.1);color:var(--rust);border:1px solid rgba(160,82,45,0.25);border-radius:3px;padding:0.08rem 0.38rem;margin-left:0.4rem;vertical-align:middle;}
+  .badge-new{font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.04em;text-transform:uppercase;background:rgba(107,124,92,0.12);color:var(--moss);border:1px solid rgba(107,124,92,0.3);border-radius:3px;padding:0.08rem 0.38rem;margin-left:0.4rem;vertical-align:middle;}
+  .badge-now{font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.04em;text-transform:uppercase;background:var(--now-bg);color:var(--now-tx);border:1px solid rgba(201,150,58,0.4);border-radius:3px;padding:0.08rem 0.38rem;margin-left:0.4rem;vertical-align:middle;}
+  .section-controls{display:flex;align-items:center;gap:0.5rem;margin-left:auto;flex-wrap:wrap;}
+
+  /* COLLECTION */
   .tab-nav{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);}
   .tab-nav::-webkit-scrollbar{display:none;}
   .tab-btn{font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.07em;text-transform:uppercase;
@@ -65,8 +93,6 @@
   .tab-btn.active .tab-count{color:var(--rust-lt);}
   .tab-panel{display:none;}.tab-panel.active{display:block;}
   .sub-panel-wrap{padding-top:1.5rem;}
-
-  /* SHARED GRID */
   .progress-row{display:flex;align-items:center;gap:1rem;margin-bottom:1.6rem;}
   .prog-track{flex:1;height:5px;background:var(--border-lt);border-radius:99px;overflow:hidden;}
   .prog-fill{height:100%;background:var(--rust);border-radius:99px;transition:width 0.4s ease;}
@@ -80,21 +106,40 @@
   .filter-btn{font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.05em;padding:0.5rem 0.9rem;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--ink-dim);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
   .filter-btn:hover{background:var(--bg2);color:var(--ink);border-color:var(--dusk);}
   .filter-btn.active{color:var(--rust);border-color:var(--rust-lt);background:var(--bg2);}
-  .item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:1px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--border);}
-  .item-card{background:var(--surface);padding:0.75rem 0.85rem;cursor:pointer;transition:background 0.12s;display:flex;align-items:center;gap:0.65rem;user-select:none;}
+
+  /* Collection grid — richer cards */
+  .item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:1px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--border);}
+  .item-grid.art-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));}
+  .item-card{background:var(--surface);padding:0.75rem 0.85rem;cursor:pointer;transition:background 0.12s;user-select:none;}
   .item-card:hover{background:var(--bg2);}.item-card.collected{background:var(--done-bg);}.item-card.collected:hover{background:#d3deca;}
-  .item-check{width:14px;height:14px;border:1.5px solid var(--border);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background 0.12s,border-color 0.12s;}
+  .item-card-top{display:flex;align-items:flex-start;gap:0.55rem;}
+  .item-check{width:14px;height:14px;border:1.5px solid var(--border);border-radius:3px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:background 0.12s,border-color 0.12s;}
   .item-card.collected .item-check{background:var(--moss);border-color:var(--moss);}
   .item-check svg{display:none;}.item-card.collected .item-check svg{display:block;}
-  .item-info{min-width:0;}
-  .item-name{font-size:0.8rem;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .item-name{font-size:0.8rem;font-weight:500;color:var(--ink);line-height:1.3;}
   .item-card.collected .item-name{color:var(--done-tx);}
-  .item-sub{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-dim);margin-top:0.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .item-card.collected .item-sub{color:#7a9e6a;}
-  .empty-msg{font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--ink-dim);text-align:center;padding:3rem 1rem;border:1px solid var(--border-lt);border-radius:8px;}
+  .item-details{margin-top:0.35rem;padding-left:1.4rem;}
+  .item-detail{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--ink-dim);line-height:1.55;}
+  .item-card.collected .item-detail{color:#7a9e6a;}
+  .item-bells{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--wheat);margin-top:0.1rem;}
+  .item-card.collected .item-bells{color:#9ab87a;}
 
-  footer{text-align:center;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);letter-spacing:0.06em;padding:0 2rem;max-width:900px;margin:2rem auto 0;}
-  @media(max-width:520px){.item-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}header{padding:2rem 1.2rem 0;}.wrap{padding:1.5rem 1.2rem;}}
+  /* simple card (fossil/art) */
+  .item-card-simple{display:flex;align-items:center;gap:0.65rem;}
+  .item-sub{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-dim);margin-top:0.15rem;}
+  .art-fake-badge{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.04em;color:var(--rust);background:rgba(160,82,45,0.08);border:1px solid rgba(160,82,45,0.22);border-radius:3px;padding:0.1rem 0.4rem;margin-top:0.3rem;display:inline-block;}
+  .art-safe-badge{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.04em;color:var(--moss);background:rgba(107,124,92,0.1);border:1px solid rgba(107,124,92,0.25);border-radius:3px;padding:0.1rem 0.4rem;margin-top:0.3rem;display:inline-block;}
+  .art-hint{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--ink-dim);margin-top:0.3rem;line-height:1.5;font-style:italic;}
+  .item-card.collected .art-hint{color:#7a9e6a;}
+  .item-card.collected .art-fake-badge{color:var(--done-tx);background:rgba(74,94,58,0.1);border-color:rgba(74,94,58,0.2);}
+
+  .empty-msg{font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--ink-dim);text-align:center;padding:3rem 1rem;border:1px solid var(--border-lt);border-radius:8px;}
+  footer{text-align:center;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);letter-spacing:0.06em;padding:0 2rem;max-width:960px;margin:2rem auto 0;}
+  @media(max-width:600px){
+    .item-grid{grid-template-columns:repeat(auto-fill,minmax(145px,1fr));}
+    header{padding:2rem 1.2rem 0;}.wrap{padding:1.5rem 1.2rem;}
+    .critter-table th:nth-child(4),.critter-table td:nth-child(4){display:none;}
+  }
 </style>
 </head>
 <body>
@@ -118,7 +163,6 @@
 </header>
 
 <div class="wrap">
-  <!-- THIS MONTH PANEL -->
   <div class="primary-panel active" id="ppanel-month">
     <div class="month-header">
       <div>
@@ -129,33 +173,33 @@
     </div>
     <div id="monthContent"></div>
   </div>
-
-  <!-- COLLECTION PANEL -->
   <div class="primary-panel" id="ppanel-collection">
     <nav class="tab-nav" id="tabNav"></nav>
-    <div class="sub-panel-wrap">
-      <div id="tabPanels"></div>
-    </div>
+    <div class="sub-panel-wrap"><div id="tabPanels"></div></div>
   </div>
 </div>
 
 <footer>data synced via back4app<br>made by zahra w/ html,css,js &amp; some sparkle dust</footer>
 
 <script>
+
 const MONTH_NAMES=['january','february','march','april','may','june','july','august','september','october','november','december'];
-const MONTH_ABBR=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+const MONTH_ABBR=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// 0 in months = year-round
+const FISH=[{"n": "Anchovy", "b": 200, "s": "Small", "l": "Sea", "t": "4am\u20139pm", "m": [0]}, {"n": "Angelfish", "b": 3000, "s": "Small", "l": "River", "t": "4pm\u20139am", "m": [5, 6, 7, 8, 9, 10]}, {"n": "Arapaima", "b": 10000, "s": "Huge", "l": "River", "t": "4pm\u20139am", "m": [6, 7, 8, 9]}, {"n": "Arowana", "b": 10000, "s": "Large", "l": "River", "t": "4pm\u20139am", "m": [6, 7, 8, 9]}, {"n": "Barred Knifejaw", "b": 5000, "s": "Medium", "l": "Sea", "t": "Any", "m": [3, 4, 5, 6, 7, 8, 9, 10, 11]}, {"n": "Barreleye", "b": 15000, "s": "Small", "l": "Sea", "t": "9pm\u20134am", "m": [0]}, {"n": "Betta", "b": 2500, "s": "Small", "l": "River", "t": "9am\u20134pm", "m": [5, 6, 7, 8, 9, 10]}, {"n": "Bitterling", "b": 900, "s": "Tiny", "l": "River", "t": "Any", "m": [11, 1, 2, 3]}, {"n": "Black Bass", "b": 400, "s": "Large", "l": "River", "t": "Any", "m": [0]}, {"n": "Blowfish", "b": 5000, "s": "Medium", "l": "Sea", "t": "9pm\u20134am", "m": [11, 1, 2, 12]}, {"n": "Blue Marlin", "b": 10000, "s": "Huge", "l": "Pier", "t": "Any", "m": [11, 12, 1, 2, 3, 4]}, {"n": "Bluegill", "b": 180, "s": "Small", "l": "River", "t": "9am\u20134pm", "m": [0]}, {"n": "Butterfly Fish", "b": 1000, "s": "Small", "l": "Sea", "t": "Any", "m": [4, 5, 6, 7, 8, 9]}, {"n": "Carp", "b": 300, "s": "Large", "l": "Pond", "t": "Any", "m": [0]}, {"n": "Catfish", "b": 800, "s": "Large", "l": "Pond", "t": "4pm\u20139am", "m": [5, 6, 7, 8, 9, 10]}, {"n": "Char", "b": 3800, "s": "Medium", "l": "River Clifftop/Pond", "t": "4pm\u20139am", "m": [3, 4, 5, 6, 9, 10, 11]}, {"n": "Cherry Salmon", "b": 1000, "s": "Medium", "l": "River Clifftop", "t": "4pm\u20139am", "m": [3, 4, 5, 6, 9, 10, 11]}, {"n": "Clown Fish", "b": 650, "s": "Tiny", "l": "Sea", "t": "Any", "m": [4, 5, 6, 7, 8, 9]}, {"n": "Coelacanth", "b": 15000, "s": "Huge", "l": "Sea (rain only)", "t": "Any", "m": [0]}, {"n": "Crawfish", "b": 200, "s": "Small", "l": "Pond", "t": "Any", "m": [4, 5, 6, 7, 8, 9]}, {"n": "Crucian Carp", "b": 160, "s": "Small", "l": "River", "t": "Any", "m": [0]}, {"n": "Dab", "b": 300, "s": "Medium", "l": "Sea", "t": "Any", "m": [10, 11, 12, 1, 2, 3, 4]}, {"n": "Dace", "b": 240, "s": "Medium", "l": "River", "t": "4pm\u20139am", "m": [0]}, {"n": "Dorado", "b": 15000, "s": "Extra Large", "l": "River", "t": "4am\u20139pm", "m": [6, 7, 8, 9]}, {"n": "Football Fish", "b": 2500, "s": "Large", "l": "Sea", "t": "4pm\u20139am", "m": [11, 12, 1, 2, 3]}, {"n": "Freshwater Goby", "b": 400, "s": "Small", "l": "River", "t": "4pm\u20139am", "m": [0]}, {"n": "Frog", "b": 120, "s": "Small", "l": "Pond", "t": "Any", "m": [5, 6, 7, 8]}, {"n": "Gar", "b": 10000, "s": "Huge", "l": "Pier", "t": "Any", "m": [11, 12, 1, 2, 3, 4]}, {"n": "Giant Snakehead", "b": 5500, "s": "Large", "l": "Pond", "t": "9am\u20134pm", "m": [6, 7, 8]}, {"n": "Giant Trevally", "b": 4500, "s": "Extra Large", "l": "Pier", "t": "Any", "m": [5, 6, 7, 8, 9, 10]}, {"n": "Golden Trout", "b": 15000, "s": "Medium", "l": "River Clifftop", "t": "4pm\u20139am", "m": [3, 4, 5, 9, 10, 11]}, {"n": "Goldfish", "b": 1300, "s": "Tiny", "l": "Pond", "t": "Any", "m": [0]}, {"n": "Great White Shark", "b": 15000, "s": "Huge (fin)", "l": "Sea", "t": "4pm\u20139am", "m": [6, 7, 8, 9]}, {"n": "Guppy", "b": 1300, "s": "Tiny", "l": "River", "t": "9am\u20134pm", "m": [4, 5, 6, 7, 8, 9, 10, 11]}, {"n": "Hammerhead Shark", "b": 8000, "s": "Huge (fin)", "l": "Sea", "t": "4pm\u20139am", "m": [6, 7, 8, 9]}, {"n": "Horse Mackerel", "b": 150, "s": "Small", "l": "Sea", "t": "Any", "m": [0]}, {"n": "Killifish", "b": 300, "s": "Tiny", "l": "Pond", "t": "Any", "m": [4, 5, 6, 7, 8]}, {"n": "King Salmon", "b": 1800, "s": "Huge", "l": "River Mouth", "t": "Any", "m": [9]}, {"n": "Koi", "b": 4000, "s": "Large", "l": "Pond", "t": "4pm\u20139am", "m": [0]}, {"n": "Loach", "b": 400, "s": "Small", "l": "River", "t": "Any", "m": [3, 4, 5]}, {"n": "Mahi-mahi", "b": 6000, "s": "Extra Large", "l": "Pier", "t": "Any", "m": [5, 6, 7, 8, 9, 10]}, {"n": "Mitten Crab", "b": 2000, "s": "Small", "l": "River", "t": "4pm\u20139am", "m": [9, 10, 11]}, {"n": "Moray Eel", "b": 2000, "s": "Thin", "l": "Sea", "t": "Any", "m": [8, 9, 10]}, {"n": "Napoleonfish", "b": 10000, "s": "Huge", "l": "Sea", "t": "4am\u20139pm", "m": [7, 8]}, {"n": "Neon Tetra", "b": 500, "s": "Tiny", "l": "River", "t": "9am\u20134pm", "m": [4, 5, 6, 7, 8, 9, 10, 11]}, {"n": "Nibble Fish", "b": 1500, "s": "Tiny", "l": "River", "t": "9am\u20134pm", "m": [5, 6, 7, 8, 9]}, {"n": "Oarfish", "b": 9000, "s": "Huge", "l": "Sea", "t": "Any", "m": [12, 1, 2, 3, 4, 5]}, {"n": "Ocean Sunfish", "b": 4000, "s": "Huge (fin)", "l": "Sea", "t": "4am\u20139pm", "m": [7, 8, 9]}, {"n": "Olive Flounder", "b": 800, "s": "Extra Large", "l": "Sea", "t": "Any", "m": [0]}, {"n": "Pale Chub", "b": 200, "s": "Tiny", "l": "River", "t": "9am\u20134pm", "m": [0]}, {"n": "Pike", "b": 1800, "s": "Extra Large", "l": "River", "t": "Any", "m": [9, 10, 11, 12]}, {"n": "Piranha", "b": 2500, "s": "Small", "l": "River", "t": "9am\u20134pm & 9pm\u20134am", "m": [6, 7, 8, 9]}, {"n": "Pond Smelt", "b": 500, "s": "Small", "l": "River", "t": "Any", "m": [12, 1, 2]}, {"n": "Pop-eyed Goldfish", "b": 1300, "s": "Tiny", "l": "Pond", "t": "9am\u20134pm", "m": [0]}, {"n": "Puffer Fish", "b": 250, "s": "Medium", "l": "Sea", "t": "Any", "m": [7, 8, 9]}, {"n": "Rainbowfish", "b": 800, "s": "Tiny", "l": "River", "t": "9am\u20134pm", "m": [5, 6, 7, 8, 9, 10]}, {"n": "Ranchu Goldfish", "b": 4500, "s": "Small", "l": "Pond", "t": "9am\u20134pm", "m": [0]}, {"n": "Ray", "b": 3000, "s": "Extra Large", "l": "Sea", "t": "4am\u20139pm", "m": [8, 9, 10, 11]}, {"n": "Red Snapper", "b": 3000, "s": "Large", "l": "Sea", "t": "Any", "m": [0]}, {"n": "Ribbon Eel", "b": 600, "s": "Thin", "l": "Sea", "t": "Any", "m": [6, 7, 8, 9, 10]}, {"n": "Saddled Bichir", "b": 4000, "s": "Large", "l": "River", "t": "9pm\u20134am", "m": [6, 7, 8, 9]}, {"n": "Salmon", "b": 700, "s": "Large", "l": "River Mouth", "t": "Any", "m": [9]}, {"n": "Saw Shark", "b": 12000, "s": "Huge (fin)", "l": "Sea", "t": "4pm\u20139am", "m": [6, 7, 8, 9]}, {"n": "Sea Bass", "b": 400, "s": "Extra Large", "l": "Sea", "t": "Any", "m": [0]}, {"n": "Sea Butterfly", "b": 1000, "s": "Tiny", "l": "Sea", "t": "Any", "m": [12, 1, 2, 3]}, {"n": "Sea Horse", "b": 1100, "s": "Tiny", "l": "Sea", "t": "Any", "m": [4, 5, 6, 7, 8, 9, 10, 11]}, {"n": "Snapping Turtle", "b": 5000, "s": "Large", "l": "River", "t": "9pm\u20134am", "m": [4, 5, 6, 7, 8, 9, 10]}, {"n": "Soft-shelled Turtle", "b": 3750, "s": "Large", "l": "River", "t": "4pm\u20139am", "m": [8, 9]}, {"n": "Squid", "b": 500, "s": "Medium", "l": "Sea", "t": "Any", "m": [12, 1, 2, 3, 4, 5, 6, 7, 8]}, {"n": "Stringfish", "b": 15000, "s": "Extra Large", "l": "River Clifftop", "t": "4pm\u20139am", "m": [12, 1, 2, 3]}, {"n": "Sturgeon", "b": 10000, "s": "Huge", "l": "River Mouth", "t": "Any", "m": [9, 10, 11, 12, 1, 2, 3]}, {"n": "Suckerfish", "b": 1500, "s": "Huge (fin)", "l": "Sea", "t": "Any", "m": [6, 7, 8, 9]}, {"n": "Surgeonfish", "b": 1000, "s": "Small", "l": "Sea", "t": "Any", "m": [4, 5, 6, 7, 8, 9]}, {"n": "Sweetfish", "b": 900, "s": "Medium", "l": "River", "t": "Any", "m": [7, 8, 9]}, {"n": "Tadpole", "b": 100, "s": "Tiny", "l": "Pond", "t": "Any", "m": [3, 4, 5, 6, 7]}, {"n": "Tilapia", "b": 800, "s": "Medium", "l": "River", "t": "Any", "m": [6, 7, 8, 9, 10]}, {"n": "Tuna", "b": 7000, "s": "Huge", "l": "Pier", "t": "Any", "m": [11, 12, 1, 2, 3, 4]}, {"n": "Whale Shark", "b": 13000, "s": "Huge (fin)", "l": "Sea", "t": "Any", "m": [6, 7, 8, 9]}, {"n": "Yellow Perch", "b": 300, "s": "Medium", "l": "River", "t": "Any", "m": [10, 11, 12, 1, 2, 3]}, {"n": "Zebra Turkeyfish", "b": 500, "s": "Medium", "l": "Sea", "t": "Any", "m": [4, 5, 6, 7, 8, 9, 10, 11]}];
+const BUGS=[{"n": "Agrias Butterfly", "b": 3000, "l": "Flying", "t": "8am\u20135pm", "m": [4, 5, 6, 7, 8, 9]}, {"n": "Ant", "b": 80, "l": "Rotten food", "t": "Any", "m": [0]}, {"n": "Atlas Moth", "b": 3000, "l": "On trees", "t": "7pm\u20134am", "m": [4, 5, 6, 7, 8, 9]}, {"n": "Bagworm", "b": 600, "l": "Shaking trees", "t": "Any", "m": [0]}, {"n": "Banded Dragonfly", "b": 4500, "l": "Flying", "t": "8am\u20135pm", "m": [5, 6, 7, 8, 9, 10]}, {"n": "Bell Cricket", "b": 430, "l": "Ground", "t": "5pm\u20138am", "m": [9, 10]}, {"n": "Blue Weevil Beetle", "b": 800, "l": "On trees", "t": "Any", "m": [7, 8]}, {"n": "Brown Cicada", "b": 250, "l": "On trees", "t": "8am\u20135pm", "m": [7, 8]}, {"n": "Centipede", "b": 300, "l": "Hit rocks", "t": "4pm\u201311pm", "m": [9, 10, 11, 12, 1, 2, 3, 4, 5, 6]}, {"n": "Cicada Shell", "b": 10, "l": "On trees", "t": "Any", "m": [7, 8]}, {"n": "Citrus Long-horned Beetle", "b": 350, "l": "Stumps", "t": "Any", "m": [0]}, {"n": "Common Bluebottle", "b": 300, "l": "Flying", "t": "4am\u20137pm", "m": [4, 5, 6, 7, 8]}, {"n": "Common Butterfly", "b": 160, "l": "Flying", "t": "4am\u20137pm", "m": [9, 10, 11, 12, 1, 2, 3, 4, 5, 6]}, {"n": "Cricket", "b": 130, "l": "Ground", "t": "5pm\u20138am", "m": [9, 10, 11]}, {"n": "Cyclommatus Stag", "b": 8000, "l": "Coconut trees", "t": "5pm\u20138am", "m": [7, 8]}, {"n": "Damselfly", "b": 500, "l": "Flying", "t": "Any", "m": [11, 12, 1, 2]}, {"n": "Darner Dragonfly", "b": 230, "l": "Flying", "t": "8am\u20135pm", "m": [4, 5, 6, 7, 8, 9, 10]}, {"n": "Diving Beetle", "b": 800, "l": "Water surface", "t": "8am\u20137pm", "m": [5, 6, 7, 8, 9]}, {"n": "Drone Beetle", "b": 200, "l": "Trees", "t": "Any", "m": [6, 7, 8]}, {"n": "Dung Beetle", "b": 3000, "l": "Ground (snowballs)", "t": "Any", "m": [12, 1, 2]}, {"n": "Earth-boring Dung Beetle", "b": 300, "l": "Ground", "t": "Any", "m": [7, 8, 9]}, {"n": "Emperor Butterfly", "b": 4000, "l": "Flying", "t": "5pm\u20138am", "m": [6, 7, 8, 9, 12, 1, 2, 3]}, {"n": "Evening Cicada", "b": 550, "l": "Trees", "t": "4am\u20138am & 4pm\u20137pm", "m": [7, 8]}, {"n": "Firefly", "b": 300, "l": "Flying", "t": "7pm\u20134am", "m": [6]}, {"n": "Flea", "b": 70, "l": "On villagers", "t": "Any", "m": [4, 5, 6, 7, 8, 9, 10, 11]}, {"n": "Fly", "b": 60, "l": "Near trash/turnips", "t": "Any", "m": [0]}, {"n": "Giant Cicada", "b": 500, "l": "Trees", "t": "8am\u20135pm", "m": [7, 8]}, {"n": "Giant Stag", "b": 10000, "l": "Trees", "t": "11pm\u20138am", "m": [7, 8]}, {"n": "Giant Water Bug", "b": 2000, "l": "Water surface", "t": "7pm\u20138am", "m": [4, 5, 6, 7, 8, 9]}, {"n": "Giraffe Stag", "b": 12000, "l": "Coconut trees", "t": "5pm\u20138am", "m": [7, 8]}, {"n": "Golden Stag", "b": 12000, "l": "Coconut trees", "t": "5pm\u20138am", "m": [7, 8]}, {"n": "Goliath Beetle", "b": 8000, "l": "Coconut trees", "t": "5pm\u20138am", "m": [6, 7, 8, 9]}, {"n": "Grasshopper", "b": 160, "l": "Ground", "t": "8am\u20135pm", "m": [7, 8, 9]}, {"n": "Great Purple Emperor", "b": 3000, "l": "Flying", "t": "4am\u20137pm", "m": [5, 6, 7, 8]}, {"n": "Hermit Crab", "b": 1000, "l": "Beach (night)", "t": "7pm\u20138am", "m": [0]}, {"n": "Honeybee", "b": 200, "l": "Flying", "t": "8am\u20135pm", "m": [3, 4, 5, 6, 7]}, {"n": "Horned Atlas", "b": 8000, "l": "Coconut trees", "t": "5pm\u20138am", "m": [7, 8]}, {"n": "Horned Dynastid", "b": 1350, "l": "Trees", "t": "5pm\u20138am", "m": [7, 8]}, {"n": "Horned Elephant", "b": 8000, "l": "Coconut trees", "t": "5pm\u20138am", "m": [7, 8]}, {"n": "Horned Hercules", "b": 12000, "l": "Coconut trees", "t": "5pm\u20138am", "m": [7, 8]}, {"n": "Jewel Beetle", "b": 2400, "l": "Stumps", "t": "Any", "m": [4, 5, 6, 7, 8]}, {"n": "Ladybug", "b": 200, "l": "Flowers", "t": "8am\u20135pm", "m": [3, 4, 5, 6, 10]}, {"n": "Long Locust", "b": 200, "l": "Ground", "t": "8am\u20137pm", "m": [4, 5, 6, 7, 8, 9, 10, 11]}, {"n": "Madagascan Sunset Moth", "b": 2500, "l": "Flying", "t": "8am\u20134pm", "m": [4, 5, 6, 7, 8, 9]}, {"n": "Man-faced Stink Bug", "b": 1000, "l": "Flowers", "t": "7pm\u20138am", "m": [3, 4, 5, 6, 7, 8, 9, 10]}, {"n": "Mantis", "b": 430, "l": "Flowers", "t": "8am\u20135pm", "m": [3, 4, 5, 6, 7, 8, 9, 10, 11]}, {"n": "Migratory Locust", "b": 600, "l": "Ground", "t": "8am\u20137pm", "m": [8, 9, 10, 11]}, {"n": "Miyama Stag", "b": 1000, "l": "Trees", "t": "Any", "m": [7, 8]}, {"n": "Mole Cricket", "b": 500, "l": "Underground", "t": "Any", "m": [11, 12, 1, 2, 3, 4, 5]}, {"n": "Monarch Butterfly", "b": 140, "l": "Flying", "t": "4am\u20135pm", "m": [9, 10, 11]}, {"n": "Mosquito", "b": 120, "l": "Flying", "t": "5pm\u20134am", "m": [6, 7, 8, 9]}, {"n": "Moth", "b": 130, "l": "Flying near light", "t": "7pm\u20134am", "m": [0]}, {"n": "Orchid Mantis", "b": 2400, "l": "White flowers", "t": "8am\u20135pm", "m": [3, 4, 5, 6, 7, 8, 9, 10, 11]}, {"n": "Paper Kite Butterfly", "b": 1000, "l": "Flying", "t": "8am\u20137pm", "m": [0]}, {"n": "Peacock Butterfly", "b": 2500, "l": "Hybrid flowers", "t": "4am\u20137pm", "m": [3, 4, 5, 6]}, {"n": "Pill Bug", "b": 250, "l": "Hit rocks", "t": "11pm\u20134pm", "m": [9, 10, 11, 12, 1, 2, 3, 4, 5, 6]}, {"n": "Pondskater", "b": 130, "l": "Water surface", "t": "8am\u20137pm", "m": [5, 6, 7, 8, 9]}, {"n": "Queen Alexandra's Birdwing", "b": 4000, "l": "Flying", "t": "8am\u20134pm", "m": [5, 6, 7, 8, 9]}, {"n": "Rainbow Stag", "b": 6000, "l": "Trees", "t": "7pm\u20138am", "m": [6, 7, 8, 9]}, {"n": "Rajah Brooke's Birdwing", "b": 2500, "l": "Hybrid flowers", "t": "8am\u20135pm", "m": [4, 5, 6, 7, 8, 9, 12, 1, 2]}, {"n": "Red Dragonfly", "b": 180, "l": "Flying", "t": "8am\u20137pm", "m": [9, 10]}, {"n": "Rice Grasshopper", "b": 160, "l": "Ground", "t": "8am\u20137pm", "m": [8, 9, 10, 11]}, {"n": "Robust Cicada", "b": 300, "l": "Trees", "t": "8am\u20135pm", "m": [7, 8]}, {"n": "Rosalia Batesi Beetle", "b": 3000, "l": "Stumps", "t": "Any", "m": [5, 6, 7, 8, 9]}, {"n": "Saw Stag", "b": 2000, "l": "Trees", "t": "Any", "m": [7, 8]}, {"n": "Scarab Beetle", "b": 10000, "l": "Trees", "t": "11pm\u20138am", "m": [7, 8]}, {"n": "Scorpion", "b": 8000, "l": "Ground", "t": "7pm\u20134am", "m": [5, 6, 7, 8, 9, 10]}, {"n": "Snail", "b": 250, "l": "Rocks/bushes (rain)", "t": "Any", "m": [0]}, {"n": "Spider", "b": 600, "l": "Shaking trees", "t": "7pm\u20138am", "m": [0]}, {"n": "Stinkbug", "b": 120, "l": "Flowers", "t": "Any", "m": [3, 4, 5, 6, 7, 8, 9, 10]}, {"n": "Tarantula", "b": 8000, "l": "Ground", "t": "7pm\u20134am", "m": [11, 12, 1, 2, 3, 4]}, {"n": "Tiger Beetle", "b": 1500, "l": "Ground", "t": "Any", "m": [2, 3, 4, 5, 6, 7, 8, 9, 10]}, {"n": "Tiger Butterfly", "b": 240, "l": "Flying", "t": "4am\u20137pm", "m": [3, 4, 5, 6, 7, 8, 9]}, {"n": "Violin Beetle", "b": 450, "l": "Stumps", "t": "Any", "m": [5, 6, 9, 10, 11]}, {"n": "Walker Cicada", "b": 400, "l": "Trees", "t": "8am\u20135pm", "m": [8, 9]}, {"n": "Walking Leaf", "b": 600, "l": "Trees", "t": "Any", "m": [7, 8, 9]}, {"n": "Walking Stick", "b": 600, "l": "Trees", "t": "4am\u20138am & 5pm\u20137pm", "m": [7, 8, 9, 10, 11]}, {"n": "Wasp", "b": 2500, "l": "Shaking trees", "t": "Any", "m": [0]}, {"n": "Wharf Roach", "b": 200, "l": "Beach rocks", "t": "Any", "m": [0]}, {"n": "Yellow Butterfly", "b": 160, "l": "Flying", "t": "4am\u20137pm", "m": [3, 4, 5, 6, 9, 10]}];
+const SEA=[{"n": "Abalone", "b": 2000, "s": "Medium", "sp": "Medium speed", "t": "4pm\u20139am", "m": [6, 7, 8, 9, 10, 11, 12, 1]}, {"n": "Acorn Barnacle", "b": 600, "s": "Tiny", "sp": "Still", "t": "Any", "m": [0]}, {"n": "Chambered Nautilus", "b": 1800, "s": "Medium", "sp": "Medium speed", "t": "4pm\u20139am", "m": [3, 4, 5, 6, 9, 10, 11]}, {"n": "Dungeness Crab", "b": 1900, "s": "Medium", "sp": "Medium speed", "t": "Any", "m": [11, 12, 1, 2, 3, 4, 5]}, {"n": "Firefly Squid", "b": 1400, "s": "Tiny", "sp": "Slow", "t": "9pm\u20134am", "m": [3, 4, 5, 6]}, {"n": "Flatworm", "b": 700, "s": "Tiny", "sp": "Extra slow", "t": "4pm\u20139am", "m": [8, 9]}, {"n": "Gazami Crab", "b": 2200, "s": "Medium", "sp": "Medium speed", "t": "Any", "m": [6, 7, 8, 9, 10, 11]}, {"n": "Giant Isopod", "b": 12000, "s": "Medium", "sp": "Extra fast", "t": "9am\u20134pm & 9pm\u20134am", "m": [7, 8, 9, 10]}, {"n": "Gigas Giant Clam", "b": 15000, "s": "Huge", "sp": "Extra fast", "t": "Any", "m": [5, 6, 7, 8, 9]}, {"n": "Horseshoe Crab", "b": 2500, "s": "Medium", "sp": "Medium speed", "t": "9pm\u20134am", "m": [7, 8, 9]}, {"n": "Lobster", "b": 4500, "s": "Large", "sp": "Fast", "t": "Any", "m": [4, 5, 6, 12, 1]}, {"n": "Mantis Shrimp", "b": 2500, "s": "Small", "sp": "Medium speed", "t": "4pm\u20139am", "m": [0]}, {"n": "Moon Jellyfish", "b": 600, "s": "Small", "sp": "Extra slow", "t": "Any", "m": [7, 8, 9]}, {"n": "Mussel", "b": 1500, "s": "Small", "sp": "Slow", "t": "Any", "m": [6, 7, 8, 9, 10, 11, 12]}, {"n": "Octopus", "b": 1200, "s": "Medium", "sp": "Slow", "t": "Any", "m": [0]}, {"n": "Oyster", "b": 2000, "s": "Small", "sp": "Slow", "t": "Any", "m": [9, 10, 11, 12, 1, 2]}, {"n": "Pearl Oyster", "b": 2800, "s": "Small", "sp": "Medium speed", "t": "Any", "m": [0]}, {"n": "Red King Crab", "b": 8000, "s": "Large", "sp": "Extra fast", "t": "Any", "m": [11, 12, 1, 2, 3]}, {"n": "Scallop", "b": 1200, "s": "Medium", "sp": "Slow", "t": "Any", "m": [0]}, {"n": "Sea Anemone", "b": 500, "s": "Large", "sp": "Still", "t": "Any", "m": [0]}, {"n": "Sea Cucumber", "b": 500, "s": "Medium", "sp": "Extra slow", "t": "Any", "m": [11, 12, 1, 2, 3, 4]}, {"n": "Sea Grapes", "b": 900, "s": "Small", "sp": "Still", "t": "Any", "m": [6, 7, 8, 9]}, {"n": "Sea Pig", "b": 10000, "s": "Small", "sp": "Extra fast", "t": "4pm\u20139am", "m": [11, 12, 1, 2]}, {"n": "Sea Pineapple", "b": 1500, "s": "Small", "sp": "Slow", "t": "Any", "m": [4, 5, 6, 7, 8]}, {"n": "Sea Slug", "b": 600, "s": "Tiny", "sp": "Extra slow", "t": "Any", "m": [0]}, {"n": "Sea Star", "b": 500, "s": "Small", "sp": "Extra slow", "t": "Any", "m": [0]}, {"n": "Sea Urchin", "b": 1700, "s": "Small", "sp": "Slow", "t": "Any", "m": [5, 6, 7, 8, 9]}, {"n": "Seaweed", "b": 600, "s": "Large", "sp": "Still", "t": "Any", "m": [10, 11, 12, 1, 2, 3, 4, 5, 6, 7]}, {"n": "Slate Pencil Urchin", "b": 2000, "s": "Medium", "sp": "Medium speed", "t": "4pm\u20139am", "m": [5, 6, 7, 8, 9]}, {"n": "Snow Crab", "b": 6000, "s": "Large", "sp": "Fast", "t": "Any", "m": [11, 12, 1, 2, 3, 4]}, {"n": "Spider Crab", "b": 12000, "s": "Huge", "sp": "Extra fast", "t": "Any", "m": [3, 4]}, {"n": "Spiny Lobster", "b": 5000, "s": "Large", "sp": "Fast", "t": "9pm\u20134am", "m": [10, 11, 12]}, {"n": "Spotted Garden Eel", "b": 1100, "s": "Small", "sp": "Slow", "t": "4am\u20139pm", "m": [5, 6, 7, 8, 9, 10]}, {"n": "Sweet Shrimp", "b": 1400, "s": "Small", "sp": "Slow", "t": "4pm\u20139am", "m": [9, 10, 11, 12, 1, 2]}, {"n": "Tiger Prawn", "b": 3000, "s": "Small", "sp": "Medium speed", "t": "4pm\u20139am", "m": [6, 7, 8, 9]}, {"n": "Turban Shell", "b": 1000, "s": "Small", "sp": "Slow", "t": "Any", "m": [3, 4, 5, 9, 10, 11, 12]}, {"n": "Umbrella Octopus", "b": 6000, "s": "Small", "sp": "Fast", "t": "Any", "m": [3, 4, 5, 9, 10, 11]}, {"n": "Vampire Squid", "b": 10000, "s": "Large", "sp": "Extra fast", "t": "4pm\u20139am", "m": [5, 6, 7, 8]}, {"n": "Venus' Flower Basket", "b": 5000, "s": "Medium", "sp": "Fast", "t": "Any", "m": [10, 11, 12, 1, 2]}, {"n": "Whelk", "b": 1000, "s": "Small", "sp": "Slow", "t": "Any", "m": [0]}];
+const FOSSILS=[{"n": "Acanthostega", "s": "single"}, {"n": "Amber", "s": "single"}, {"n": "Ammonite", "s": "single"}, {"n": "Ankylo Skull", "s": "ankylosaurus 1/3"}, {"n": "Ankylo Torso", "s": "ankylosaurus 2/3"}, {"n": "Ankylo Tail", "s": "ankylosaurus 3/3"}, {"n": "Anomalocaris", "s": "single"}, {"n": "Archaeopteryx", "s": "single"}, {"n": "Archelon Skull", "s": "archelon 1/2"}, {"n": "Archelon Tail", "s": "archelon 2/2"}, {"n": "Australopith", "s": "single"}, {"n": "Brachio Skull", "s": "brachiosaurus 1/4"}, {"n": "Brachio Chest", "s": "brachiosaurus 2/4"}, {"n": "Brachio Pelvis", "s": "brachiosaurus 3/4"}, {"n": "Brachio Tail", "s": "brachiosaurus 4/4"}, {"n": "Coprolite", "s": "single"}, {"n": "Deinony Torso", "s": "deinonychus 1/2"}, {"n": "Deinony Tail", "s": "deinonychus 2/2"}, {"n": "Dimetrodon Skull", "s": "dimetrodon 1/2"}, {"n": "Dimetrodon Torso", "s": "dimetrodon 2/2"}, {"n": "Dinosaur Track", "s": "single"}, {"n": "Diplo Skull", "s": "diplodocus 1/5"}, {"n": "Diplo Neck", "s": "diplodocus 2/5"}, {"n": "Diplo Chest", "s": "diplodocus 3/5"}, {"n": "Diplo Hip", "s": "diplodocus 4/5"}, {"n": "Diplo Tail", "s": "diplodocus 5/5"}, {"n": "Diplo Tail Tip", "s": "diplodocus tip"}, {"n": "Dunkleosteus", "s": "single"}, {"n": "Eusthenopteron", "s": "single"}, {"n": "Ichthyo Skull", "s": "ichthyosaurus 1/2"}, {"n": "Ichthyo Torso", "s": "ichthyosaurus 2/2"}, {"n": "Iguanodon Skull", "s": "iguanodon 1/2"}, {"n": "Iguanodon Torso", "s": "iguanodon 2/2"}, {"n": "Iguanodon Tail", "s": "iguanodon tail"}, {"n": "Juramaia", "s": "single"}, {"n": "Left Megalo Side", "s": "megaloceros 1/3"}, {"n": "Right Megalo Side", "s": "megaloceros 2/3"}, {"n": "Megalo Torso", "s": "megaloceros 3/3"}, {"n": "Megalodon", "s": "single"}, {"n": "Myllokunmingia", "s": "single"}, {"n": "Ophthalmo Skull", "s": "ophthalmosaurus 1/2"}, {"n": "Ophthalmo Torso", "s": "ophthalmosaurus 2/2"}, {"n": "Pachy Skull", "s": "pachycephalosaurus 1/2"}, {"n": "Pachy Tail", "s": "pachycephalosaurus 2/2"}, {"n": "Left Ptera Wing", "s": "pteranodon 1/3"}, {"n": "Right Ptera Wing", "s": "pteranodon 2/3"}, {"n": "Ptera Body", "s": "pteranodon 3/3"}, {"n": "Quetzal Torso", "s": "quetzalcoatlus 1/2"}, {"n": "Left Quetzal Wing", "s": "quetzalcoatlus 2/2"}, {"n": "Right Quetzal Wing", "s": "quetzalcoatlus wing"}, {"n": "Sabertooth Skull", "s": "smilodon 1/2"}, {"n": "Sabertooth Torso", "s": "smilodon 2/2"}, {"n": "Shark-tooth Pattern", "s": "single"}, {"n": "Spino Skull", "s": "spinosaurus 1/3"}, {"n": "Spino Torso", "s": "spinosaurus 2/3"}, {"n": "Spino Tail", "s": "spinosaurus 3/3"}, {"n": "Stego Skull", "s": "stegosaurus 1/3"}, {"n": "Stego Torso", "s": "stegosaurus 2/3"}, {"n": "Stego Tail", "s": "stegosaurus 3/3"}, {"n": "Styraco Skull", "s": "styracosaurus 1/2"}, {"n": "Styraco Tail", "s": "styracosaurus 2/2"}, {"n": "T. Rex Skull", "s": "t-rex 1/3"}, {"n": "T. Rex Torso", "s": "t-rex 2/3"}, {"n": "T. Rex Tail", "s": "t-rex 3/3"}, {"n": "Tricera Skull", "s": "triceratops 1/3"}, {"n": "Tricera Torso", "s": "triceratops 2/3"}, {"n": "Tricera Tail", "s": "triceratops 3/3"}, {"n": "Trilobite", "s": "single"}, {"n": "Plesio Skull", "s": "plesiosaurus 1/3"}, {"n": "Plesio Body", "s": "plesiosaurus 2/3"}, {"n": "Plesio Tail", "s": "plesiosaurus 3/3"}, {"n": "Shastasaurus", "s": "single"}];
+const ART=[{"n": "Academic Painting", "f": true, "h": "Look for a large coffee cup stain in the upper-right corner \u2014 real version is clean."}, {"n": "Amazing Painting", "f": true, "h": "The man in black wears a hat in the real version. The fake is hatless."}, {"n": "Ancient Statue", "f": true, "h": "The fake has two antennas on its head and its eyes may glow. Real has none."}, {"n": "Basic Painting", "f": true, "h": "The boy has less hair in the real version. The fake has bangs/a fringe."}, {"n": "Beautiful Statue", "f": true, "h": "The fake is wearing a pearl necklace. The real statue has no necklace."}, {"n": "Calm Painting", "f": false}, {"n": "Common Painting", "f": false}, {"n": "Detailed Painting", "f": true, "h": "Real has a stamp and vertical signature on the left side, and blue flowers. Fake has no signature and all-purple flowers."}, {"n": "Dynamic Painting", "f": false}, {"n": "Familiar Statue", "f": false}, {"n": "Famous Painting", "f": true, "h": "The fake Mona Lisa has raised, arched eyebrows. Real eyebrows are flat and subtle."}, {"n": "Flowery Painting", "f": false}, {"n": "Gallant Statue", "f": true, "h": "The fake holds a book against his right arm. The real statue's arms are empty."}, {"n": "Glowing Painting", "f": false}, {"n": "Graceful Painting", "f": true, "h": "Two fake versions: the woman is much taller in both fakes (filling the frame). Real: she takes up roughly two-thirds of the height, facing right."}, {"n": "Great Statue", "f": false}, {"n": "Informative Statue", "f": true, "h": "The fake is colored blue. The real statue is dark gray/black stone."}, {"n": "Jolly Painting", "f": true, "h": "The real painting has a leaf/artichoke shape emerging from the man's chest. It is absent in the fake."}, {"n": "Moody Painting", "f": false}, {"n": "Motherly Statue", "f": true, "h": "The fake wolf has its tongue hanging out. The real wolf's mouth is closed."}, {"n": "Moving Painting", "f": true, "h": "The real painting has tall trees in the upper-right corner. The fake shows only sky there \u2014 the trees are missing."}, {"n": "Mysterious Painting", "f": false}, {"n": "Mystic Statue", "f": true, "h": "The fake has a large dangling earring on the ear. The real Nefertiti bust has no earring."}, {"n": "Nice Painting", "f": false}, {"n": "Perfect Painting", "f": false}, {"n": "Proper Painting", "f": false}, {"n": "Quaint Painting", "f": true, "h": "The woman pours only a trickle of milk in the real version. The fake shows her pouring a heavy stream of milk."}, {"n": "Robust Statue", "f": true, "h": "The fake is wearing a wristwatch on its raised arm. The real statue has no watch."}, {"n": "Rock-head Statue", "f": true, "h": "The real statue has a neutral expression. The fake has a slight smile \u2014 look carefully at the mouth."}, {"n": "Scary Painting", "f": true, "h": "Two fake versions: in both fakes the eyebrows tilt upward (looking goofy). Real eyebrows angle downward toward the nose, giving an angry look. Focus on the eyebrows, not the mouth."}, {"n": "Scenic Painting", "f": true, "h": "The real painting has three hunters in the lower-left corner. The fake shows only one hunter \u2014 two are missing."}, {"n": "Serene Painting", "f": true, "h": "The woman holds an ermine (weasel-like animal). Real: the animal is pure white. Fake: it is gray with darker bands across its face."}, {"n": "Sinking Painting", "f": false}, {"n": "Solemn Painting", "f": true, "h": "Look at the man in the background near the center. Real: his hand disappears behind the curtain. Fake: his arm is fully raised and visible."}, {"n": "Tremendous Statue", "f": true, "h": "The fake has a lid covering the top. The real statue is open at the top with no lid."}, {"n": "Twinkling Painting", "f": false}, {"n": "Valiant Statue", "f": true, "h": "The real statue steps forward with its RIGHT foot. The fake steps forward with its LEFT foot. Think from the statue's perspective."}, {"n": "Warm Painting", "f": false}, {"n": "Warrior Statue", "f": true, "h": "The fake holds a shovel in its hands. The real statue's hands are empty."}, {"n": "Wild Painting Left Half", "f": true, "h": "Raijin (storms god) has WHITE/light skin in the real version. The fake shows him with dark/green skin."}, {"n": "Wild Painting Right Half", "f": true, "h": "Fujin (wind god) has DARK/green skin in the real version. The fake shows him with white skin \u2014 the opposite of the left half."}, {"n": "Wistful Painting", "f": true, "h": "Two fake versions: both have star-shaped earrings instead of pearl earrings. One fake also shows her eyes closed. Real: pearl earring, eyes open."}, {"n": "Worthy Painting", "f": false}];
 
 const SECTIONS={
-  fish:{label:'Fish',total:80,items:[{name:'Anchovy',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 4a - 9p'},{name:'Angelfish',sub:'aug, jul, jun, may, oct, sep · 4p - 9a'},{name:'Arapaima',sub:'aug, jul, jun, sep · 4p -9a'},{name:'Arowana',sub:'aug, jul, jun, sep · 4p - 9a'},{name:'Barred Knifejaw',sub:'apr, aug, jul, jun, mar, may, nov, oct, sep'},{name:'Barreleye',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 9p - 4a'},{name:'Betta',sub:'aug, jul, jun, may, oct, sep · 9 - 4p'},{name:'Bitterling',sub:'dec, feb, jan, mar, nov'},{name:'Black Bass',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Blowfish',sub:'dec, feb, jan, nov · 9p- 4a'},{name:'Blue Marlin',sub:'apr, aug, dec, feb, jan, jul, mar, nov, sep'},{name:'Bluegill',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 9- 4p'},{name:'Butterfly Fish',sub:'apr, aug, jul, jun, may, sep'},{name:'Carp',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Catfish',sub:'aug, jul, jun, may, oct, sep · 4p - 9a'},{name:'Char',sub:'apr, jun, mar, may, nov, oct, sep · 4p - 9a'},{name:'Cherry Salmon',sub:'apr, mar, may, nov, oct, sep · 4p - 9a'},{name:'Clown Fish',sub:'apr, aug, jul, jun, may, sep'},{name:'Coelacanth',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Crawfish',sub:'apr, aug, jul, jun, may, sep'},{name:'Crucian Carp',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Dab',sub:'apr, dec, feb, jan, mar, nov, oct'},{name:'Dace',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 4p - 9a'},{name:'Dorado',sub:'aug, jul, jun, sep · 4a - 9p'},{name:'Football Fish',sub:'dec, feb, jan, mar, nov · 4p - 9a'},{name:'Freshwater goby',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 4p - 9a'},{name:'Frog',sub:'aug, jul, jun, may'},{name:'Gar',sub:'aug, jul, jun, sep · 4p - 9a'},{name:'Giant Snakehead',sub:'aug, jul, jun · 9a - 4p'},{name:'Giant Trevally',sub:'aug, jul, jun, may, oct, sep'},{name:'Golden Trout',sub:'apr, mar, may, nov, oct, sep · 4p - 9a'},{name:'Goldfish',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Great White Shark',sub:'aug, jul, jun, sep · 4p - 9a'},{name:'Guppy',sub:'apr, aug, jul, jun, may, nov, oct, sep · 9a - 4p'},{name:'Hammerhead Shark',sub:'aug, jul, jun, sep · 4p - 9a'},{name:'Horse Mackerel',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Killifish',sub:'apr, aug, jul, jun, may'},{name:'King Salmon',sub:'sep'},{name:'Koi',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 4p - 9a'},{name:'Loach',sub:'apr, mar, may'},{name:'Mahi-mahi',sub:'aug, jul, jun, may, oct, sep'},{name:'Mitten Crab',sub:'nov, oct, sep · 4p - 9a'},{name:'Moray Eel',sub:'aug, oct, sep'},{name:'Napoleonfish',sub:'aug, jul · 4a - 9p'},{name:'Neon Tetra',sub:'apr, aug, jul, jun, may, nov, oct, sep · 9a - 4p'},{name:'Nibble Fish',sub:'aug, jul, jun, may, sep · 9a - 4p'},{name:'Oarfish',sub:'apr, dec, feb, jan, mar, may'},{name:'Ocean Sunfish',sub:'aug, jul, sep · 4a - 9p'},{name:'Olive Flounder',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Pale Chub',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 9a - 4p'},{name:'Pike',sub:'dec, nov, oct, sep'},{name:'Piranha',sub:'aug, jul, jun, sep · 9a - 4p & 9p - 4a'},{name:'Pond Smelt',sub:'dec, feb, jan'},{name:'Pop-eyed Goldfish',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 9a - 4p'},{name:'Puffer Fish',sub:'aug, jul, sep'},{name:'Rainbowfish',sub:'aug, jul, jun, may, oct, sep · 9a - 4p'},{name:'Ranchu Goldfish',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 9a - 4p'},{name:'Ray',sub:'aug, nov, oct, sep · 4a - 9p'},{name:'Red Snapper',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Ribbon Eel',sub:'aug, jul, jun, oct, sep'},{name:'Saddled Bichir',sub:'aug, jul, jun, sep · 9p - 4a'},{name:'Salmon',sub:'sep'},{name:'Saw Shark',sub:'aug, jul, jun, sep · 4p - 9a'},{name:'Sea Bass',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Sea Butterfly',sub:'dec, feb, jan, mar'},{name:'Sea Horse',sub:'apr, aug, jul, jun, may, nov, oct, sep'},{name:'Snapping Turtle',sub:'apr, aug, jul, jun, may, oct, sep · 9p - 4a'},{name:'Soft-shelled Turtle',sub:'aug, sep · 4p - 9a'},{name:'Squid',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may'},{name:'Stringfish',sub:'dec, feb, jan, mar · 4p - 9a'},{name:'Sturgeon',sub:'dec, feb, jan, mar, nov, oct, sep'},{name:'Suckerfish',sub:'aug, jul, jun, sep'},{name:'Surgeonfish',sub:'apr, aug, jul, jun, may, sep'},{name:'Sweetfish',sub:'aug, jul, sep'},{name:'Tadpole',sub:'apr, jul, jun, mar, may'},{name:'Tilapia',sub:'aug, jul, jun, oct, sep'},{name:'Tuna',sub:'apr, dec, feb, jan, mar, nov'},{name:'Whale Shark',sub:'aug, jul, jun, sep'},{name:'Yellow Perch',sub:'dec, feb, jan, mar, nov, oct'},{name:'Zebra Turkeyfish',sub:'apr, aug, jul, jun, may, nov, oct, sep'}]},
-  bugs:{label:'Bugs',total:80,items:[{name:'Agrias Butterfly',sub:'apr, aug, jul, jun, may, sep · 8a - 5p'},{name:'Ant',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Atlas Moth',sub:'apr, aug, jul, jun, may, sep · 7p - 4a'},{name:'Bagworm',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Banded Dragonfly',sub:'aug, jul, jun, may, oct, sep · 8a - 5p'},{name:'Bell Cricket',sub:'oct, sep · 5p - 8a'},{name:'Blue Weevil Beetle',sub:'aug, jul'},{name:'Brown Cicada',sub:'aug, jul · 8a - 5p'},{name:'Centipede',sub:'apr, dec, feb, jan, jun, mar, may, nov, oct, sep · 4p - 11a'},{name:'Cicada Shell',sub:'aug, jul'},{name:'Citrus Long-horned Beetle',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Common Bluebottle',sub:'apr, aug, jul, jun, may · 4a - 7p'},{name:'Common Butterfly',sub:'apr, dec, feb, jan, jun, mar, may, nov, oct, sep · 4a - 7p'},{name:'Cricket',sub:'nov, oct, sep · 5p - 8a'},{name:'Cyclommatus Stag',sub:'aug, jul · 5p - 8a'},{name:'Damselfly',sub:'dec, feb, jan, nov'},{name:'Darner Dragonfly',sub:'apr, aug, jul, jun, may, oct, sep · 8a - 5p'},{name:'Diving Beetle',sub:'aug, jul, jun, may, sep · 8a - 7p'},{name:'Drone Beetle',sub:'aug, jul, jun'},{name:'Dung Beetle',sub:'dec, feb, jan'},{name:'Earth-Boring Dung Beetle',sub:'aug, jul, sep'},{name:'Emperor Butterfly',sub:'aug, dec, feb, jan, jul, jun, mar, sep · 5p - 8a'},{name:'Evening Cicada',sub:'aug, jul · 4a - 8a & 4p - 7p'},{name:'Firefly',sub:'jun · 7p - 4a'},{name:'Flea',sub:'apr, aug, jul, jun, may, nov, oct, sep'},{name:'Fly',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Giant Cicada',sub:'aug, jul · 8a - 5p'},{name:'Giant Stag',sub:'aug, jul · 11p - 8a'},{name:'Giant Water Bug',sub:'apr, aug, jul, jun, may, sep · 7p - 8a'},{name:'Giraffe Stag',sub:'aug, jul · 5p - 8a'},{name:'Golden Stag',sub:'aug, jul · 5p - 8a'},{name:'Goliath Beetle',sub:'aug, jul, jun, sep · 5p - 8a'},{name:'Grasshopper',sub:'aug, jul, sep · 8a - 5p'},{name:'Great Purple Emperor',sub:'aug, jul, jun, may · 4a - 7p'},{name:'Hermit Crab',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 7p - 8a'},{name:'Honeybee',sub:'apr, jul, jun, mar, may · 8a - 5p'},{name:'Horned Atlas',sub:'aug, jul · 5p - 8a'},{name:'Horned Dynastid',sub:'aug, jul · 5p - 8a'},{name:'Horned Elephant',sub:'aug, jul · 5p - 8a'},{name:'Horned Hercules',sub:'aug, jul · 5p - 8a'},{name:'Jewel Beetle',sub:'apr, aug, jul, jun, may'},{name:'Ladybug',sub:'apr, jun, mar, may, oct · 8a - 5p'},{name:'Long Locust',sub:'apr, aug, jul, jun, may, nov, oct, sep · 8a - 7p'},{name:'Madagascan Sunset Moth',sub:'apr, aug, jul, jun, may, sep · 8a - 4p'},{name:'Man-faced Stink Bug',sub:'apr, aug, jul, jun, mar, may, oct, sep · 7p - 8a'},{name:'Mantis',sub:'apr, aug, jul, jun, mar, may, nov, oct, sep · 8a - 5p'},{name:'Migratory Locust',sub:'aug, nov, oct, sep · 8a - 7p'},{name:'Miyama Stag',sub:'aug, jul'},{name:'Mole Cricket',sub:'apr, dec, feb, jan, mar, may, nov · 8a - 5p'},{name:'Monarch Butterfly',sub:'nov, oct, sep · 4a - 5p'},{name:'Mosquito',sub:'aug, jul, jun, sep · 5p - 4a'},{name:'Moth',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 7p - 4a'},{name:'Orchid Mantis',sub:'apr, aug, jul, jun, mar, may, nov, oct, sep · 8a - 5p'},{name:'Paper Kite Butterfly',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 8a - 7p'},{name:'Peacock Butterfly',sub:'apr, jun, mar, may · 4a - 7p'},{name:'Pill Bug',sub:'apr, dec, feb, jan, jun, mar, may, nov, oct, sep · 11p - 4p'},{name:'Pondskater',sub:'aug, jul, jun, may, sep · 8a - 7p'},{name:"Queen Alexandra's Birdwing",sub:'aug, jul, jun, may, sep · 8a - 4p'},{name:'Rainbow Stag',sub:'aug, jul, jun, sep · 7p - 8a'},{name:"Rajah Brooke's Birdwing",sub:'apr, aug, dec, feb, jan, jul, jun, may, sep · 8a - 5p'},{name:'Red Dragonfly',sub:'oct, sep · 8a - 7p'},{name:'Rice Grasshopper',sub:'aug, nov, oct, sep · 8a - 7p'},{name:'Robust Cicada',sub:'aug, jul · 8a - 5p'},{name:'Rosalia Batesi Beetle',sub:'aug, jul, jun, may, sep'},{name:'Saw Stag',sub:'aug, jul'},{name:'Scarab Beetle',sub:'aug, jul · 11p - 8a'},{name:'Scorpion',sub:'aug, jul, jun, may, oct, sep · 7p - 4a'},{name:'Snail',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Spider',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 7p - 8a'},{name:'Stinkbug',sub:'apr, aug, jul, jun, mar, may, oct, sep'},{name:'Tiger Beetle',sub:'apr, aug, feb, jul, jun, mar, may, oct, sep'},{name:'Tiger Butterfly',sub:'apr, aug, jul, jun, mar, may, sep · 4a - 7p'},{name:'Trantula',sub:'apr, dec, feb, jan, mar, nov · 7p - 4a'},{name:'Violin Beetle',sub:'jun, may, nov, oct, sep'},{name:'Walker Cicada',sub:'aug, sep · 8a - 5p'},{name:'Walking Leaf',sub:'aug, jul, sep'},{name:'Walking Stick',sub:'aug, jul, nov, oct, sep · 4a - 8a & 5p - 7p'},{name:'Wasp',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Wharf Roach',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Yellow Butterfly',sub:'apr, jun, mar, may, oct, sep · 4a - 7p'}]},
-  sea:{label:'Sea Creatures',total:40,items:[{name:'Abalone',sub:'aug, dec, jan, jul, jun, nov, oct, sep · 4p - 9a'},{name:'Acorn Barnacle',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Chambered Nautilus',sub:'apr, jun, mar, may, nov, oct, sep · 4p - 9a'},{name:'Dungeness Crab',sub:'apr, dec, feb, jan, mar, may, nov'},{name:'Firefly Squid',sub:'apr, jun, mar, may · 9p - 4a'},{name:'Flatworm',sub:'aug, sep · 4p - 9a'},{name:'Gazami Crab',sub:'aug, jul, jun, nov, oct, sep'},{name:'Giant Isopod',sub:'aug, jul, oct, sep · 9a - 4p & 9p - 4a'},{name:'Gigas Giant Clam',sub:'aug, jul, jun, may, sep'},{name:'Horseshoe Crab',sub:'aug, jul, sep · 9p - 4a'},{name:'Lobster',sub:'apr, dec, jan, jun, may'},{name:'Mantis Shrimp',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep · 4p - 9a'},{name:'Moon Jellyfish',sub:'aug, jul, sep'},{name:'Mussel',sub:'aug, dec, jul, jun, nov, oct, sep'},{name:'Octopus',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Oyster',sub:'dec, feb, jan, nov, oct, sep'},{name:'Pearl Oyster',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Red King Crab',sub:'dec, feb, jan, mar, nov'},{name:'Scallop',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Sea Anemone',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Sea Cucumber',sub:'apr, dec, feb, jan, mar, nov'},{name:'Sea Grapes',sub:'aug, jul, jun, sep'},{name:'Sea Pig',sub:'dec, feb, jan, nov · 4p-9a'},{name:'Sea Pineapple',sub:'apr, aug, jul, jun, may'},{name:'Sea Slug',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Sea Star',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'},{name:'Sea Urchin',sub:'aug, jul, jun, may, sep'},{name:'Seaweed',sub:'apr, dec, feb, jan, jul, jun, mar, may, nov, oct'},{name:'Slate Pencil Urchin',sub:'aug, jul, jun, may, sep · 4p - 9p'},{name:'Snow Crab',sub:'apr, dec, feb, jan, mar, nov'},{name:'Spider Crab',sub:'apr, mar'},{name:'Spiny Lobster',sub:'apr, jun, may · 9p - 4a'},{name:'Spotted Garden Eel',sub:'aug, jul, jun, may, oct, sep · 4a - 9p'},{name:'Sweet Shrimp',sub:'dec, feb, jan, nov, oct, sep · 4p - 9a'},{name:'Tiger Prawn',sub:'aug, jul, jun, sep · 4p - 9a'},{name:'Turban Shell',sub:'apr, dec, mar, may, nov, oct, sep'},{name:'Umbrella Octopus',sub:'apr, mar, may, nov, oct, sep'},{name:'Vampire Squid',sub:'aug, jul, jun, may · 4p - 9a'},{name:"Venus' Flower Basket",sub:'dec, feb, jan, nov, oct'},{name:'Whelk',sub:'apr, aug, dec, feb, jan, jul, jun, mar, may, nov, oct, sep'}]},
-  fossils:{label:'Fossils',total:73,items:[
-    {name:'Acanthostega',sub:'single'},{name:'Amber',sub:'single'},{name:'Ammonite',sub:'single'},{name:'Ankylo Skull',sub:'ankylosaurus 1/3'},{name:'Ankylo Torso',sub:'ankylosaurus 2/3'},{name:'Ankylo Tail',sub:'ankylosaurus 3/3'},{name:'Anomalocaris',sub:'single'},{name:'Archaeopteryx',sub:'single'},{name:'Archelon Skull',sub:'archelon 1/2'},{name:'Archelon Tail',sub:'archelon 2/2'},{name:'Australopith',sub:'single'},{name:'Brachio Skull',sub:'brachiosaurus 1/4'},{name:'Brachio Chest',sub:'brachiosaurus 2/4'},{name:'Brachio Pelvis',sub:'brachiosaurus 3/4'},{name:'Brachio Tail',sub:'brachiosaurus 4/4'},{name:'Coprolite',sub:'single'},{name:'Deinony Torso',sub:'deinonychus 1/2'},{name:'Deinony Tail',sub:'deinonychus 2/2'},{name:'Dimetrodon Skull',sub:'dimetrodon 1/2'},{name:'Dimetrodon Torso',sub:'dimetrodon 2/2'},{name:'Dinosaur Track',sub:'single'},{name:'Diplo Skull',sub:'diplodocus 1/5'},{name:'Diplo Neck',sub:'diplodocus 2/5'},{name:'Diplo Chest',sub:'diplodocus 3/5'},{name:'Diplo Hip',sub:'diplodocus 4/5'},{name:'Diplo Tail',sub:'diplodocus 5/5'},{name:'Diplo Tail Tip',sub:'diplodocus tip'},{name:'Dunkleosteus',sub:'single'},{name:'Eusthenopteron',sub:'single'},{name:'Ichthyo Skull',sub:'ichthyosaurus 1/2'},{name:'Ichthyo Torso',sub:'ichthyosaurus 2/2'},{name:'Iguanodon Skull',sub:'iguanodon 1/2'},{name:'Iguanodon Torso',sub:'iguanodon 2/2'},{name:'Iguanodon Tail',sub:'iguanodon tail'},{name:'Juramaia',sub:'single'},{name:'Left Megalo Side',sub:'megaloceros 1/3'},{name:'Right Megalo Side',sub:'megaloceros 2/3'},{name:'Megalo Torso',sub:'megaloceros 3/3'},{name:'Megalodon',sub:'single'},{name:'Myllokunmingia',sub:'single'},{name:'Ophthalmo Skull',sub:'ophthalmosaurus 1/2'},{name:'Ophthalmo Torso',sub:'ophthalmosaurus 2/2'},{name:'Pachy Skull',sub:'pachycephalosaurus 1/2'},{name:'Pachy Tail',sub:'pachycephalosaurus 2/2'},{name:'Left Ptera Wing',sub:'pteranodon 1/3'},{name:'Right Ptera Wing',sub:'pteranodon 2/3'},{name:'Ptera Body',sub:'pteranodon 3/3'},{name:'Quetzal Torso',sub:'quetzalcoatlus 1/2'},{name:'Left Quetzal Wing',sub:'quetzalcoatlus 2/2'},{name:'Right Quetzal Wing',sub:'quetzalcoatlus wing'},{name:'Sabertooth Skull',sub:'smilodon 1/2'},{name:'Sabertooth Torso',sub:'smilodon 2/2'},{name:'Shark-tooth Pattern',sub:'single'},{name:'Spino Skull',sub:'spinosaurus 1/3'},{name:'Spino Torso',sub:'spinosaurus 2/3'},{name:'Spino Tail',sub:'spinosaurus 3/3'},{name:'Stego Skull',sub:'stegosaurus 1/3'},{name:'Stego Torso',sub:'stegosaurus 2/3'},{name:'Stego Tail',sub:'stegosaurus 3/3'},{name:'T. Rex Skull',sub:'t-rex 1/3'},{name:'T. Rex Torso',sub:'t-rex 2/3'},{name:'T. Rex Tail',sub:'t-rex 3/3'},{name:'Tricera Skull',sub:'triceratops 1/3'},{name:'Tricera Torso',sub:'triceratops 2/3'},{name:'Tricera Tail',sub:'triceratops 3/3'},{name:'Trilobite',sub:'single'},{name:'Shastasaurus',sub:'single'},{name:'Plesio Skull',sub:'plesiosaurus 1/3'},{name:'Plesio Body',sub:'plesiosaurus 2/3'},{name:'Plesio Tail',sub:'plesiosaurus 3/3'},{name:'Ptera Body',sub:'pteranodon body'},{name:'Styraco Skull',sub:'styracosaurus 1/2'},{name:'Styraco Tail',sub:'styracosaurus 2/2'},
-  ]},
-  art:{label:'Art',total:43,items:[{name:'Academic Painting',sub:'fake'},{name:'Amazing Painting',sub:'fake'},{name:'Ancient Statue',sub:'two fakes'},{name:'Basic Painting',sub:'fake'},{name:'Beautiful Statue',sub:'fake'},{name:'Calm Painting',sub:'always'},{name:'Common Painting',sub:'always'},{name:'Detailed Painting',sub:'fake'},{name:'Dynamic Painting',sub:'always'},{name:'Familiar Statue',sub:'always'},{name:'Famous Painting',sub:'fake'},{name:'Flowery Painting',sub:'always'},{name:'Gallant Statue',sub:'fake'},{name:'Glowing Painting',sub:'always'},{name:'Graceful Painting',sub:'two fakes'},{name:'Great Statue',sub:'always'},{name:'Informative Statue',sub:'fake'},{name:'Jolly Painting',sub:'fake'},{name:'Moody Painting',sub:'always'},{name:'Motherly Statue',sub:'fake'},{name:'Moving Painting',sub:'fake'},{name:'Mysterious Painting',sub:'always'},{name:'Mystic Statue',sub:'fake'},{name:'Nice Painting',sub:'always'},{name:'Perfect Painting',sub:'always'},{name:'Proper Painting',sub:'always'},{name:'Quaint Painting',sub:'fake'},{name:'Robust Statue',sub:'fake'},{name:'Rock-head Statue',sub:'fake'},{name:'Scary Painting',sub:'two fakes'},{name:'Scenic Painting',sub:'fake'},{name:'Serene Painting',sub:'fake'},{name:'Sinking Painting',sub:'always'},{name:'Solemn Painting',sub:'fake'},{name:'Tremendous Statue',sub:'fake'},{name:'Twinkling Painting',sub:'always'},{name:'Valiant Statue',sub:'fake'},{name:'Warm Painting',sub:'always'},{name:'Warrior Statue',sub:'fake'},{name:'Wild Painting Left Half',sub:'fake'},{name:'Wild Painting Right Half',sub:'fake'},{name:'Wistful Painting',sub:'fake'},{name:'Worthy Painting',sub:'always'}]}
+  fish:{label:'Fish',total:80,data:FISH},
+  bugs:{label:'Bugs',total:80,data:BUGS},
+  sea:{label:'Sea Creatures',total:40,data:SEA},
+  fossils:{label:'Fossils',total:73,data:FOSSILS},
+  art:{label:'Art',total:43,data:ART},
 };
-
-const CATCHABLE_SECTIONS=['fish','bugs','sea'];
 
 let collected={fish:[],bugs:[],sea:[],fossils:[],art:[]};
 let parseObj=null;
@@ -163,12 +207,64 @@ let primaryTab='month';
 let activeTab='fish';
 let activeFilter={fish:'all',bugs:'all',sea:'all',fossils:'all',art:'all'};
 let searchQuery={fish:'',bugs:'',sea:'',fossils:'',art:''};
+// per-section "show active now" toggle in this-month view
+let showNowOnly={fish:false,bugs:false,sea:false};
+// per-section "show caught" toggle in this-month view
+let showCaught={fish:false,bugs:false,sea:false};
 
+// ── HELPERS ─────────────────────────────────────────────────────────────────
 function isActiveThisMonth(item){
-  const now=new Date();
-  const abbr=MONTH_ABBR[now.getMonth()];
-  return item.sub.toLowerCase().includes(abbr);
+  const mo=new Date().getMonth()+1; // 1-indexed
+  if(!item.m||item.m[0]===0) return true;
+  return item.m.includes(mo);
 }
+
+function isActiveThisMonthAndLastMonth(item){
+  const mo=new Date().getMonth()+1;
+  if(!item.m||item.m[0]===0) return false;
+  const prev=mo===1?12:mo-1;
+  return item.m.includes(mo) && !item.m.includes(prev);
+}
+
+function isLeavingNextMonth(item){
+  const mo=new Date().getMonth()+1;
+  if(!item.m||item.m[0]===0) return false;
+  const next=mo===12?1:mo+1;
+  return item.m.includes(mo) && !item.m.includes(next);
+}
+
+// Check if currently active based on time (rough, client clock)
+function isActiveRightNow(item){
+  if(!item.t||item.t==='Any') return true;
+  const hr=new Date().getHours();
+  const t=item.t;
+  // parse ranges like "4pm–9am", "9am–4pm", "7pm–4am"
+  function parseHr(s){
+    const m=s.match(/(\d+)(am|pm)/i);
+    if(!m) return -1;
+    let h=parseInt(m[1]);
+    if(m[2].toLowerCase()==='pm' && h!==12) h+=12;
+    if(m[2].toLowerCase()==='am' && h===12) h=0;
+    return h;
+  }
+  // handle multiple ranges like "9am–4pm & 9pm–4am"
+  const parts=t.split(/[&,]+/).map(s=>s.trim());
+  for(const p of parts){
+    const dash=p.match(/(.+?)[–-](.+)/);
+    if(!dash) continue;
+    const start=parseHr(dash[1].trim());
+    const end=parseHr(dash[2].trim());
+    if(start<0||end<0) return true;
+    if(end<start){ // overnight range
+      if(hr>=start||hr<end) return true;
+    }else{
+      if(hr>=start&&hr<end) return true;
+    }
+  }
+  return false;
+}
+
+const SVG_CHECK='<svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 (async()=>{
   const u=Parse.User.current();
@@ -194,8 +290,7 @@ async function saveData(){
   const u=Parse.User.current();if(!u)return;
   try{
     if(!parseObj){
-      const MuseumData=Parse.Object.extend('MuseumData');
-      parseObj=new MuseumData();
+      const MD=Parse.Object.extend('MuseumData');parseObj=new MD();
       parseObj.set('user',u);
       const acl=new Parse.ACL(u);parseObj.setACL(acl);
     }
@@ -204,147 +299,287 @@ async function saveData(){
   }catch(e){console.error(e);}
 }
 
-function toggleItem(section,idx){
-  const arr=collected[section];
+function render(){
+  const now=new Date();
+  document.getElementById('monthName').textContent=MONTH_NAMES[now.getMonth()];
+  renderMonth();
+  renderCollection();
+}
+
+// ── THIS MONTH ──────────────────────────────────────────────────────────────
+function renderMonth(){
+  const secs=['fish','bugs','sea'];
+  let totalActive=0,totalUncaught=0;
+  secs.forEach(k=>{
+    const active=SECTIONS[k].data.filter(isActiveThisMonth);
+    totalActive+=active.length;
+    totalUncaught+=active.filter((_,i)=>!collected[k].includes(i)).length;
+  });
+  document.getElementById('monthSummary').textContent=
+    totalUncaught+' still to catch · '+totalActive+' active critters';
+
+  let html='';
+  secs.forEach(sec=>{
+    const items=SECTIONS[sec].data;
+    const active=items.map((item,i)=>{{return {item,i};}}).filter(x=>isActiveThisMonth(x.item));
+    const uncaught=active.filter(x=>!collected[sec].includes(x.i));
+
+    // sort: leaving this month first, then new this month, then alpha
+    function sortFn(a,b){
+      const al=isLeavingNextMonth(a.item)?0:1;
+      const bl=isLeavingNextMonth(b.item)?0:1;
+      if(al!==bl) return al-bl;
+      const an=isActiveThisMonthAndLastMonth(a.item)?0:1;
+      const bn=isActiveThisMonthAndLastMonth(b.item)?0:1;
+      if(an!==bn) return an-bn;
+      return a.item.n.localeCompare(b.item.n);
+    }
+    active.sort(sortFn);
+
+    html+=`<div class="month-section">
+      <div class="month-sec-header">
+        <div class="month-sec-title">${SECTIONS[sec].label}</div>
+        <div class="month-sec-badge${uncaught.length===0?' all-done':''}">${uncaught.length===0?'✓ all caught':uncaught.length+' to catch'}</div>
+        <div class="section-controls">
+          <button class="now-toggle-btn${showNowOnly[sec]?' active':''}" onclick="toggleNow('${sec}')" title="Show only available right now">⏱ now</button>
+          <button class="toggle-caught-btn${showCaught[sec]?' active':''}" onclick="toggleCaught('${sec}')">show caught</button>
+        </div>
+      </div>`;
+
+    const toShow=active.filter(x=>{
+      if(!showCaught[sec] && collected[sec].includes(x.i)) return false;
+      if(showNowOnly[sec] && !isActiveRightNow(x.item)) return false;
+      return true;
+    });
+
+    if(toShow.length===0){
+      if(uncaught.length===0){
+        html+=`<div class="month-all-done">✓ all ${SECTIONS[sec].label.toLowerCase()} this month collected!</div>`;
+      }else{
+        html+=`<div class="month-all-done" style="background:var(--bg2);color:var(--ink-dim);border-color:var(--border)">nothing matches current filter</div>`;
+      }
+    }else{
+      html+=buildCritterTable(sec,toShow);
+    }
+    html+='</div>';
+  });
+  document.getElementById('monthContent').innerHTML=html;
+}
+
+function buildCritterTable(sec,rows){
+  const isSeaCreature=(sec==='sea');
+  const isBug=(sec==='bugs');
+  const isFish=(sec==='fish');
+  let h=`<table class="critter-table"><thead><tr>
+    <th style="width:16px"></th>
+    <th>name</th>
+    <th>${isSeaCreature?'shadow / speed':'shadow'}</th>
+    <th>where to find</th>
+    <th>time</th>
+    <th>bells</th>
+  </tr></thead><tbody>`;
+
+  rows.forEach(x=>{
+    const {item,i}=x;
+    const isDone=collected[sec].includes(i);
+    const isNow=isActiveRightNow(item)&&isActiveThisMonth(item);
+    const leaving=isLeavingNextMonth(item);
+    const newThis=isActiveThisMonthAndLastMonth(item);
+
+    const shadowStr=isSeaCreature?`${item.s} · ${item.sp}`:isFish?item.s:'-';
+    const locStr=isBug?item.l:isFish?item.l:'-';
+    const bellsStr=(item.b||0).toLocaleString();
+
+    const leavingBadge=leaving?'<span class="badge-leaving">leaving</span>':'';
+    const newBadge=newThis?'<span class="badge-new">new</span>':'';
+    const nowBadge=isNow&&!isDone?'<span class="badge-now">now</span>':'';
+
+    h+=`<tr class="${isDone?'done-row':''}${isNow&&!isDone?' now-row':''}"
+       onclick="toggleCritter('${sec}',${i})">
+      <td><div class="ct-check">${SVG_CHECK}</div></td>
+      <td><span class="ct-name">${item.n}</span>${leavingBadge}${newBadge}${nowBadge}</td>
+      <td class="ct-shadow">${shadowStr}</td>
+      <td class="ct-loc">${isBug?locStr:isFish?locStr:'-'}</td>
+      <td class="ct-time">${item.t}</td>
+      <td class="ct-bells">${bellsStr}</td>
+    </tr>`;
+  });
+  h+='</tbody></table>';
+  return h;
+}
+
+function toggleNow(sec){
+  showNowOnly[sec]=!showNowOnly[sec];
+  renderMonth();
+}
+function toggleCaught(sec){
+  showCaught[sec]=!showCaught[sec];
+  renderMonth();
+}
+
+function toggleCritter(sec,idx){
+  const arr=collected[sec];
   const pos=arr.indexOf(idx);
-  if(pos>=0)arr.splice(pos,1);else arr.push(idx);
+  if(pos>=0) arr.splice(pos,1); else arr.push(idx);
   saveData();
   render();
 }
 
-function setPrimaryTab(tab){
-  primaryTab=tab;
-  document.querySelectorAll('.primary-tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('ptab-'+tab).classList.add('active');
-  document.querySelectorAll('.primary-panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('ppanel-'+tab).classList.add('active');
-  render();
-}
-
-function renderMonthPanel(){
-  const now=new Date();
-  const monthAbbr=MONTH_ABBR[now.getMonth()];
-  const monthFull=MONTH_NAMES[now.getMonth()];
-  document.getElementById('monthName').textContent=monthFull;
-
-  let totalNeeded=0,totalDone=0;
-  const content=document.getElementById('monthContent');
-  content.innerHTML='';
-
-  CATCHABLE_SECTIONS.forEach(key=>{
-    const sec=SECTIONS[key];
-    const activeItems=sec.items.map((item,idx)=>({item,idx}))
-      .filter(({item})=>isActiveThisMonth(item));
-    const missing=activeItems.filter(({idx})=>!collected[key].includes(idx));
-    const done=activeItems.filter(({idx})=>collected[key].includes(idx));
-    totalNeeded+=activeItems.length;
-    totalDone+=done.length;
-
-    const section=document.createElement('div');
-    section.className='month-section';
-
-    const allCaught=missing.length===0;
-    section.innerHTML=`
-      <div class="month-sec-header">
-        <span class="month-sec-title">${sec.label}</span>
-        <span class="month-sec-badge${allCaught?' all-done':''}">${allCaught?'all caught ✓':missing.length+' left'}</span>
-      </div>`;
-
-    if(allCaught){
-      const msg=document.createElement('div');
-      msg.className='month-all-done';
-      msg.textContent='✓ all '+sec.label.toLowerCase()+' donated this month!';
-      section.appendChild(msg);
-    } else {
-      const grid=document.createElement('div');
-      grid.className='item-grid';
-      missing.forEach(({item,idx})=>{
-        const card=document.createElement('div');
-        card.className='item-card';
-        card.innerHTML=`<div class="item-check"><svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="item-info"><div class="item-name">${item.name}</div><div class="item-sub">${item.sub}</div></div>`;
-        card.onclick=()=>toggleItem(key,idx);
-        grid.appendChild(card);
-      });
-      section.appendChild(grid);
-    }
-    content.appendChild(section);
-  });
-
-  document.getElementById('monthSummary').textContent=`${totalDone} of ${totalNeeded} active critters donated`;
-}
-
-function buildCollectionTabs(){
-  const nav=document.getElementById('tabNav');nav.innerHTML='';
+// ── COLLECTION ───────────────────────────────────────────────────────────────
+function buildSubTabs(){
+  const nav=document.getElementById('tabNav');
+  const panels=document.getElementById('tabPanels');
+  nav.innerHTML=''; panels.innerHTML='';
   Object.entries(SECTIONS).forEach(([key,sec])=>{
-    const done=collected[key].length,total=sec.items.length;
+    const done=collected[key].length;
     const btn=document.createElement('button');
     btn.className='tab-btn'+(key===activeTab?' active':'');
-    btn.innerHTML=`${sec.label}<span class="tab-count">${done}/${total}</span>`;
-    btn.onclick=()=>{activeTab=key;render();};
+    btn.id='tab-'+key;
+    btn.onclick=()=>setTab(key);
+    btn.innerHTML=sec.label+'<span class="tab-count">'+done+'/'+sec.total+'</span>';
     nav.appendChild(btn);
-  });
-}
-
-function buildCollectionPanels(){
-  const container=document.getElementById('tabPanels');container.innerHTML='';
-  Object.entries(SECTIONS).forEach(([key,sec])=>{
-    const done=collected[key].length,total=sec.items.length,pct=total>0?Math.round(done/total*100):0;
     const panel=document.createElement('div');
     panel.className='tab-panel'+(key===activeTab?' active':'');
     panel.id='panel-'+key;
-    panel.innerHTML=`
-      <div class="sec-label">${sec.label.toLowerCase()} · ${done} of ${total} donated</div>
-      <div class="progress-row"><div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div><div class="prog-label"><strong>${pct}%</strong> complete</div></div>
-      <div class="controls-row">
-        <div class="search-wrap"><input type="text" placeholder="search…" value="${searchQuery[key]||''}" oninput="searchQuery['${key}']=this.value;renderItems('${key}')"/></div>
-        <button class="filter-btn${(activeFilter[key]||'all')==='all'?' active':''}" onclick="setFilter('all','${key}',event)">all</button>
-        <button class="filter-btn${(activeFilter[key]||'all')==='missing'?' active':''}" onclick="setFilter('missing','${key}',event)">missing</button>
-        <button class="filter-btn${(activeFilter[key]||'all')==='collected'?' active':''}" onclick="setFilter('collected','${key}',event)">donated</button>
-      </div>
-      <div class="item-grid" id="grid-${key}"></div>
-      <div class="empty-msg" id="empty-${key}" style="display:none">nothing matches.</div>`;
-    container.appendChild(panel);
-    renderItems(key);
+    panels.appendChild(panel);
   });
 }
 
-function renderItems(key){
+function renderCollection(){
+  buildSubTabs();
+  Object.keys(SECTIONS).forEach(renderSection);
+}
+
+function renderSection(key){
   const sec=SECTIONS[key];
-  const grid=document.getElementById('grid-'+key);
-  const empty=document.getElementById('empty-'+key);
-  if(!grid)return;
-  grid.innerHTML='';
-  const q=(searchQuery[key]||'').toLowerCase().trim();
-  const filt=activeFilter[key]||'all';
-  let visible=0;
-  sec.items.forEach((item,idx)=>{
-    const isColl=collected[key].includes(idx);
-    const mF=filt==='all'||(filt==='collected'&&isColl)||(filt==='missing'&&!isColl);
-    const mS=!q||item.name.toLowerCase().includes(q)||item.sub.toLowerCase().includes(q);
-    if(!mF||!mS)return;
-    visible++;
-    const card=document.createElement('div');
-    card.className='item-card'+(isColl?' collected':'');
-    card.innerHTML=`<div class="item-check"><svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="item-info"><div class="item-name">${item.name}</div><div class="item-sub">${item.sub}</div></div>`;
-    card.onclick=()=>toggleItem(key,idx);
-    grid.appendChild(card);
-  });
-  grid.style.display=visible?'grid':'none';
-  empty.style.display=visible?'none':'block';
+  const el=document.getElementById('panel-'+key);
+  if(!el) return;
+  const done=collected[key].length;
+  const total=sec.total;
+  const pct=total>0?Math.round(done/total*100):0;
+  const q=searchQuery[key]||'';
+  const f=activeFilter[key]||'all';
+  const isCreature=(key==='fish'||key==='bugs'||key==='sea');
+
+  let items=sec.data.map((item,i)=>({item,i}));
+  if(q) items=items.filter(x=>x.item.n.toLowerCase().includes(q.toLowerCase()));
+  if(f==='missing') items=items.filter(x=>!collected[key].includes(x.i));
+  if(f==='collected') items=items.filter(x=>collected[key].includes(x.i));
+
+  let html=`<div class="progress-row">
+    <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+    <div class="prog-label"><strong>${done}</strong> / ${total} &middot; ${pct}%</div>
+  </div>
+  <div class="controls-row">
+    <div class="search-wrap"><input type="text" placeholder="search ${sec.label.toLowerCase()}..." value="${q}" oninput="setSearch('${key}',this.value)"/></div>
+    <button class="filter-btn${f==='all'?' active':''}" onclick="setFilter('${key}','all')">all</button>
+    <button class="filter-btn${f==='missing'?' active':''}" onclick="setFilter('${key}','missing')">missing</button>
+    <button class="filter-btn${f==='collected'?' active':''}" onclick="setFilter('${key}','collected')">collected</button>
+  </div>`;
+
+  if(items.length===0){
+    html+='<div class="empty-msg">no results</div>';
+  }else if(isCreature){
+    html+='<div class="item-grid">';
+    items.forEach(x=>{
+      const {item,i}=x;
+      const isDone=collected[key].includes(i);
+      let details='';
+      if(key==='fish'){
+        details=`<div class="item-detail">🗺 ${item.l}</div>
+                 <div class="item-detail">🌑 shadow: ${item.s}</div>
+                 <div class="item-detail">⏰ ${item.t}</div>`;
+      }else if(key==='bugs'){
+        details=`<div class="item-detail">🗺 ${item.l}</div>
+                 <div class="item-detail">⏰ ${item.t}</div>`;
+      }else if(key==='sea'){
+        details=`<div class="item-detail">🌑 shadow: ${item.s}</div>
+                 <div class="item-detail">💨 ${item.sp}</div>
+                 <div class="item-detail">⏰ ${item.t}</div>`;
+      }
+      html+=`<div class="item-card${isDone?' collected':''}" onclick="toggleItem('${key}',${i})">
+        <div class="item-card-top">
+          <div class="item-check">${SVG_CHECK}</div>
+          <div class="item-name">${item.n}</div>
+        </div>
+        <div class="item-details">
+          ${details}
+          <div class="item-bells">${(item.b||0).toLocaleString()} bells</div>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  }else{
+    // fossil/art: simple grid
+    html+=`<div class="item-grid${key==='art'?' art-grid':''}">`;
+    items.forEach(x=>{
+      const {item,i}=x;
+      const isDone=collected[key].includes(i);
+      let sub='';
+      if(key==='art'){
+        if(item.f){
+          sub=`<div class="art-fake-badge">⚠ fake possible</div>`;
+          if(item.h) sub+=`<div class="art-hint">${item.h}</div>`;
+        }else{
+          sub=`<div class="art-safe-badge">✓ always genuine</div>`;
+        }
+      }else{
+        sub=`<div class="item-sub">${item.s}</div>`;
+      }
+      html+=`<div class="item-card${isDone?' collected':''}" onclick="toggleItem('${key}',${i})">
+        <div class="item-card-simple">
+          <div class="item-check">${SVG_CHECK}</div>
+          <div class="item-info">
+            <div class="item-name">${item.n}</div>
+            ${sub}
+          </div>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  }
+
+  el.innerHTML=html;
 }
 
-function setFilter(f,key,e){
+function toggleItem(key,idx){
+  const arr=collected[key];
+  const pos=arr.indexOf(idx);
+  if(pos>=0) arr.splice(pos,1); else arr.push(idx);
+  saveData();
+  render();
+}
+
+function setTab(key){
+  activeTab=key;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  const btn=document.getElementById('tab-'+key);
+  const panel=document.getElementById('panel-'+key);
+  if(btn) btn.classList.add('active');
+  if(panel) panel.classList.add('active');
+  renderSection(key);
+}
+
+function setSearch(key,val){
+  searchQuery[key]=val;
+  renderSection(key);
+}
+
+function setFilter(key,f){
   activeFilter[key]=f;
-  document.querySelectorAll(`#panel-${key} .filter-btn`).forEach(b=>b.classList.remove('active'));
-  e.target.classList.add('active');
-  renderItems(key);
+  renderSection(key);
 }
 
-function render(){
-  renderMonthPanel();
-  buildCollectionTabs();
-  buildCollectionPanels();
+function setPrimaryTab(t){
+  primaryTab=t;
+  document.getElementById('ptab-month').classList.toggle('active',t==='month');
+  document.getElementById('ptab-collection').classList.toggle('active',t==='collection');
+  document.getElementById('ppanel-month').classList.toggle('active',t==='month');
+  document.getElementById('ppanel-collection').classList.toggle('active',t==='collection');
 }
+
 </script>
+
 </body>
 </html>
