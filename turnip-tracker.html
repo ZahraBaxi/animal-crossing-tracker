@@ -476,11 +476,11 @@ function computeProbabilities(buy, known){
 // Advice per pattern
 const PATTERNS={
   0:{name:'large spike',key:'large-spike',advClass:'adv-spike',
-    advice:(fmax,fslot)=>`<strong>Large spike</strong> — prices shoot up 200–600% then drop sharply. Look for 3 consecutive increases (⬆⬆⬆). ${fslot!=null?`Spike projected to start around <strong>${LABELS[fslot]}</strong>.`:''} Peak can reach up to <strong>${fmax} bells</strong>. Sell at the 3rd rise or the moment prices exceed 200% of your buy price — the crash follows immediately.`},
+    advice:(fmax,fslot)=>`<strong>Large spike</strong> — prices shoot up 200–600% then drop sharply. Look for 3 consecutive increases (↑↑↑). ${fslot!=null?`Spike projected to start around <strong>${LABELS[fslot]}</strong>.`:''} Peak can reach up to <strong>${fmax} bells</strong>. Sell at the 3rd rise or the moment prices exceed 200% of your buy price — the crash follows immediately.`},
   1:{name:'decreasing',key:'decreasing',advClass:'adv-loss',
     advice:()=>`<strong>Decreasing pattern</strong> — prices start at 85–90% and drop steadily 3–5% every slot. They will not recover. Minimum floor is roughly 27 bells. Sell now to minimize loss, or check a friend's island — maybe they have a spike going.`},
   2:{name:'small spike',key:'small-spike',advClass:'adv-spike',
-    advice:(fmax)=>`<strong>Small spike</strong> — prices rise to 140–200% of buy price. Pattern is either 4 straight rises (⬆⬆⬆⬆) or a slight dip then rise (⬆↓⬆⬆). Peak around <strong>${fmax} bells</strong>. If two back-to-back prices look similarly high, sell immediately — the drop follows quickly.`},
+    advice:(fmax)=>`<strong>Small spike</strong> — prices rise to 140–200% of buy price. Pattern is either 4 straight rises (↑↑↑↑) or a slight dip then rise (↑↓↑↑). Peak around <strong>${fmax} bells</strong>. If two back-to-back prices look similarly high, sell immediately — the drop follows quickly.`},
   3:{name:'fluctuating',key:'fluctuating',advClass:'adv-gain',
     advice:(fmax)=>`<strong>Fluctuating</strong> — exactly 7 high-price slots (90–140%) distributed in 1–3 bursts with low phases between them. Peak up to <strong>${fmax} bells</strong>. All high slots are roughly equal, so sell as soon as you're in profit — don't gamble waiting for higher unless you can track which burst you're in.`}
 };
@@ -676,9 +676,9 @@ function recalculate(){
     // Trend arrow vs previous non-null slot
     if(idx>0&&known[idx-1]!=null&&tr){
       const prev=known[idx-1];
-      if(v>prev*1.5){tr.textContent='⬆⬆';tr.classList.add('arr-spike');}
-      else if(v>prev){tr.textContent='⬆';tr.classList.add('arr-up');}
-      else if(v<prev){tr.textContent='⬇';tr.classList.add('arr-down');}
+      if(v>prev*1.5){tr.textContent='↑↑';tr.classList.add('arr-spike');}
+      else if(v>prev){tr.textContent='↑';tr.classList.add('arr-up');}
+      else if(v<prev){tr.textContent='↓';tr.classList.add('arr-down');}
       else{tr.textContent='→';}
     }
   });
