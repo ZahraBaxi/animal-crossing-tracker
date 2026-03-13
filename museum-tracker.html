@@ -164,8 +164,7 @@
   @media(max-width:600px){
     .item-grid{grid-template-columns:repeat(auto-fill,minmax(145px,1fr));}
     header{padding:2rem 1.2rem 0;}.wrap{padding:1.5rem 1.2rem;}
-    .critter-table th:nth-child(4),.critter-table td:nth-child(4){display:none;}
-    .mo-pills{display:none;}
+    .critter-table th:nth-child(5),.critter-table td:nth-child(5){display:none;}
   }
 </style>
 </head>
@@ -249,7 +248,7 @@
       <div class="legend-desc" style="color:var(--ink-dim);font-size:0.6rem;">
         <strong style="color:var(--ink-mid);">⏱ now button</strong> — filters the list to only critters you can catch at this exact hour.<br/><br/>
         <strong style="color:var(--ink-mid);">show caught</strong> — reveals already-ticked critters (hidden by default to keep the list clean).<br/><br/>
-        <strong style="color:var(--ink-mid);">🟠 wheat row highlight</strong> — catchable right now and not yet collected.
+        <strong style="color:var(--ink-mid);">✦ row highlight</strong> — a warm tinted row means catchable right now and not yet collected.
       </div>
     </div>
   </div>
@@ -568,7 +567,7 @@ function renderSection(key){
         :'<div class="mo-pills">'+MO.map((ab,idx)=>{
             const m=idx+1;
             const active=item.m.includes(m);
-            const cls=m===curMo?'cur':active?'on':'';
+            const cls=(m===curMo&&active)?'cur':active?'on':'';
             return `<span class="mo-pill${cls?' '+cls:''}">${ab}</span>`;
           }).join('')+'</div>';
       let details='';
