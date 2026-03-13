@@ -133,12 +133,39 @@
   .item-card.collected .art-hint{color:#7a9e6a;}
   .item-card.collected .art-fake-badge{color:var(--done-tx);background:rgba(74,94,58,0.1);border-color:rgba(74,94,58,0.2);}
 
+  /* month availability pills */
+  .mo-pills{display:flex;flex-wrap:wrap;gap:2px;margin-top:0.32rem;padding-left:1.4rem;}
+  .mo-pill{font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.01em;border-radius:2px;padding:0.07rem 0.25rem;background:var(--border-lt);color:var(--ink-dim);line-height:1.4;}
+  .mo-pill.on{background:rgba(107,124,92,0.18);color:var(--moss);}
+  .mo-pill.cur{background:var(--rust);color:#fff;font-weight:500;}
+  .mo-pill.yr{background:rgba(107,124,92,0.18);color:var(--moss);font-style:italic;}
+  .item-card.collected .mo-pill.on{background:rgba(74,94,58,0.15);color:#7a9e6a;}
+  .item-card.collected .mo-pill.cur{background:#7a9e6a;color:#fff;}
+
+  /* legend button */
+  .legend-btn{font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:0.05em;padding:0.28rem 0.65rem;border:1px solid var(--border);border-radius:4px;background:none;color:var(--ink-dim);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+  .legend-btn:hover{border-color:var(--dusk);color:var(--ink-mid);}
+
+  /* legend modal */
+  .legend-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(40,30,22,0.45);backdrop-filter:blur(3px);align-items:center;justify-content:center;}
+  .legend-overlay.open{display:flex;}
+  .legend-box{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:1.6rem 1.8rem;max-width:380px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,0.18);}
+  .legend-title{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-mid);margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between;}
+  .legend-close{background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--ink-dim);line-height:1;padding:0;}
+  .legend-close:hover{color:var(--ink);}
+  .legend-row{display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:0.85rem;}
+  .legend-swatch{flex-shrink:0;margin-top:0.1rem;}
+  .legend-desc{font-family:'DM Mono',monospace;font-size:0.63rem;color:var(--ink-mid);line-height:1.6;}
+  .legend-desc strong{color:var(--ink);font-weight:500;}
+  .legend-divider{border:none;border-top:1px solid var(--border-lt);margin:0.9rem 0;}
+
   .empty-msg{font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--ink-dim);text-align:center;padding:3rem 1rem;border:1px solid var(--border-lt);border-radius:8px;}
   footer{text-align:center;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);letter-spacing:0.06em;padding:0 2rem;max-width:960px;margin:2rem auto 0;}
   @media(max-width:600px){
     .item-grid{grid-template-columns:repeat(auto-fill,minmax(145px,1fr));}
     header{padding:2rem 1.2rem 0;}.wrap{padding:1.5rem 1.2rem;}
     .critter-table th:nth-child(4),.critter-table td:nth-child(4){display:none;}
+    .mo-pills{display:none;}
   }
 </style>
 </head>
@@ -169,7 +196,10 @@
         <div class="month-label">active this month</div>
         <div class="month-name" id="monthName"></div>
       </div>
-      <div class="month-summary" id="monthSummary"></div>
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+        <div class="month-summary" id="monthSummary"></div>
+        <button class="legend-btn" onclick="openLegend()">&#9432; key</button>
+      </div>
     </div>
     <div id="monthContent"></div>
   </div>
@@ -180,6 +210,50 @@
 </div>
 
 <footer>data synced via back4app<br>made by zahra w/ html,css,js &amp; some sparkle dust</footer>
+
+<!-- LEGEND MODAL -->
+<div class="legend-overlay" id="legendOverlay" onclick="if(event.target===this)closeLegend()">
+  <div class="legend-box">
+    <div class="legend-title">
+      what things mean
+      <button class="legend-close" onclick="closeLegend()">&#x2715;</button>
+    </div>
+
+    <div class="legend-row">
+      <div class="legend-swatch"><span class="badge-leaving" style="font-family:'DM Mono',monospace;font-size:0.48rem;letter-spacing:0.04em;text-transform:uppercase;background:rgba(160,82,45,0.1);color:var(--rust);border:1px solid rgba(160,82,45,0.25);border-radius:3px;padding:0.07rem 0.35rem;">leaving</span></div>
+      <div class="legend-desc"><strong>leaving next month</strong> — available now but won't be after this month ends. Catch it soon!</div>
+    </div>
+    <div class="legend-row">
+      <div class="legend-swatch"><span class="badge-new" style="font-family:'DM Mono',monospace;font-size:0.48rem;letter-spacing:0.04em;text-transform:uppercase;background:rgba(107,124,92,0.12);color:var(--moss);border:1px solid rgba(107,124,92,0.3);border-radius:3px;padding:0.07rem 0.35rem;">new</span></div>
+      <div class="legend-desc"><strong>new this month</strong> — wasn't available last month. Just arrived!</div>
+    </div>
+    <div class="legend-row">
+      <div class="legend-swatch"><span class="badge-now" style="font-family:'DM Mono',monospace;font-size:0.48rem;letter-spacing:0.04em;text-transform:uppercase;background:var(--now-bg);color:var(--now-tx);border:1px solid rgba(201,150,58,0.4);border-radius:3px;padding:0.07rem 0.35rem;">now</span></div>
+      <div class="legend-desc"><strong>catchable right now</strong> — active at your current time of day based on your device clock.</div>
+    </div>
+
+    <hr class="legend-divider"/>
+
+    <div class="legend-row">
+      <div class="legend-swatch" style="display:flex;gap:2px;">
+        <span class="mo-pill cur">M</span>
+        <span class="mo-pill on">J</span>
+        <span class="mo-pill">F</span>
+      </div>
+      <div class="legend-desc"><strong>month pills</strong> — shown on collection cards. <span style="color:var(--rust)">Rust/filled</span> = this month. <span style="color:var(--moss)">Green</span> = available. Faded = not available that month. <em style="color:var(--ink-dim)">year-round</em> = active all year.</div>
+    </div>
+
+    <hr class="legend-divider"/>
+
+    <div class="legend-row">
+      <div class="legend-desc" style="color:var(--ink-dim);font-size:0.6rem;">
+        <strong style="color:var(--ink-mid);">⏱ now button</strong> — filters the list to only critters you can catch at this exact hour.<br/><br/>
+        <strong style="color:var(--ink-mid);">show caught</strong> — reveals already-ticked critters (hidden by default to keep the list clean).<br/><br/>
+        <strong style="color:var(--ink-mid);">🟠 wheat row highlight</strong> — catchable right now and not yet collected.
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 
@@ -386,8 +460,8 @@ function buildCritterTable(sec,rows){
     const leaving=isLeavingNextMonth(item);
     const newThis=isActiveThisMonthAndLastMonth(item);
 
-    const shadowStr=isSeaCreature?`${item.s} · ${item.sp}`:isFish?item.s:'-';
-    const locStr=isBug?item.l:isFish?item.l:'-';
+    const shadowStr=isSeaCreature?`${item.s} · ${item.sp}`:isFish?item.s:'—';
+    const locStr=isSeaCreature?'Ocean (diving)':item.l||'—';
     const bellsStr=(item.b||0).toLocaleString();
 
     const leavingBadge=leaving?'<span class="badge-leaving">leaving</span>':'';
@@ -399,7 +473,7 @@ function buildCritterTable(sec,rows){
       <td><div class="ct-check">${SVG_CHECK}</div></td>
       <td><span class="ct-name">${item.n}</span>${leavingBadge}${newBadge}${nowBadge}</td>
       <td class="ct-shadow">${shadowStr}</td>
-      <td class="ct-loc">${isBug?locStr:isFish?locStr:'-'}</td>
+      <td class="ct-loc">${locStr}</td>
       <td class="ct-time">${item.t}</td>
       <td class="ct-bells">${bellsStr}</td>
     </tr>`;
@@ -475,6 +549,7 @@ function renderSection(key){
     <button class="filter-btn${f==='all'?' active':''}" onclick="setFilter('${key}','all')">all</button>
     <button class="filter-btn${f==='missing'?' active':''}" onclick="setFilter('${key}','missing')">missing</button>
     <button class="filter-btn${f==='collected'?' active':''}" onclick="setFilter('${key}','collected')">collected</button>
+    ${isCreature?`<button class="legend-btn" onclick="openLegend()">&#9432; key</button>`:''}
   </div>`;
 
   if(items.length===0){
@@ -484,16 +559,29 @@ function renderSection(key){
     items.forEach(x=>{
       const {item,i}=x;
       const isDone=collected[key].includes(i);
+      const curMo=new Date().getMonth()+1;
+      const allYear=!item.m||item.m[0]===0;
+      // build month pills
+      const MO=['Ja','F','Mr','Ap','My','Jn','Jl','Au','S','O','N','D'];
+      let moPills=allYear
+        ?'<div class="mo-pills"><span class="mo-pill yr" style="padding:0.07rem 0.4rem;font-style:italic;">year-round</span></div>'
+        :'<div class="mo-pills">'+MO.map((ab,idx)=>{
+            const m=idx+1;
+            const active=item.m.includes(m);
+            const cls=m===curMo?'cur':active?'on':'';
+            return `<span class="mo-pill${cls?' '+cls:''}">${ab}</span>`;
+          }).join('')+'</div>';
       let details='';
       if(key==='fish'){
-        details=`<div class="item-detail">🗺 ${item.l}</div>
+        details=`<div class="item-detail">📍 ${item.l}</div>
                  <div class="item-detail">🌑 shadow: ${item.s}</div>
                  <div class="item-detail">⏰ ${item.t}</div>`;
       }else if(key==='bugs'){
-        details=`<div class="item-detail">🗺 ${item.l}</div>
+        details=`<div class="item-detail">📍 ${item.l}</div>
                  <div class="item-detail">⏰ ${item.t}</div>`;
       }else if(key==='sea'){
-        details=`<div class="item-detail">🌑 shadow: ${item.s}</div>
+        details=`<div class="item-detail">📍 Ocean (diving)</div>
+                 <div class="item-detail">🌑 shadow: ${item.s}</div>
                  <div class="item-detail">💨 ${item.sp}</div>
                  <div class="item-detail">⏰ ${item.t}</div>`;
       }
@@ -506,6 +594,7 @@ function renderSection(key){
           ${details}
           <div class="item-bells">${(item.b||0).toLocaleString()} bells</div>
         </div>
+        ${moPills}
       </div>`;
     });
     html+='</div>';
@@ -578,6 +667,16 @@ function setPrimaryTab(t){
   document.getElementById('ppanel-month').classList.toggle('active',t==='month');
   document.getElementById('ppanel-collection').classList.toggle('active',t==='collection');
 }
+
+function openLegend(){
+  document.getElementById('legendOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeLegend(){
+  document.getElementById('legendOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLegend();});
 
 </script>
 
