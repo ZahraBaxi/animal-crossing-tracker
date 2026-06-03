@@ -447,6 +447,19 @@ const TOOLS=[
         return{done:(r.get('owned')||[]).length,total:107};
       }catch{return null;}
     }},
+  {href:'diy.html',tag:'crafting',title:'diys & recipes',
+    desc:'Track all crafting DIYs and cooking recipes. Shows materials, how to obtain, and what to collect.',
+    pills:['food','crafting','6 categories'],
+    progress:async()=>{
+      const u=Parse.User.current();if(!u)return null;
+      try{
+        const q=new Parse.Query('DIYData');q.equalTo('user',u);const r=await q.first();
+        if(!r)return{done:0,total:450};
+        const all=r.get('obtained')||{};let done=0;
+        Object.values(all).forEach(arr=>{done+=arr.length;});
+        return{done,total:450};
+      }catch{return null;}
+    }},
 ];
 
 async function buildGrid(){

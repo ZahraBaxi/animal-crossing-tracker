@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>diys & recipes · tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+<script>
+  Parse.initialize("G9QH61WfFxbMqM8pfxMTlkBQDkDkHornk0MRX6Zb", "9oUG5sdMcxYQwTe5XqdNDw8gXmyLmwsN3v3vUom2");
+  Parse.serverURL = "https://parseapi.back4app.com/";
+</script>
+<style>
+:root{--bg:#f0ebe3;--bg2:#e8e1d6;--surface:#ede6da;--border:#c9bfb0;--border-lt:#d9d1c4;
+  --rust:#a0522d;--rust-lt:#c47a4a;--moss:#6b7c5c;--clay:#b5714e;--wheat:#c9a96e;
+  --dusk:#8c7b6e;--ink:#3b3028;--ink-mid:#6b5c50;--ink-dim:#9e8f83;
+  --done-bg:#dde6d5;--done-tx:#4a5e3a;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:15px;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:5rem;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");}
+
+/* HEADER */
+header{padding:3rem 2rem 0;border-bottom:1px solid var(--border);max-width:1060px;margin:0 auto;}
+.header-top{display:flex;align-items:baseline;gap:1.2rem;flex-wrap:wrap;padding-bottom:1.5rem;}
+.site-title{font-family:'DM Mono',monospace;font-weight:400;font-size:1.05rem;color:var(--ink);}
+.site-title span{color:var(--rust);font-size:0.9rem;}
+.site-meta{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--ink-dim);letter-spacing:0.04em;text-transform:uppercase;}
+.nav-links{margin-left:auto;display:flex;gap:1rem;align-items:center;}
+.back-link{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--ink-dim);text-decoration:none;letter-spacing:0.04em;border-bottom:1px solid var(--border);padding-bottom:1px;transition:color 0.15s;}
+.back-link:hover{color:var(--rust);border-color:var(--rust);}
+.user-chip{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);}
+
+/* PRIMARY TABS (crafting / food) */
+.primary-tab-nav{display:flex;gap:0;margin-top:1.2rem;}
+.primary-tab-btn{font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.07em;text-transform:uppercase;
+  color:var(--ink-dim);background:none;border:none;border-bottom:2px solid transparent;
+  padding:0.6rem 1.4rem 0.7rem;cursor:pointer;white-space:nowrap;transition:color 0.15s,border-color 0.15s;position:relative;top:1px;}
+.primary-tab-btn:hover{color:var(--ink-mid);}
+.primary-tab-btn.active{color:var(--rust);border-bottom-color:var(--rust);}
+.primary-tab-btn .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--wheat);margin-right:0.5rem;vertical-align:middle;position:relative;top:-1px;}
+.primary-tab-btn.active .dot{background:var(--rust);}
+
+.wrap{max-width:1060px;margin:0 auto;padding:2rem;}
+.primary-panel{display:none;}.primary-panel.active{display:block;}
+
+/* SECONDARY TABS (sub-tabs) */
+.sub-tab-nav{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);margin-bottom:1.8rem;}
+.sub-tab-nav::-webkit-scrollbar{display:none;}
+.stab{font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.07em;text-transform:uppercase;
+  color:var(--ink-dim);background:none;border:none;border-bottom:2px solid transparent;
+  padding:0.55rem 1.1rem 0.65rem;cursor:pointer;white-space:nowrap;transition:color 0.15s,border-color 0.15s;position:relative;top:1px;}
+.stab:hover{color:var(--ink-mid);}
+.stab.active{color:var(--moss);border-bottom-color:var(--moss);}
+.stab-count{font-size:0.58rem;color:var(--ink-dim);margin-left:0.35rem;}
+.stab.active .stab-count{color:var(--moss);}
+.sub-panel{display:none;}.sub-panel.active{display:block;}
+
+/* SECTION HEADER */
+.section-header{display:flex;align-items:center;gap:0.9rem;margin-bottom:1rem;flex-wrap:wrap;}
+.section-title{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-mid);}
+.prog-row{display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem;}
+.prog-track{flex:1;height:4px;background:var(--border-lt);border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--rust);border-radius:99px;transition:width 0.4s;}
+.prog-label{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--ink-dim);white-space:nowrap;}
+.prog-label strong{color:var(--rust);font-weight:500;}
+
+/* CONTROLS */
+.controls-row{display:flex;gap:0.6rem;margin-bottom:1.1rem;flex-wrap:wrap;}
+.search-wrap{flex:1 1 200px;display:flex;align-items:center;border:1px solid var(--border);border-radius:5px;background:var(--surface);overflow:hidden;transition:border-color 0.15s;}
+.search-wrap:focus-within{border-color:var(--rust);}
+.search-wrap input{font-family:'Inter',sans-serif;font-size:0.82rem;border:none;background:transparent;color:var(--ink);padding:0.48rem 0.75rem;outline:none;width:100%;}
+.search-wrap input::placeholder{color:var(--ink-dim);}
+.filter-btn{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.05em;padding:0.45rem 0.85rem;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--ink-dim);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.filter-btn:hover{background:var(--bg2);color:var(--ink);}
+.filter-btn.active{color:var(--rust);border-color:var(--rust-lt);background:var(--bg2);}
+
+/* RECIPE CARDS */
+.recipe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--border);}
+.recipe-card{background:var(--surface);padding:0.8rem 0.9rem;cursor:pointer;user-select:none;transition:background 0.12s;}
+.recipe-card:hover{background:var(--bg2);}
+.recipe-card.obtained{background:var(--done-bg);}
+.recipe-card.obtained:hover{background:#d3deca;}
+.rc-top{display:flex;align-items:flex-start;gap:0.6rem;}
+.rc-check{width:15px;height:15px;border:1.5px solid var(--border);border-radius:3px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:background 0.12s,border-color 0.12s;}
+.recipe-card.obtained .rc-check{background:var(--moss);border-color:var(--moss);}
+.rc-check svg{display:none;}.recipe-card.obtained .rc-check svg{display:block;}
+.rc-name{font-size:0.82rem;font-weight:500;color:var(--ink);line-height:1.3;}
+.recipe-card.obtained .rc-name{color:var(--done-tx);}
+.rc-body{margin-top:0.45rem;padding-left:1.45rem;}
+.rc-mats{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--ink-mid);line-height:1.7;}
+.recipe-card.obtained .rc-mats{color:#7a9e6a;}
+.rc-mat-item{display:flex;align-items:center;gap:0.3rem;}
+.rc-mat-tag{display:inline-block;font-size:0.5rem;letter-spacing:0.03em;border-radius:2px;padding:0.06rem 0.28rem;margin-left:0.2rem;vertical-align:middle;}
+.tag-catch{background:rgba(107,124,92,0.12);color:var(--moss);border:1px solid rgba(107,124,92,0.25);}
+.tag-dive{background:rgba(107,124,92,0.12);color:var(--moss);border:1px solid rgba(107,124,92,0.25);}
+.rc-obtain{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--ink-dim);margin-top:0.4rem;display:flex;align-items:center;gap:0.35rem;flex-wrap:wrap;}
+.recipe-card.obtained .rc-obtain{color:#99b887;}
+.obtain-pill{display:inline-block;font-size:0.52rem;letter-spacing:0.04em;border-radius:3px;padding:0.07rem 0.38rem;border:1px solid;}
+.pill-bottle{background:rgba(140,123,110,0.1);color:var(--dusk);border-color:rgba(140,123,110,0.3);}
+.pill-villager{background:rgba(180,113,78,0.1);color:var(--clay);border-color:rgba(180,113,78,0.3);}
+.pill-fishing{background:rgba(107,124,92,0.12);color:var(--moss);border-color:rgba(107,124,92,0.3);}
+.pill-nookmiles{background:rgba(160,82,45,0.1);color:var(--rust);border-color:rgba(160,82,45,0.25);}
+.pill-nookcranny{background:rgba(201,150,58,0.12);color:#7a5810;border-color:rgba(201,150,58,0.35);}
+.pill-daisy{background:rgba(160,82,45,0.1);color:var(--rust);border-color:rgba(160,82,45,0.25);}
+.pill-celeste{background:rgba(140,123,110,0.12);color:var(--dusk);border-color:rgba(140,123,110,0.3);}
+.pill-balloon{background:rgba(140,123,110,0.1);color:var(--dusk);border-color:rgba(140,123,110,0.3);}
+.pill-franklin{background:rgba(160,82,45,0.1);color:var(--rust);border-color:rgba(160,82,45,0.25);}
+.rc-collect{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--clay);margin-top:0.35rem;font-style:italic;}
+.recipe-card.obtained .rc-collect{color:#99b887;}
+.empty-msg{font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--ink-dim);text-align:center;padding:3rem 1rem;border:1px solid var(--border-lt);border-radius:8px;}
+
+footer{text-align:center;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-dim);letter-spacing:0.06em;padding:0 2rem;max-width:1060px;margin:2rem auto 0;}
+@media(max-width:600px){
+  header{padding:2rem 1.2rem 0;}.wrap{padding:1.5rem 1.2rem;}
+  .recipe-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-top">
+    <div class="site-title">diys <span>& recipes</span></div>
+    <div class="site-meta">animal crossing · nh</div>
+    <div class="nav-links">
+      <span class="user-chip" id="userChip"></span>
+      <a class="back-link" href="index.html">← home</a>
+    </div>
+  </div>
+  <nav class="primary-tab-nav">
+    <button class="primary-tab-btn active" id="ptab-food" onclick="setPrimaryTab('food')">
+      <span class="dot"></span>food & cooking
+    </button>
+    <button class="primary-tab-btn" id="ptab-crafting" onclick="setPrimaryTab('crafting')">
+      <span class="dot"></span>crafting
+    </button>
+  </nav>
+</header>
+
+<div class="wrap">
+  <!-- FOOD TAB -->
+  <div class="primary-panel active" id="ppanel-food">
+    <nav class="sub-tab-nav" id="foodTabNav"></nav>
+    <div id="foodPanels"></div>
+  </div>
+  <!-- CRAFTING TAB -->
+  <div class="primary-panel" id="ppanel-crafting">
+    <nav class="sub-tab-nav" id="craftTabNav"></nav>
+    <div id="craftPanels"></div>
+  </div>
+</div>
+
+<footer>data synced via back4app<br>made by zahra w/ html,css,js &amp; some sparkle dust</footer>
+
+<script>
+const SVG_CHECK='<svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+// ── OBTAIN SOURCES ──────────────────────────────────────────────────────────
+// pill helpers
+const P={
+  bottle:'<span class="obtain-pill pill-bottle">bottle</span>',
+  villager:'<span class="obtain-pill pill-villager">villager</span>',
+  fishing:'<span class="obtain-pill pill-fishing">fishing</span>',
+  nookmiles:'<span class="obtain-pill pill-nookmiles">nook miles</span>',
+  nookcranny:'<span class="obtain-pill pill-nookcranny">nook&#39;s cranny</span>',
+  daisy:'<span class="obtain-pill pill-daisy">daisy mae</span>',
+  celeste:'<span class="obtain-pill pill-celeste">celeste</span>',
+  balloon:'<span class="obtain-pill pill-balloon">balloon</span>',
+  franklin:'<span class="obtain-pill pill-franklin">franklin</span>',
+};
+
+// ── INGREDIENT TAG HELPERS ───────────────────────────────────────────────────
+// "collect" ingredients that need to be gathered (not grown/bought)
+const COLLECT_ITEMS=['anchovy','salmon','dab','squid','sea bass','red snapper','horse mackerel','crucian carp',
+  'tiger prawn','sweet shrimp','manila clam','scallop','seaweed','bamboo shoot','turnips',
+  'round mushroom','flat mushroom','skinny mushroom','rare mushroom','tomato puree',
+  'iron nugget','stone','wood','hardwood','softwood','bamboo','young spring bamboo',
+  'weed','clump of weeds','acorn','pinecone','maple leaf','star fragment','large star fragment',
+  'gold nugget','tree branch','pear','orange','cherry','peach','coconut','apple'];
+
+// Simple "needs to be caught/found" indicator
+const CATCH_FISH=['anchovy','salmon','dab','squid','sea bass','red snapper','horse mackerel','crucian carp'];
+const CATCH_SEA=['tiger prawn','sweet shrimp','manila clam','scallop','seaweed'];
+
+function matTag(mat){
+  const low=mat.toLowerCase();
+  if(CATCH_FISH.some(f=>low.includes(f))) return '<span class="rc-mat-tag tag-catch">fish</span>';
+  if(CATCH_SEA.some(s=>low.includes(s))) return '<span class="rc-mat-tag tag-dive">dive/beach</span>';
+  if(low.includes('mushroom')) return '<span class="rc-mat-tag tag-catch">forage</span>';
+  if(low.includes('bamboo shoot')) return '<span class="rc-mat-tag tag-catch">forage</span>';
+  if(low.includes('turnip')) return '<span class="rc-mat-tag tag-catch">buy from daisy</span>';
+  if(low.includes('weed')||low==='clump of weeds') return '<span class="rc-mat-tag tag-catch">pull weeds</span>';
+  return '';
+}
+
+// collectNote — special items needed (non-standard)
+function collectNote(mats){
+  const specials=[];
+  mats.forEach(([qty,mat])=>{
+    const low=mat.toLowerCase();
+    if(CATCH_FISH.some(f=>low.includes(f))) specials.push(mat+' (catch fish)');
+    else if(CATCH_SEA.some(s=>low.includes(s))) specials.push(mat+' (dive/beach)');
+    else if(low.includes('mushroom')) specials.push(mat+' (forage in Nov)');
+    else if(low.includes('bamboo shoot')) specials.push(mat+' (dig bamboo grove)');
+    else if(low.includes('turnip')&&!low.includes('fish')) specials.push('Turnips (buy from Daisy Mae on Sunday)');
+    else if(low.includes('tomato puree')) specials.push('Tomato puree (craft from 3 tomato)');
+    else if(low.includes('weed')) specials.push('Clump of Weeds (pull from ground)');
+  });
+  return [...new Set(specials)];
+}
+
+// ── DATA ────────────────────────────────────────────────────────────────────
+// Format: {n:name, mats:[[qty,item],...], src:[P.x,...], srcNote:'optional text'}
+// Sources abbreviated: nookmiles=Be a Chef! DIY Recipes+ (2000 miles), nookcranny=Basic Cooking Recipes (4980 bells)
+
+const SAVORY=[
+  {n:"Flour",                   mats:[[5,"Wheat"]],                                                  src:[P.nookmiles]},
+  {n:"Whole-wheat flour",       mats:[[5,"Wheat"]],                                                  src:[P.nookcranny]},
+  {n:"Sugar",                   mats:[[5,"Sugarcane"]],                                              src:[P.nookmiles]},
+  {n:"Brown sugar",             mats:[[5,"Sugarcane"]],                                              src:[P.nookcranny]},
+  {n:"Tomato puree",            mats:[[3,"Tomato"]],                                                 src:[P.nookcranny]},
+  {n:"Carrot potage",           mats:[[1,"Flour"],[2,"Carrot"]],                                     src:[P.nookmiles]},
+  {n:"Potato potage",           mats:[[1,"Flour"],[2,"Potato"]],                                     src:[P.villager,P.bottle]},
+  {n:"Mushroom potage",         mats:[[1,"Flour"],[1,"Round mushroom"],[1,"Flat mushroom"]],         src:[P.villager,P.bottle]},
+  {n:"Pumpkin soup",            mats:[[3,"Orange pumpkin"]],                                         src:[P.villager,P.bottle]},
+  {n:"Minestrone soup",         mats:[[2,"Tomato"],[1,"Potato"],[1,"Carrot"]],                       src:[P.villager,P.bottle]},
+  {n:"Seaweed soup",            mats:[[2,"Seaweed"]],                                                src:[P.nookcranny]},
+  {n:"Bamboo-shoot soup",       mats:[[2,"Bamboo shoot"]],                                           src:[P.daisy]},
+  {n:"Salad",                   mats:[[1,"Tomato"],[1,"Carrot"],[1,"Potato"],[1,"Orange pumpkin"]], src:[P.villager,P.bottle]},
+  {n:"Salade de carottes râpées",mats:[[3,"Carrot"]],                                               src:[P.villager,P.bottle]},
+  {n:"Mushroom salad",          mats:[[1,"Round mushroom"],[1,"Flat mushroom"],[1,"Skinny mushroom"]],src:[P.villager,P.bottle]},
+  {n:"Turnip salad",            mats:[[1,"Turnips (×10)"],[1,"Tomato"]],                             src:[P.daisy]},
+  {n:"Fruit salad",             mats:[[1,"Apple"],[1,"Orange"],[1,"Pear"],[1,"Peach"],[1,"Cherry"]],src:[P.villager,P.bottle]},
+  {n:"Seafood salad",           mats:[[1,"Squid"],[1,"Sweet shrimp"]],                               src:[P.villager,P.bottle]},
+  {n:"Poke",                    mats:[[1,"Salmon"],[1,"Tomato"]],                                    src:[P.fishing]},
+  {n:"French fries",            mats:[[3,"Potato"]],                                                  src:[P.villager,P.bottle]},
+  {n:"Baked potatoes",          mats:[[2,"Potato"]],                                                  src:[P.villager,P.bottle]},
+  {n:"Fish-and-chips",          mats:[[2,"Potato"],[1,"Dab"]],                                       src:[P.villager,P.bottle]},
+  {n:"Potato galette",          mats:[[2,"Flour"],[3,"Potato"]],                                     src:[P.villager,P.bottle]},
+  {n:"Veggie quiche",           mats:[[1,"Flour"],[1,"Potato"],[1,"Orange pumpkin"]],                src:[P.villager,P.bottle]},
+  {n:"Veggie sandwich",         mats:[[2,"Flour"],[1,"Tomato"],[1,"Carrot"]],                        src:[P.villager,P.bottle]},
+  {n:"Mixed-fruits sandwich",   mats:[[2,"Flour"],[1,"Orange"],[1,"Pear"],[1,"Peach"]],              src:[P.villager,P.bottle]},
+  {n:"Salmon sandwich",         mats:[[2,"Whole-wheat flour"],[1,"Salmon"]],                         src:[P.fishing]},
+  {n:"Tomato bagel sandwich",   mats:[[2,"Flour"],[3,"Tomato"]],                                     src:[P.villager,P.bottle]},
+  {n:"Carrot bagel sandwich",   mats:[[2,"Whole-wheat flour"],[3,"Carrot"]],                         src:[P.villager,P.bottle]},
+  {n:"Pumpkin bagel sandwich",  mats:[[2,"Flour"],[3,"Orange pumpkin"]],                             src:[P.nookmiles]},
+  {n:"Mixed-fruits bagel sandwich",mats:[[2,"Flour"],[1,"Apple"],[1,"Orange"],[1,"Pear"],[1,"Peach"],[1,"Cherry"]],src:[P.villager,P.bottle]},
+  {n:"Salmon bagel sandwich",   mats:[[2,"Flour"],[1,"Salmon"]],                                     src:[P.fishing]},
+  {n:"Mushroom crêpe",          mats:[[2,"Flour"],[1,"Round mushroom"],[1,"Skinny mushroom"]],       src:[P.villager,P.bottle]},
+  {n:"Veggie crêpe",            mats:[[2,"Flour"],[1,"Tomato"],[1,"Orange pumpkin"]],                src:[P.villager,P.bottle]},
+  {n:"Pull-apart bread",        mats:[[2,"Flour"]],                                                  src:[P.villager,P.bottle]},
+  {n:"Bread",                   mats:[[3,"Flour"]],                                                  src:[P.villager,P.bottle]},
+  {n:"Organic bread",           mats:[[3,"Whole-wheat flour"]],                                      src:[P.nookcranny]},
+  {n:"Snack bread",             mats:[[3,"Flour"],[1,"Sugar"]],                                      src:[P.villager,P.bottle]},
+  {n:"Savory bread",            mats:[[3,"Flour"],[1,"Carrot"],[1,"Tomato"],[1,"Potato"]],           src:[P.villager,P.bottle]},
+  {n:"Bread gratin",            mats:[[2,"Flour"],[2,"Whole-wheat flour"]],                          src:[P.villager,P.bottle]},
+  {n:"Salad-stuffed tomato",    mats:[[3,"Tomato"]],                                                 src:[P.villager,P.bottle]},
+  {n:"Tomates al ajillo",       mats:[[3,"Tomato"]],                                                 src:[P.villager,P.bottle]},
+  {n:"Champiñones al ajillo",   mats:[[1,"Round mushroom"],[1,"Flat mushroom"],[1,"Skinny mushroom"],[1,"Rare mushroom"]],src:[P.villager,P.bottle]},
+  {n:"Anchoas al ajillo",       mats:[[2,"Anchovy"]],                                                src:[P.fishing]},
+  {n:"Seafood ajillo",          mats:[[1,"Tiger prawn"],[1,"Squid"],[1,"Scallop"]],                  src:[P.villager,P.bottle]},
+  {n:"Gnocchi di carote",       mats:[[2,"Flour"],[3,"Carrot"]],                                     src:[P.villager,P.bottle]},
+  {n:"Gnocchi di patate",       mats:[[2,"Flour"],[3,"Potato"]],                                     src:[P.nookcranny]},
+  {n:"Gnocchi di zucca",        mats:[[2,"Flour"],[3,"Orange pumpkin"]],                             src:[P.villager,P.bottle]},
+  {n:"Spaghetti marinara",      mats:[[3,"Flour"],[1,"Tomato puree"]],                               src:[P.villager,P.bottle]},
+  {n:"Spaghetti napolitan",     mats:[[3,"Flour"],[1,"Tomato puree"]],                               src:[P.villager,P.bottle]},
+  {n:"Squid-ink spaghetti",     mats:[[3,"Flour"],[1,"Squid"]],                                     src:[P.fishing]},
+  {n:"Tomato curry",            mats:[[3,"Flour"],[3,"Tomato"]],                                     src:[P.nookmiles]},
+  {n:"Carrot-tops curry",       mats:[[3,"Flour"],[3,"Carrot"]],                                     src:[P.villager,P.bottle]},
+  {n:"Potato curry",            mats:[[3,"Flour"],[3,"Potato"]],                                     src:[P.villager,P.bottle]},
+  {n:"Pumpkin curry",           mats:[[3,"Flour"],[3,"Orange pumpkin"]],                             src:[P.villager,P.bottle]},
+  {n:"Mushroom curry",          mats:[[3,"Flour"],[1,"Round mushroom"],[1,"Flat mushroom"],[1,"Skinny mushroom"]],src:[P.villager,P.bottle]},
+  {n:"Squid-ink curry",         mats:[[3,"Flour"],[1,"Squid"]],                                     src:[P.fishing]},
+  {n:"Pizza margherita",        mats:[[3,"Flour"],[2,"Tomato"]],                                     src:[P.villager,P.bottle]},
+  {n:"Mushroom pizza",          mats:[[3,"Flour"],[2,"Round mushroom"],[2,"Flat mushroom"]],         src:[P.villager,P.bottle]},
+  {n:"Fruit pizza",             mats:[[3,"Flour"],[1,"Apple"],[1,"Orange"],[1,"Pear"],[1,"Peach"],[1,"Cherry"]],src:[P.villager,P.bottle]},
+  {n:"Seafood pizza",           mats:[[3,"Flour"],[1,"Tiger prawn"],[2,"Manila clam"]],              src:[P.villager,P.bottle]},
+  {n:"Carpaccio di capesante",  mats:[[2,"Scallop"]],                                               src:[P.fishing]},
+  {n:"Barred-knifejaw carpaccio",mats:[[1,"Barred knifejaw"]],                                      src:[P.fishing]},
+  {n:"Grilled sea bass with herbs",mats:[[1,"Sea bass"],[1,"Clump of weeds"]],                       src:[P.nookmiles]},
+  {n:"Aji fry",                 mats:[[1,"Horse mackerel"]],                                         src:[P.fishing]},
+  {n:"Karei no nitsuke",        mats:[[1,"Dab"],[1,"Sugar"]],                                        src:[P.fishing]},
+  {n:"Pancakes",                mats:[[1,"Flour"],[1,"Sugar"]],                                      src:[P.nookmiles]},
+  {n:"Kabu ankake",             mats:[[1,"Turnips (×10)"]],                                          src:[P.daisy]},
+];
+
+const SWEET=[
+  {n:"Apple jelly",             mats:[[2,"Apple"],[1,"Sugar"]],                                      src:[P.villager,P.bottle]},
+  {n:"Apple jam",               mats:[[3,"Apple"],[2,"Sugar"]],                                      src:[P.villager,P.bottle]},
+  {n:"Pear jelly",              mats:[[2,"Pear"],[1,"Sugar"]],                                       src:[P.villager,P.bottle]},
+  {n:"Pear jam",                mats:[[3,"Pear"],[2,"Sugar"]],                                       src:[P.villager,P.bottle]},
+  {n:"Orange jelly",            mats:[[2,"Orange"],[1,"Sugar"]],                                     src:[P.villager,P.bottle]},
+  {n:"Orange jam",              mats:[[3,"Orange"],[2,"Sugar"]],                                     src:[P.villager,P.bottle]},
+  {n:"Peach jelly",             mats:[[2,"Peach"],[1,"Sugar"]],                                      src:[P.villager,P.bottle]},
+  {n:"Peach jam",               mats:[[3,"Peach"],[2,"Sugar"]],                                      src:[P.villager,P.bottle]},
+  {n:"Cherry jelly",            mats:[[2,"Cherry"],[1,"Sugar"]],                                     src:[P.villager,P.bottle]},
+  {n:"Cherry jam",              mats:[[3,"Cherry"],[2,"Sugar"]],                                     src:[P.villager,P.bottle]},
+  {n:"Coconut jelly",           mats:[[2,"Coconut"],[1,"Sugar"]],                                    src:[P.villager,P.bottle]},
+  {n:"Coconut jam",             mats:[[3,"Coconut"],[2,"Sugar"]],                                    src:[P.villager,P.bottle]},
+  {n:"Mixed-fruits jelly",      mats:[[1,"Apple"],[1,"Orange"],[1,"Pear"],[1,"Peach"],[1,"Cherry"],[1,"Sugar"]],src:[P.villager,P.bottle]},
+  {n:"Apple pie",               mats:[[1,"Flour"],[3,"Apple"],[2,"Sugar"]],                          src:[P.villager,P.bottle]},
+  {n:"Pear pie",                mats:[[1,"Flour"],[3,"Pear"],[2,"Sugar"]],                           src:[P.villager,P.bottle]},
+  {n:"Orange pie",              mats:[[1,"Flour"],[3,"Orange"],[2,"Sugar"]],                         src:[P.villager,P.bottle]},
+  {n:"Peach pie",               mats:[[1,"Flour"],[3,"Peach"],[2,"Sugar"]],                          src:[P.villager,P.bottle]},
+  {n:"Cherry pie",              mats:[[1,"Flour"],[3,"Cherry"],[2,"Sugar"]],                         src:[P.villager,P.bottle]},
+  {n:"Coconut pie",             mats:[[1,"Flour"],[3,"Coconut"],[2,"Sugar"]],                        src:[P.villager,P.bottle]},
+  {n:"Mixed-fruits pie",        mats:[[1,"Flour"],[1,"Apple"],[1,"Orange"],[1,"Pear"],[1,"Peach"],[1,"Cherry"],[2,"Sugar"]],src:[P.villager,P.bottle]},
+  {n:"Apple tart",              mats:[[1,"Flour"],[2,"Apple"],[1,"Sugar"]],                          src:[P.villager,P.bottle]},
+  {n:"Pear tart",               mats:[[1,"Flour"],[2,"Pear"],[1,"Sugar"]],                           src:[P.villager,P.bottle]},
+  {n:"Orange tart",             mats:[[1,"Flour"],[2,"Orange"],[1,"Sugar"]],                         src:[P.villager,P.bottle]},
+  {n:"Peach tart",              mats:[[1,"Flour"],[2,"Peach"],[1,"Sugar"]],                          src:[P.villager,P.bottle]},
+  {n:"Cherry tart",             mats:[[1,"Flour"],[2,"Cherry"],[1,"Sugar"]],                         src:[P.villager,P.bottle]},
+  {n:"Coconut tart",            mats:[[1,"Flour"],[2,"Coconut"],[1,"Sugar"]],                        src:[P.villager,P.bottle]},
+  {n:"Carrot cake",             mats:[[1,"Flour"],[2,"Carrot"],[2,"Sugar"]],                         src:[P.nookcranny]},
+  {n:"Pumpkin pie",             mats:[[1,"Flour"],[3,"Orange pumpkin"],[2,"Sugar"]],                 src:[P.villager,P.bottle]},
+  {n:"Brown-sugar cupcakes",    mats:[[1,"Flour"],[2,"Brown sugar"]],                                src:[P.nookcranny]},
+  {n:"Apple smoothie",          mats:[[2,"Apple"],[1,"Sugar"]],                                      src:[P.villager,P.bottle]},
+  {n:"Pear smoothie",           mats:[[2,"Pear"],[1,"Sugar"]],                                       src:[P.villager,P.bottle]},
+  {n:"Orange smoothie",         mats:[[2,"Orange"],[1,"Sugar"]],                                     src:[P.villager,P.bottle]},
+  {n:"Peach smoothie",          mats:[[2,"Peach"],[1,"Sugar"]],                                      src:[P.villager,P.bottle]},
+  {n:"Cherry smoothie",         mats:[[2,"Cherry"],[1,"Sugar"]],                                     src:[P.villager,P.bottle]},
+  {n:"Coconut smoothie",        mats:[[2,"Coconut"],[1,"Sugar"]],                                    src:[P.villager,P.bottle]},
+  {n:"Mixed-fruits smoothie",   mats:[[1,"Apple"],[1,"Orange"],[1,"Pear"],[1,"Peach"],[1,"Cherry"],[1,"Sugar"]],src:[P.villager,P.bottle]},
+  {n:"Mixed-fruits crepe",      mats:[[2,"Flour"],[1,"Apple"],[1,"Orange"],[1,"Pear"],[1,"Peach"],[1,"Cherry"],[1,"Sugar"]],src:[P.villager,P.bottle]},
+  {n:"Pumpkin pudding",         mats:[[2,"Orange pumpkin"],[2,"Sugar"]],                             src:[P.villager,P.bottle]},
+  {n:"Spooky cookies",          mats:[[2,"Flour"],[3,"Orange pumpkin"],[2,"Sugar"]],                 src:[P.balloon]},
+  {n:"Spooky candy",            mats:[[3,"Orange pumpkin"],[2,"Sugar"]],                             src:[P.balloon]},
+  {n:"Mushroom mochi",          mats:[[1,"Round mushroom"],[1,"Flat mushroom"],[1,"Skinny mushroom"],[1,"Rare mushroom"]],src:[P.villager,P.bottle]},
+  {n:"Bamboo-shoot rice",       mats:[[2,"Bamboo shoot"],[1,"Flour"]],                               src:[P.daisy]},
+  {n:"Turnip salad sweet",      mats:[[1,"Turnips (×10)"],[1,"Sugar"]],                              src:[P.daisy]},
+  {n:"Acorn cookies",           mats:[[3,"Acorn"],[2,"Flour"],[1,"Sugar"]],                          src:[P.villager,P.bottle],srcNote:"autumn only (balloon / villager)"},
+  {n:"Pine-cone cookies",       mats:[[3,"Pinecone"],[2,"Flour"],[1,"Sugar"]],                       src:[P.villager,P.bottle],srcNote:"autumn only (balloon / villager)"},
+];
+
+// ── CRAFTING DATA ────────────────────────────────────────────────────────────
+// Housewares, wall-mounted, wallpaper/rugs/flooring, fencing, tools, objects
+// These are curated highlights — the full game has hundreds but we capture all named groups
+// Sources for crafting: bottle, villager (+ personality type), balloon, celeste, pascal, npc-event, fishing, etc.
+
+const HOUSEWARES=[
+  // Iron & Basic
+  {n:"Iron garden bench",       mats:[[6,"Iron nugget"],[5,"Wood"]],                src:[P.bottle,P.villager]},
+  {n:"Iron garden chair",       mats:[[6,"Iron nugget"]],                            src:[P.bottle,P.villager]},
+  {n:"Iron garden table",       mats:[[6,"Iron nugget"],[5,"Hardwood"]],             src:[P.bottle,P.villager]},
+  {n:"Steel frame",             mats:[[5,"Iron nugget"],[3,"Wood"]],                 src:[P.bottle,P.villager]},
+  {n:"Log dining table",        mats:[[6,"Wood"],[4,"Hardwood"]],                   src:[P.bottle,P.villager]},
+  {n:"Log low table",           mats:[[4,"Wood"],[3,"Clay"]],                        src:[P.bottle,P.villager]},
+  {n:"Log bench",               mats:[[8,"Softwood"]],                               src:[P.bottle,P.villager]},
+  {n:"Log bed",                 mats:[[6,"Wood"],[2,"Softwood"],[2,"Hardwood"]],    src:[P.bottle,P.villager]},
+  {n:"Log stool",               mats:[[3,"Softwood"]],                              src:[P.bottle,P.villager]},
+  {n:"Log chair",               mats:[[4,"Wood"]],                                   src:[P.bottle,P.villager]},
+  {n:"Log sofa",                mats:[[6,"Wood"],[3,"Softwood"]],                   src:[P.bottle,P.villager]},
+  {n:"Log round table",         mats:[[5,"Wood"]],                                  src:[P.bottle,P.villager]},
+  {n:"Log garden lounge",       mats:[[5,"Softwood"],[3,"Clump of weeds"]],         src:[P.bottle,P.villager]},
+  {n:"Wooden double bed",       mats:[[8,"Wood"]],                                   src:[P.bottle,P.villager]},
+  {n:"Wooden low table",        mats:[[4,"Wood"]],                                   src:[P.bottle,P.villager]},
+  {n:"Wooden chair",            mats:[[5,"Hardwood"]],                               src:[P.bottle,P.villager]},
+  {n:"Wooden shelves",          mats:[[6,"Wood"],[3,"Iron nugget"]],                src:[P.bottle,P.villager]},
+  {n:"Wooden bookshelf",        mats:[[5,"Wood"],[3,"Hardwood"]],                   src:[P.bottle,P.villager]},
+  {n:"Wooden block table",      mats:[[8,"Softwood"]],                               src:[P.bottle,P.villager]},
+  {n:"Ironwood kitchenette",    mats:[[8,"Hardwood"],[3,"Iron nugget"],[1,"Ironwood dresser"],[1,"Ironwood cupboard"]],src:[P.bottle,P.villager]},
+  {n:"Ironwood dresser",        mats:[[8,"Hardwood"],[6,"Iron nugget"]],             src:[P.bottle,P.villager]},
+  {n:"Ironwood cupboard",       mats:[[8,"Hardwood"],[4,"Iron nugget"]],             src:[P.bottle,P.villager]},
+  {n:"Ironwood table",          mats:[[7,"Hardwood"],[4,"Iron nugget"]],             src:[P.bottle,P.villager]},
+  {n:"Ironwood clock",          mats:[[6,"Hardwood"],[4,"Iron nugget"]],             src:[P.bottle,P.villager]},
+  {n:"Ironwood bed",            mats:[[9,"Hardwood"],[6,"Iron nugget"]],             src:[P.bottle,P.villager]},
+  {n:"Stonework kitchen",       mats:[[1,"Flour"],[5,"Stone"],[5,"Iron nugget"]],   src:[P.nookmiles],srcNote:"unlocked with Be a Chef!"},
+  {n:"Campfire",                mats:[[5,"Stone"],[3,"Wood"]],                       src:[P.bottle,P.villager]},
+  {n:"Bonfire",                 mats:[[10,"Wood"]],                                  src:[P.bottle,P.villager]},
+  {n:"Sawhorse",                mats:[[5,"Hardwood"]],                               src:[P.bottle,P.villager]},
+  {n:"Tree stump",              mats:[[5,"Wood"]],                                   src:[P.bottle,P.villager]},
+  {n:"Peach chair",             mats:[[6,"Peach"]],                                  src:[P.bottle,P.villager],srcNote:"native/non-native fruit"},
+  {n:"Apple chair",             mats:[[6,"Apple"]],                                  src:[P.bottle,P.villager]},
+  {n:"Pear wardrobe",           mats:[[6,"Pear"],[3,"Wood"]],                        src:[P.bottle,P.villager]},
+  {n:"Orange end table",        mats:[[5,"Orange"],[3,"Wood"]],                      src:[P.bottle,P.villager]},
+  {n:"Cherry speakers",         mats:[[6,"Cherry"],[2,"Iron nugget"]],               src:[P.bottle,P.villager]},
+  {n:"Coconut juice",           mats:[[3,"Coconut"]],                                src:[P.bottle,P.villager]},
+  {n:"Barrel",                  mats:[[6,"Hardwood"]],                               src:[P.bottle,P.villager]},
+  {n:"Birdhouse",               mats:[[10,"Wood"]],                                  src:[P.bottle,P.villager]},
+  {n:"Hammock",                 mats:[[5,"Clump of weeds"],[5,"Hardwood"]],          src:[P.bottle,P.villager]},
+  {n:"Hanging terrarium",       mats:[[5,"Iron nugget"],[3,"Clump of weeds"]],       src:[P.bottle,P.villager]},
+  {n:"Potted ivy",              mats:[[3,"Clump of weeds"]],                         src:[P.bottle,P.villager]},
+  {n:"Birdbath",                mats:[[6,"Stone"]],                                  src:[P.bottle,P.villager]},
+  {n:"Lily record player",      mats:[[6,"Hardwood"],[3,"Iron nugget"]],             src:[P.bottle,P.villager]},
+  {n:"Shell bed",               mats:[[8,"Giant clam"],[3,"Coral"],[3,"White coral"]],src:[P.bottle,P.villager]},
+  {n:"Shell stool",             mats:[[3,"Giant clam"]],                             src:[P.bottle,P.villager]},
+  {n:"Shell arch",              mats:[[8,"Giant clam"],[5,"Coral"],[5,"White coral"]],src:[P.bottle,P.villager]},
+  {n:"Shell lamp",              mats:[[5,"Coral"],[3,"White coral"],[3,"Giant clam"]],src:[P.bottle,P.villager]},
+  {n:"Shell fountain",          mats:[[6,"Giant clam"],[5,"Coral"],[5,"White coral"]],src:[P.bottle,P.villager]},
+  {n:"Bamboo shelf",            mats:[[6,"Bamboo"],[3,"Stone"]],                     src:[P.bottle,P.villager]},
+  {n:"Bamboo table",            mats:[[5,"Bamboo"]],                                 src:[P.bottle,P.villager]},
+  {n:"Bamboo basket",           mats:[[3,"Bamboo"],[2,"Young spring bamboo"]],       src:[P.bottle,P.villager]},
+  {n:"Bamboo dance platform",   mats:[[10,"Bamboo"],[5,"Stone"]],                   src:[P.bottle,P.villager]},
+  {n:"Bamboo floor lamp",       mats:[[5,"Bamboo"],[3,"Stone"]],                    src:[P.bottle,P.villager]},
+  {n:"Bamboo speaker",          mats:[[5,"Bamboo"],[3,"Iron nugget"]],               src:[P.bottle,P.villager]},
+  {n:"Bamboo stool",            mats:[[3,"Young spring bamboo"]],                    src:[P.bottle,P.villager]},
+  {n:"Bamboo room divider",     mats:[[8,"Bamboo"]],                                 src:[P.bottle,P.villager]},
+  {n:"Bamboo doll",             mats:[[3,"Bamboo"],[2,"Young spring bamboo"]],       src:[P.bottle,P.villager]},
+  {n:"Spooky sofa",             mats:[[5,"Orange pumpkin"],[3,"Hardwood"]],          src:[P.balloon],srcNote:"balloon / crafted during Halloween"},
+  {n:"Spooky table",            mats:[[5,"Orange pumpkin"],[3,"Wood"]],              src:[P.balloon]},
+  {n:"Spooky wardrobe",         mats:[[5,"Orange pumpkin"],[4,"Hardwood"]],          src:[P.balloon]},
+  {n:"Spooky arch",             mats:[[8,"Orange pumpkin"],[5,"Hardwood"]],          src:[P.balloon]},
+  {n:"Turkey Day casserole",    mats:[[1,"Carrot"],[1,"Potato"],[1,"Pumpkin"],[1,"Flour"]],src:[P.franklin],srcNote:"Turkey Day event"},
+  {n:"Turkey Day table",        mats:[[3,"Wood"],[3,"Hardwood"],[3,"Softwood"]],     src:[P.franklin],srcNote:"Turkey Day event"},
+];
+
+const WALLMOUNTED=[
+  {n:"Log wall-mounted clock",  mats:[[5,"Softwood"],[4,"Iron nugget"]],             src:[P.bottle,P.villager]},
+  {n:"Wooden-block wall clock", mats:[[5,"Softwood"]],                               src:[P.bottle,P.villager]},
+  {n:"Simple DIY workbench",    mats:[[8,"Wood"]],                                   src:[P.bottle,P.villager]},
+  {n:"DIY workbench",           mats:[[10,"Wood"],[5,"Hardwood"],[3,"Iron nugget"]], src:[P.bottle,P.villager]},
+  {n:"Improved DIY workbench",  mats:[[10,"Wood"],[5,"Hardwood"],[5,"Softwood"],[3,"Iron nugget"]],src:[P.bottle,P.villager]},
+  {n:"Log wall TV (32 in)",     mats:[[5,"Softwood"],[3,"Iron nugget"]],             src:[P.bottle,P.villager]},
+  {n:"Clothesline",             mats:[[5,"Wood"],[3,"Clump of weeds"]],              src:[P.bottle,P.villager]},
+  {n:"Wild log wall planter",   mats:[[4,"Softwood"],[3,"Clump of weeds"]],          src:[P.bottle,P.villager]},
+  {n:"Log stakes",              mats:[[5,"Softwood"]],                               src:[P.bottle,P.villager]},
+  {n:"Bamboo wall decoration",  mats:[[5,"Bamboo"],[3,"Clump of weeds"]],            src:[P.bottle,P.villager]},
+  {n:"Bamboo wall art",         mats:[[4,"Bamboo"],[3,"Young spring bamboo"]],       src:[P.bottle,P.villager]},
+  {n:"Shell wreath",            mats:[[5,"Coral"],[3,"White coral"],[3,"Venus comb"]],src:[P.bottle,P.villager]},
+  {n:"Autumn wall",             mats:[[6,"Maple leaf"],[3,"Hardwood"]],              src:[P.balloon],srcNote:"autumn balloons"},
+  {n:"Cherry-blossom branches", mats:[[6,"Cherry-blossom petal"],[3,"Wood"]],        src:[P.balloon],srcNote:"spring cherry blossom"},
+  {n:"Starry-night-sky wall",   mats:[[10,"Star fragment"],[3,"Large star fragment"]],src:[P.celeste]},
+  {n:"Space wall",              mats:[[10,"Star fragment"],[5,"Iron nugget"]],        src:[P.celeste]},
+  {n:"Virgo harp",              mats:[[8,"Star fragment"],[3,"Gold nugget"]],         src:[P.celeste],srcNote:"zodiac DIY"},
+  {n:"Scorpio lamp",            mats:[[8,"Star fragment"],[5,"Iron nugget"]],         src:[P.celeste]},
+  {n:"Leo sculpture",           mats:[[8,"Star fragment"],[5,"Stone"]],               src:[P.celeste]},
+];
+
+const WALLPAPER_FLOORING=[
+  {n:"Spooky flooring",         mats:[[6,"Orange pumpkin"]],                         src:[P.balloon]},
+  {n:"Spooky wall",             mats:[[6,"Orange pumpkin"]],                         src:[P.balloon]},
+  {n:"Leaf rug",                mats:[[6,"Clump of weeds"],[4,"Softwood"]],          src:[P.bottle,P.villager]},
+  {n:"Woven twig rug",          mats:[[3,"Tree branch"],[5,"Clump of weeds"]],       src:[P.bottle,P.villager]},
+  {n:"Bamboo rug",              mats:[[8,"Bamboo"]],                                  src:[P.bottle,P.villager]},
+  {n:"Clover rug",              mats:[[6,"Clump of weeds"]],                          src:[P.bottle,P.villager]},
+  {n:"Hemp rug",                mats:[[5,"Clump of weeds"],[3,"Wood"]],               src:[P.bottle,P.villager]},
+  {n:"Cherry-blossom flooring", mats:[[8,"Cherry-blossom petal"]],                   src:[P.balloon],srcNote:"spring cherry blossom"},
+  {n:"Cherry-blossom wall",     mats:[[6,"Cherry-blossom petal"],[3,"Wood"]],         src:[P.balloon]},
+  {n:"Autumn wall",             mats:[[6,"Maple leaf"],[4,"Wood"]],                   src:[P.balloon]},
+  {n:"Mushroom flooring",       mats:[[6,"Flat mushroom"],[3,"Stone"]],               src:[P.bottle,P.villager]},
+  {n:"Mushroom wall",           mats:[[6,"Flat mushroom"],[3,"Round mushroom"]],      src:[P.bottle,P.villager]},
+  {n:"Snowy rug",               mats:[[3,"Snowflake"]],                               src:[P.balloon],srcNote:"winter balloons"},
+  {n:"Frozen wall",             mats:[[6,"Snowflake"],[4,"Large snowflake"]],         src:[P.balloon]},
+  {n:"Patchwork rug",           mats:[[5,"Clump of weeds"],[2,"Wood"]],               src:[P.bottle,P.villager]},
+  {n:"Star rug",                mats:[[4,"Star fragment"],[2,"Large star fragment"]], src:[P.celeste]},
+  {n:"Starry garland",          mats:[[5,"Star fragment"],[3,"Tree branch"]],          src:[P.celeste]},
+];
+
+const FENCING=[
+  {n:"Log stakes",              mats:[[5,"Softwood"]],                               src:[P.bottle,P.villager]},
+  {n:"Bamboo fence",            mats:[[8,"Bamboo"]],                                  src:[P.bottle,P.villager]},
+  {n:"Iron fence",              mats:[[5,"Iron nugget"]],                             src:[P.bottle,P.villager]},
+  {n:"Stone fence",             mats:[[5,"Stone"]],                                   src:[P.bottle,P.villager]},
+  {n:"Hedge fence",             mats:[[3,"Wood"],[3,"Clump of weeds"]],               src:[P.bottle,P.villager]},
+  {n:"Classic-wood fence",      mats:[[5,"Hardwood"]],                                src:[P.bottle,P.villager]},
+  {n:"Ranch fence",             mats:[[5,"Wood"]],                                    src:[P.bottle,P.villager]},
+  {n:"Wooden-plank fence",      mats:[[5,"Wood"]],                                    src:[P.bottle,P.villager]},
+  {n:"Tropical fence",          mats:[[5,"Softwood"]],                                src:[P.bottle,P.villager]},
+  {n:"Horizontal bamboo fence", mats:[[5,"Bamboo"]],                                  src:[P.bottle,P.villager]},
+  {n:"Rustic stone wall",       mats:[[8,"Stone"]],                                   src:[P.bottle,P.villager]},
+  {n:"Lattice fence",           mats:[[5,"Softwood"],[2,"Stone"]],                    src:[P.bottle,P.villager]},
+];
+
+const TOOLS=[
+  {n:"Flimsy axe",              mats:[[5,"Tree branch"],[1,"Stone"]],                src:[P.bottle,P.villager]},
+  {n:"Stone axe",               mats:[[3,"Wood"],[1,"Flimsy axe"]],                  src:[P.bottle,P.villager]},
+  {n:"Axe",                     mats:[[3,"Wood"],[1,"Stone axe"],[1,"Iron nugget"]], src:[P.bottle,P.villager]},
+  {n:"Golden axe",              mats:[[1,"Axe"],[1,"Gold nugget"]],                   src:[P.bottle],srcNote:"break 100 axes first"},
+  {n:"Flimsy fishing rod",      mats:[[5,"Tree branch"]],                             src:[P.bottle,P.villager]},
+  {n:"Fishing rod",             mats:[[4,"Wood"],[1,"Flimsy fishing rod"]],           src:[P.bottle,P.villager]},
+  {n:"Golden fishing rod",      mats:[[1,"Fishing rod"],[1,"Gold nugget"]],           src:[P.bottle],srcNote:"catch all fish in Critterpedia"},
+  {n:"Flimsy net",              mats:[[5,"Tree branch"]],                             src:[P.bottle,P.villager]},
+  {n:"Net",                     mats:[[4,"Wood"],[1,"Flimsy net"]],                   src:[P.bottle,P.villager]},
+  {n:"Golden net",              mats:[[1,"Net"],[1,"Gold nugget"]],                   src:[P.bottle],srcNote:"catch all bugs in Critterpedia"},
+  {n:"Flimsy shovel",           mats:[[5,"Hardwood"]],                                src:[P.bottle,P.villager]},
+  {n:"Shovel",                  mats:[[1,"Flimsy shovel"],[4,"Hardwood"]],            src:[P.bottle,P.villager]},
+  {n:"Golden shovel",           mats:[[1,"Shovel"],[1,"Gold nugget"]],                src:[P.bottle],srcNote:"help Gulliver 30 times"},
+  {n:"Flimsy watering can",     mats:[[5,"Tree branch"]],                             src:[P.bottle,P.villager]},
+  {n:"Watering can",            mats:[[1,"Flimsy watering can"],[4,"Iron nugget"]],   src:[P.bottle,P.villager]},
+  {n:"Golden watering can",     mats:[[1,"Watering can"],[1,"Gold nugget"]],          src:[P.bottle],srcNote:"achieve 5-star island rating"},
+  {n:"Slingshot",               mats:[[5,"Hardwood"]],                                src:[P.bottle,P.villager]},
+  {n:"Golden slingshot",        mats:[[1,"Slingshot"],[1,"Gold nugget"]],             src:[P.balloon],srcNote:"pop 300 balloons"},
+  {n:"Vaulting pole",           mats:[[5,"Softwood"]],                                src:[P.bottle,P.villager]},
+  {n:"Ladder",                  mats:[[4,"Wood"],[4,"Hardwood"],[4,"Softwood"]],      src:[P.bottle,P.villager]},
+  {n:"Flimsy wand",             mats:[[3,"Star fragment"],[1,"Copper wand tip"]],     src:[P.celeste]},
+  {n:"Outdoor wand",            mats:[[3,"Star fragment"],[1,"Copper wand tip"]],     src:[P.celeste]},
+  {n:"Tree-branch wand",        mats:[[3,"Star fragment"],[3,"Tree branch"]],         src:[P.celeste]},
+  {n:"Bamboo wand",             mats:[[3,"Star fragment"],[3,"Young spring bamboo"]], src:[P.celeste]},
+  {n:"Mushroom wand",           mats:[[3,"Star fragment"],[3,"Flat mushroom"]],       src:[P.celeste]},
+  {n:"Shell wand",              mats:[[3,"Star fragment"],[3,"Coral"]],               src:[P.celeste]},
+  {n:"Tulip wand",              mats:[[3,"Star fragment"],[3,"Yellow tulip"]],        src:[P.celeste]},
+  {n:"Petal wand",              mats:[[3,"Star fragment"],[3,"Cherry-blossom petal"]],src:[P.celeste]},
+  {n:"Leaf wand",               mats:[[3,"Star fragment"],[3,"Maple leaf"]],          src:[P.celeste]},
+  {n:"Snowflake wand",          mats:[[3,"Star fragment"],[3,"Snowflake"]],           src:[P.celeste]},
+  {n:"Twinkling wand",          mats:[[3,"Star fragment"],[3,"Gold nugget"]],         src:[P.celeste]},
+  {n:"Star wand",               mats:[[3,"Star fragment"],[3,"Large star fragment"]], src:[P.celeste]},
+];
+
+const OBJECTS=[
+  {n:"Firewood",                mats:[[10,"Wood"]],                                   src:[P.bottle,P.villager]},
+  {n:"Wooden-block toy",        mats:[[4,"Softwood"]],                                src:[P.bottle,P.villager]},
+  {n:"Log decoration",          mats:[[3,"Softwood"],[3,"Clump of weeds"]],           src:[P.bottle,P.villager]},
+  {n:"Tree branch wand",        mats:[[3,"Star fragment"],[3,"Tree branch"]],          src:[P.celeste]},
+  {n:"Hay bed",                 mats:[[20,"Clump of weeds"]],                          src:[P.bottle,P.villager]},
+  {n:"Scarecrow",               mats:[[6,"Hardwood"],[20,"Clump of weeds"]],           src:[P.bottle,P.villager]},
+  {n:"Timber birdhouse",        mats:[[8,"Wood"],[2,"Iron nugget"]],                   src:[P.bottle,P.villager]},
+  {n:"Straw hat",               mats:[[10,"Clump of weeds"]],                          src:[P.bottle,P.villager]},
+  {n:"Flower wand",             mats:[[3,"Star fragment"],[3,"Any flower"]],            src:[P.celeste]},
+  {n:"Mossy garden rock",       mats:[[5,"Stone"],[3,"Clump of weeds"]],               src:[P.bottle,P.villager]},
+  {n:"Garden rock",             mats:[[5,"Stone"]],                                    src:[P.bottle,P.villager]},
+  {n:"Pile of leaves",          mats:[[6,"Maple leaf"],[3,"Hardwood"]],                src:[P.balloon],srcNote:"autumn"},
+  {n:"Bamboo hat",              mats:[[6,"Bamboo"],[3,"Young spring bamboo"]],          src:[P.bottle,P.villager]},
+  {n:"Bamboo noodle slide",     mats:[[8,"Bamboo"],[4,"Young spring bamboo"]],          src:[P.bottle,P.villager]},
+  {n:"Snowperson head",         mats:[[3,"Snowflake"],[3,"Large snowflake"]],           src:[P.balloon],srcNote:"winter"},
+  {n:"Crescent-moon chair",     mats:[[5,"Star fragment"],[3,"Large star fragment"]],   src:[P.celeste]},
+  {n:"Shell windchimes",        mats:[[3,"Coral"],[5,"White coral"],[3,"Venus comb"]],  src:[P.bottle,P.villager]},
+  {n:"Stone tablet",            mats:[[8,"Stone"]],                                     src:[P.bottle,P.villager]},
+  {n:"Pufferfish lamp",         mats:[[1,"Puffer fish"],[4,"Iron nugget"]],             src:[P.fishing],srcNote:"catch puffer fish"},
+  {n:"Anchor statue",           mats:[[5,"Iron nugget"],[3,"Stone"]],                   src:[P.bottle,P.villager]},
+  {n:"Trash bags",              mats:[[3,"Stone"],[3,"Clump of weeds"]],                src:[P.bottle,P.villager]},
+  {n:"Watering trough",         mats:[[6,"Hardwood"],[4,"Iron nugget"]],                src:[P.bottle,P.villager]},
+  {n:"Robot hero",              mats:[[30,"Rusted part"],[10,"Gold nugget"],[90,"Iron nugget"]],src:[P.bottle],srcNote:"Gulliver repair parts"},
+  {n:"Mermaid bed",             mats:[[5,"Coral"],[5,"White coral"],[3,"Giant clam"],[1,"Pearl"]],src:['<span class="obtain-pill pill-bottle">pascal</span>'],srcNote:"trade scallop to Pascal"},
+  {n:"Mermaid table",           mats:[[4,"Coral"],[3,"White coral"],[1,"Pearl"]],                  src:['<span class="obtain-pill pill-bottle">pascal</span>']},
+  {n:"Mermaid sofa",            mats:[[4,"Coral"],[3,"White coral"],[2,"Giant clam"],[1,"Pearl"]], src:['<span class="obtain-pill pill-bottle">pascal</span>']},
+  {n:"Mermaid dress form",      mats:[[2,"Coral"],[2,"White coral"],[1,"Pearl"]],                  src:['<span class="obtain-pill pill-bottle">pascal</span>']},
+];
+
+// ── STATE ───────────────────────────────────────────────────────────────────
+let obtained={savory:[],sweet:[],housewares:[],wallmounted:[],wallpaper:[],fencing:[],tools:[],objects:[]};
+let parseObj=null;
+let primaryTab='food';
+let foodTab='savory';
+let craftTab='housewares';
+let searchQ={savory:'',sweet:'',housewares:'',wallmounted:'',wallpaper:'',fencing:'',tools:'',objects:''};
+let filterF={savory:'all',sweet:'all',housewares:'all',wallmounted:'all',wallpaper:'all',fencing:'all',tools:'all',objects:'all'};
+
+const FOOD_SECTIONS={
+  savory:{label:'Savory',data:SAVORY},
+  sweet:{label:'Sweet',data:SWEET},
+};
+const CRAFT_SECTIONS={
+  housewares:{label:'Housewares',data:HOUSEWARES},
+  wallmounted:{label:'Wall-mounted',data:WALLMOUNTED},
+  wallpaper:{label:'Wallpaper & Flooring',data:WALLPAPER_FLOORING},
+  fencing:{label:'Fencing',data:FENCING},
+  tools:{label:'Tools',data:TOOLS},
+  objects:{label:'Objects',data:OBJECTS},
+};
+
+(async()=>{
+  const u=Parse.User.current();
+  if(!u){window.location.href='index.html';return;}
+  document.getElementById('userChip').textContent=u.get('email')||u.get('username');
+  await loadData();
+  buildNav();
+  renderAll();
+})();
+
+async function loadData(){
+  const u=Parse.User.current();
+  try{
+    const q=new Parse.Query('DIYData');q.equalTo('user',u);
+    parseObj=await q.first()||null;
+    if(parseObj){
+      const saved=parseObj.get('obtained')||{};
+      Object.keys(obtained).forEach(k=>{obtained[k]=saved[k]||[];});
+    }
+  }catch(e){console.error(e);}
+}
+
+async function saveData(){
+  const u=Parse.User.current();if(!u)return;
+  try{
+    if(!parseObj){
+      const D=Parse.Object.extend('DIYData');parseObj=new D();
+      parseObj.set('user',u);
+      const acl=new Parse.ACL(u);parseObj.setACL(acl);
+    }
+    parseObj.set('obtained',obtained);
+    await parseObj.save();
+  }catch(e){console.error(e);}
+}
+
+function buildNav(){
+  // Food sub tabs
+  const fn=document.getElementById('foodTabNav');
+  fn.innerHTML='';
+  Object.entries(FOOD_SECTIONS).forEach(([k,s])=>{
+    const b=document.createElement('button');b.className='stab'+(k===foodTab?' active':'');
+    b.id='ftab-'+k;b.onclick=()=>setFoodTab(k);
+    b.innerHTML=s.label+`<span class="stab-count">${obtained[k].length}/${s.data.length}</span>`;
+    fn.appendChild(b);
+    const p=document.createElement('div');p.className='sub-panel'+(k===foodTab?' active':'');
+    p.id='fpanel-'+k;document.getElementById('foodPanels').appendChild(p);
+  });
+  // Craft sub tabs
+  const cn=document.getElementById('craftTabNav');
+  cn.innerHTML='';
+  Object.entries(CRAFT_SECTIONS).forEach(([k,s])=>{
+    const b=document.createElement('button');b.className='stab'+(k===craftTab?' active':'');
+    b.id='ctab-'+k;b.onclick=()=>setCraftTab(k);
+    b.innerHTML=s.label+`<span class="stab-count">${obtained[k].length}/${s.data.length}</span>`;
+    cn.appendChild(b);
+    const p=document.createElement('div');p.className='sub-panel'+(k===craftTab?' active':'');
+    p.id='cpanel-'+k;document.getElementById('craftPanels').appendChild(p);
+  });
+}
+
+function renderAll(){
+  Object.keys(FOOD_SECTIONS).forEach(k=>renderSection(k,'f'));
+  Object.keys(CRAFT_SECTIONS).forEach(k=>renderSection(k,'c'));
+  updateNavCounts();
+}
+
+function updateNavCounts(){
+  Object.keys(FOOD_SECTIONS).forEach(k=>{
+    const b=document.getElementById('ftab-'+k);if(b){const s=b.querySelector('.stab-count');if(s)s.textContent=obtained[k].length+'/'+FOOD_SECTIONS[k].data.length;}
+  });
+  Object.keys(CRAFT_SECTIONS).forEach(k=>{
+    const b=document.getElementById('ctab-'+k);if(b){const s=b.querySelector('.stab-count');if(s)s.textContent=obtained[k].length+'/'+CRAFT_SECTIONS[k].data.length;}
+  });
+}
+
+function renderSection(key,pfx){
+  const SECS=pfx==='f'?FOOD_SECTIONS:CRAFT_SECTIONS;
+  const sec=SECS[key];
+  const el=document.getElementById((pfx==='f'?'fpanel-':'cpanel-')+key);
+  if(!el)return;
+  const done=obtained[key].length;
+  const total=sec.data.length;
+  const pct=total>0?Math.round(done/total*100):0;
+  const q=searchQ[key]||'';
+  const f=filterF[key]||'all';
+
+  let items=sec.data.map((item,i)=>({item,i}));
+  if(q) items=items.filter(x=>x.item.n.toLowerCase().includes(q.toLowerCase()));
+  if(f==='obtained') items=items.filter(x=>obtained[key].includes(x.i));
+  if(f==='missing') items=items.filter(x=>!obtained[key].includes(x.i));
+
+  let html=`<div class="prog-row">
+    <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+    <div class="prog-label"><strong>${done}</strong> / ${total} &middot; ${pct}%</div>
+  </div>
+  <div class="controls-row">
+    <div class="search-wrap"><input type="text" placeholder="search..." value="${q.replace(/"/g,'&quot;')}" oninput="setSearch('${key}','${pfx}',this.value)"/></div>
+    <button class="filter-btn${f==='all'?' active':''}" onclick="setFilter('${key}','${pfx}','all')">all</button>
+    <button class="filter-btn${f==='missing'?' active':''}" onclick="setFilter('${key}','${pfx}','missing')">missing</button>
+    <button class="filter-btn${f==='obtained'?' active':''}" onclick="setFilter('${key}','${pfx}','obtained')">obtained</button>
+  </div>`;
+
+  if(items.length===0){
+    html+='<div class="empty-msg">no results</div>';
+  }else{
+    html+='<div class="recipe-grid">';
+    items.forEach(({item,i})=>{
+      const got=obtained[key].includes(i);
+      const matHtml=item.mats.map(([qty,mat])=>{
+        const tag=matTag(mat);
+        return `<div class="rc-mat-item">${qty}× ${mat}${tag}</div>`;
+      }).join('');
+      const srcHtml=(item.src||[]).join(' ');
+      const noteHtml=item.srcNote?`<span style="opacity:0.7;">${item.srcNote}</span>`:'';
+      const notes=collectNote(item.mats);
+      const collectHtml=notes.length?`<div class="rc-collect">→ need: ${notes.join(', ')}</div>`:'';
+      html+=`<div class="recipe-card${got?' obtained':''}" onclick="toggle('${key}','${pfx}',${i})">
+        <div class="rc-top">
+          <div class="rc-check">${SVG_CHECK}</div>
+          <div class="rc-name">${item.n}</div>
+        </div>
+        <div class="rc-body">
+          <div class="rc-mats">${matHtml}</div>
+          <div class="rc-obtain">${srcHtml}${noteHtml}</div>
+          ${collectHtml}
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  }
+  el.innerHTML=html;
+}
+
+function toggle(key,pfx,idx){
+  const arr=obtained[key];
+  const pos=arr.indexOf(idx);
+  if(pos>=0)arr.splice(pos,1);else arr.push(idx);
+  saveData();
+  renderSection(key,pfx);
+  updateNavCounts();
+}
+
+function setSearch(key,pfx,val){
+  searchQ[key]=val;renderSection(key,pfx);
+}
+function setFilter(key,pfx,f){
+  filterF[key]=f;renderSection(key,pfx);
+}
+
+function setPrimaryTab(t){
+  primaryTab=t;
+  document.getElementById('ptab-food').classList.toggle('active',t==='food');
+  document.getElementById('ptab-crafting').classList.toggle('active',t==='crafting');
+  document.getElementById('ppanel-food').classList.toggle('active',t==='food');
+  document.getElementById('ppanel-crafting').classList.toggle('active',t==='crafting');
+}
+
+function setFoodTab(k){
+  foodTab=k;
+  document.querySelectorAll('#foodTabNav .stab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#foodPanels .sub-panel').forEach(p=>p.classList.remove('active'));
+  const b=document.getElementById('ftab-'+k);if(b)b.classList.add('active');
+  const p=document.getElementById('fpanel-'+k);if(p)p.classList.add('active');
+  renderSection(k,'f');
+}
+
+function setCraftTab(k){
+  craftTab=k;
+  document.querySelectorAll('#craftTabNav .stab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#craftPanels .sub-panel').forEach(p=>p.classList.remove('active'));
+  const b=document.getElementById('ctab-'+k);if(b)b.classList.add('active');
+  const p=document.getElementById('cpanel-'+k);if(p)p.classList.add('active');
+  renderSection(k,'c');
+}
+</script>
+</body>
+</html>
