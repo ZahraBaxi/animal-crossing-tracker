@@ -57,13 +57,13 @@
   .genre-pill:hover{border-color:var(--dusk);color:var(--ink-mid);}
   .genre-pill.active{background:var(--ink);border-color:var(--ink);color:#fff;}
   .song-list{display:flex;flex-direction:column;gap:2px;border:2px dashed var(--border-lt);border-radius:14px;overflow:hidden;background:var(--border-lt);}
-  .song-row{display:flex;align-items:center;gap:0.9rem;padding:0.7rem 1rem;background:var(--surface);cursor:pointer;transition:background 0.12s;user-select:none;}
+  .song-row{display:flex;align-items:center;gap:0.9rem;padding:0.85rem 1rem;min-height:48px;background:var(--surface);cursor:pointer;transition:background 0.12s;user-select:none;}
   .song-row:hover{background:var(--bg2);}
   .song-row.owned{background:var(--done-bg);}
   .song-row.owned:hover{background:#d3f0e0;}
-  .song-check{width:16px;height:16px;border:2px solid var(--border-lt);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background 0.12s,border-color 0.12s;background:var(--surface);}
+  .song-check{width:22px;height:22px;border:2px solid var(--border-lt);border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background 0.12s,border-color 0.12s;background:var(--surface);}
   .song-row.owned .song-check{background:var(--leaf);border-color:var(--leaf);}
-  .song-check svg{display:none;}.song-row.owned .song-check svg{display:block;}
+  .song-check svg{display:none;width:13px;height:10px;}.song-row.owned .song-check svg{display:block;}
   .song-num{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--ink-dim);width:24px;flex-shrink:0;text-align:right;}
   .song-info{flex:1;min-width:0;}
   .song-name{font-size:0.85rem;font-weight:500;color:var(--ink);}
@@ -77,7 +77,10 @@
   .song-row.owned .how-tag{color:#3fa876;}
   .empty-msg{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--ink-dim);text-align:center;padding:3rem 1rem;border:2px dashed var(--border-lt);border-radius:14px;}
   footer{text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--ink-dim);letter-spacing:0.06em;padding:1.6rem 2rem 0;max-width:860px;margin:0 auto;}
-  @media(max-width:520px){.how-tag{display:none;}header{padding:1.3rem 1.2rem 1.2rem;}.wrap{padding:1.3rem 1.2rem 1.6rem;}}
+  @media(max-width:520px){.how-tag{display:none;}header{padding:1.3rem 1.2rem 1.2rem;}.wrap{padding:1.3rem 1.2rem 1.6rem;}
+    .song-check{width:24px;height:24px;}.song-check svg{width:14px;height:11px;}
+    .genre-pill{padding:0.48rem 0.85rem;min-height:36px;display:inline-flex;align-items:center;}
+    .filter-btn{padding:0.6rem 1rem;min-height:38px;display:inline-flex;align-items:center;}}
   @media(max-width:400px){.song-genre{display:none;}}
 </style>
 </head>

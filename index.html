@@ -150,11 +150,11 @@ body{
 
 .chk-group{margin-bottom:1.1rem;}
 .chk-group-label{font-size:0.55rem;font-weight:500;letter-spacing:0.13em;text-transform:uppercase;color:var(--ink-ghost);padding-bottom:0.35rem;margin-bottom:0.45rem;border-bottom:2px dashed var(--border-lt);}
-.chk-item{display:flex;align-items:flex-start;gap:0.6rem;padding:0.28rem 0;cursor:pointer;user-select:none;}
+.chk-item{display:flex;align-items:flex-start;gap:0.7rem;padding:0.5rem 0;min-height:44px;cursor:pointer;user-select:none;}
 .chk-item:hover .chk-box{border-color:var(--leaf);}
-.chk-box{width:15px;height:15px;border:2px solid var(--border-lt);border-radius:6px;flex-shrink:0;margin-top:3px;display:flex;align-items:center;justify-content:center;transition:background .12s,border-color .12s;}
+.chk-box{width:22px;height:22px;border:2px solid var(--border-lt);border-radius:7px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:background .12s,border-color .12s;}
 .chk-item.done .chk-box{background:var(--leaf);border-color:var(--leaf);}
-.chk-box svg{display:none;}
+.chk-box svg{display:none;width:13px;height:10px;}
 .chk-item.done .chk-box svg{display:block;}
 .chk-label{font-size:0.78rem;color:var(--ink);line-height:1.45;}
 .chk-item.done .chk-label{color:var(--ink-dim);text-decoration:line-through;text-decoration-color:var(--border-lt);}
@@ -201,7 +201,8 @@ body{
 
 .tool-grid{
   margin:1.1rem 1.5rem 1.5rem;display:grid;
-  grid-template-rows:repeat(3,1fr);
+  grid-template-columns:repeat(2,1fr);
+  grid-template-rows:repeat(2,1fr);
   gap:0.8rem;
   overflow:hidden;flex:1;min-height:0;
 }
@@ -260,6 +261,7 @@ body{
 .tool-card:nth-child(1){animation-delay:.05s;}
 .tool-card:nth-child(2){animation-delay:.12s;}
 .tool-card:nth-child(3){animation-delay:.19s;}
+.tool-card:nth-child(4){animation-delay:.26s;}
 
 /* ── FOOTER ── */
 footer{
@@ -274,8 +276,13 @@ footer{
   .body-grid{grid-template-columns:1fr;gap:0.6rem;overflow:visible;}
   .sidebar{max-height:480px;}
   .tools-area{overflow:visible;}
-  .tool-grid{margin:1rem 1rem 1.2rem;grid-template-rows:none;flex:none;gap:0.7rem;}
+  .tool-grid{margin:1rem 1rem 1.2rem;grid-template-columns:1fr;grid-template-rows:none;flex:none;gap:0.7rem;}
   .tools-header{padding:1.1rem 1.1rem 0;}
+  .chk-box{width:24px;height:24px;}
+  .chk-box svg{width:14px;height:11px;}
+  .chk-item{padding:0.6rem 0;min-height:48px;}
+  .stab{padding:0.65rem 1.1rem;min-height:40px;}
+  .btn-logout{padding:0.5rem 0.9rem;min-height:36px;}
 }
 @media(max-width:480px){
   .tool-card{
@@ -519,7 +526,7 @@ const TASKS=[
   {id:'kkreq',     group:'saturday', days:[6],  text:'Request a song from K.K. Slider at 6pm+', note:'Say the exact song title to receive the vinyl — any time after 6pm counts'},
   {id:'daisy2',    group:'monday',   days:[1],  text:'Get free turnips', note:'Daisy Mae\'s grandmother hands out free turnips to celebrate the start of the week'},
 ];
-const SVG='<svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const SVG='<svg width="13" height="10" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const DAY_NAMES=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
 const MON_NAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function todayKey(){const d=new Date();return`acnh_daily_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;}

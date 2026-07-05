@@ -69,7 +69,7 @@
   .critter-table{width:100%;min-width:480px;border-collapse:collapse;}
   .critter-table thead tr{background:var(--bg2);}
   .critter-table th{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-dim);padding:0.55rem 0.75rem;text-align:left;font-weight:500;border-bottom:1px solid var(--border-lt);}
-  .critter-table td{font-size:0.8rem;padding:0.5rem 0.75rem;border-bottom:1px solid var(--border-lt);vertical-align:top;}
+  .critter-table td{font-size:0.8rem;padding:0.65rem 0.75rem;border-bottom:1px solid var(--border-lt);vertical-align:top;}
   .critter-table tr:last-child td{border-bottom:none;}
   .critter-table tbody tr{cursor:pointer;transition:background 0.1s;}
   .critter-table tbody tr:hover{background:var(--bg2);}
@@ -78,9 +78,9 @@
   .critter-table tbody tr.done-row td{color:#7a9e6a;}
   .critter-table tbody tr.now-row{background:var(--now-bg);}
   .critter-table tbody tr.now-row.done-row{background:var(--done-bg);}
-  .ct-check{width:16px;height:16px;border:2px solid var(--border-lt);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.12s,border-color 0.12s;}
+  .ct-check{width:20px;height:20px;border:2px solid var(--border-lt);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.12s,border-color 0.12s;}
   .done-row .ct-check{background:var(--moss);border-color:var(--moss);}
-  .ct-check svg{display:none;}.done-row .ct-check svg{display:block;}
+  .ct-check svg{display:none;width:12px;height:9px;}.done-row .ct-check svg{display:block;}
   .ct-name{font-weight:500;color:var(--ink);}
   .ct-shadow,.ct-loc,.ct-time{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--ink-dim);}
   .ct-bells{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--wheat);}
@@ -117,15 +117,15 @@
   /* Collection grid — richer cards */
   .item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:2px;border:2px dashed var(--border-lt);border-radius:14px;overflow:hidden;background:var(--border-lt);}
   .item-grid.art-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));}
-  .item-card{background:var(--surface);padding:0.75rem 0.85rem;cursor:pointer;transition:background 0.12s;user-select:none;}
+  .item-card{background:var(--surface);padding:0.85rem 0.9rem;min-height:44px;cursor:pointer;transition:background 0.12s;user-select:none;}
   .item-card:hover{background:var(--bg2);}.item-card.collected{background:var(--done-bg);}.item-card.collected:hover{background:#d3f0e0;}
-  .item-card-top{display:flex;align-items:flex-start;gap:0.55rem;}
-  .item-check{width:16px;height:16px;border:2px solid var(--border-lt);border-radius:6px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:background 0.12s,border-color 0.12s;}
+  .item-card-top{display:flex;align-items:flex-start;gap:0.6rem;}
+  .item-check{width:20px;height:20px;border:2px solid var(--border-lt);border-radius:6px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:background 0.12s,border-color 0.12s;}
   .item-card.collected .item-check{background:var(--moss);border-color:var(--moss);}
-  .item-check svg{display:none;}.item-card.collected .item-check svg{display:block;}
+  .item-check svg{display:none;width:12px;height:9px;}.item-card.collected .item-check svg{display:block;}
   .item-name{font-size:0.8rem;font-weight:500;color:var(--ink);line-height:1.3;}
   .item-card.collected .item-name{color:var(--done-tx);}
-  .item-details{margin-top:0.35rem;padding-left:1.4rem;}
+  .item-details{margin-top:0.35rem;padding-left:1.6rem;}
   .item-detail{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--ink-dim);line-height:1.55;}
   .item-card.collected .item-detail{color:#3fa876;}
   .item-bells{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--wheat);margin-top:0.1rem;}
@@ -141,7 +141,7 @@
   .item-card.collected .art-fake-badge{color:var(--done-tx);background:rgba(28,140,82,0.1);border-color:rgba(28,140,82,0.2);}
 
   /* month availability pills */
-  .mo-pills{display:flex;flex-wrap:wrap;gap:2px;margin-top:0.32rem;padding-left:1.4rem;}
+  .mo-pills{display:flex;flex-wrap:wrap;gap:2px;margin-top:0.32rem;padding-left:1.6rem;}
   .mo-pill{font-family:'JetBrains Mono',monospace;font-size:0.52rem;letter-spacing:0.01em;border-radius:4px;padding:0.07rem 0.3rem;background:var(--border-lt);color:var(--ink-dim);line-height:1.4;}
   .mo-pill.on{background:rgba(47,191,113,0.18);color:var(--moss);}
   .mo-pill.cur{background:var(--rust);color:#fff;font-weight:500;}
@@ -172,6 +172,11 @@
     .item-grid{grid-template-columns:repeat(auto-fill,minmax(145px,1fr));}
     header{padding:1.3rem 1.1rem 0;}.wrap{padding:1.2rem 1.1rem;}
     .critter-table th:nth-child(5),.critter-table td:nth-child(5){display:none;}
+    .ct-check,.item-check{width:23px;height:23px;}
+    .ct-check svg,.item-check svg{width:13px;height:10px;}
+    .item-details,.mo-pills{padding-left:1.75rem;}
+    .critter-table td{padding:0.75rem 0.65rem;}
+    .filter-btn,.tab-btn,.now-toggle-btn,.toggle-caught-btn,.legend-btn{padding:0.6rem 1rem;min-height:38px;display:inline-flex;align-items:center;}
   }
 </style>
 </head>
@@ -344,7 +349,7 @@ function isActiveRightNow(item){
   return false;
 }
 
-const SVG_CHECK='<svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const SVG_CHECK='<svg width="12" height="9" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 (async()=>{
   const u=Parse.User.current();
