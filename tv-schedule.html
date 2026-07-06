@@ -49,6 +49,17 @@ body{
 }
 .back-link:hover{color:var(--accent-lt);border-color:var(--accent);background:rgba(255,201,60,0.08);}
 
+.channel-bar{
+  margin-top:1.1rem;background:var(--ink);color:#fff;border-radius:10px;
+  display:flex;align-items:center;justify-content:space-between;gap:0.8rem;flex-wrap:wrap;
+  padding:0.55rem 1rem;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:500;
+}
+.ch-num{background:var(--accent);color:var(--ink);border-radius:5px;padding:0.14rem 0.45rem;font-weight:700;margin-right:0.55rem;letter-spacing:0.03em;}
+.ch-live{display:flex;align-items:center;gap:0.4rem;font-size:0.58rem;color:var(--ink-ghost);}
+.ch-live.live{color:#ffb4b4;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--coral);animation:liveBlink 1.4s infinite;flex-shrink:0;}
+@keyframes liveBlink{0%,50%{opacity:1;}51%,100%{opacity:0.2;}}
+
 /* ── STICKY DAY NAV ── */
 .day-nav-wrap{
   position:sticky;top:0;z-index:20;
@@ -78,21 +89,31 @@ body{
 /* ── WRAP ── */
 .main{max-width:820px;margin:0 auto;padding:1.7rem 1.8rem 2rem;border:2px dashed var(--border-lt);border-top:none;border-radius:0 0 16px 16px;background:var(--surface);}
 
-/* ── NOW BANNER ── */
+/* ── NOW BANNER (retro CRT frame) ── */
 .now-banner{
+  position:relative;
   display:grid;grid-template-columns:1fr auto;gap:0.6rem 1.2rem;
-  padding:1.15rem 1.4rem;margin-bottom:2.2rem;border-radius:14px;
-  background:rgba(255,201,60,0.1);
-  border:2px dashed var(--accent);
+  padding:1.25rem 1.5rem 1.1rem;margin:0 0 2.4rem;border-radius:18px;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 1px, transparent 1px, transparent 4px),
+    rgba(255,201,60,0.12);
+  border:3px solid var(--ink);
   animation:fadeUp .4s ease both;
 }
+.now-banner::before,.now-banner::after{
+  content:'';position:absolute;top:-13px;width:2px;height:15px;background:var(--ink);border-radius:2px;
+}
+.now-banner::before{left:34px;transform:rotate(-20deg);transform-origin:bottom;}
+.now-banner::after{left:46px;transform:rotate(20deg);transform-origin:bottom;}
 .now-banner.hidden{display:none}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .now-top{display:flex;align-items:center;gap:0.8rem;grid-column:1}
 .now-badge{
   font-size:0.53rem;font-weight:500;letter-spacing:0.13em;text-transform:uppercase;
   background:var(--accent);color:#fff;padding:0.22rem 0.65rem;border-radius:99px;flex-shrink:0;
+  display:inline-flex;align-items:center;gap:0.32rem;
 }
+.now-badge .live-dot{background:#fff;}
 .now-emoji{font-size:1.6rem;line-height:1}
 .now-name{
   font-family:'JetBrains Mono',monospace;font-size:1.05rem;font-weight:600;
@@ -105,7 +126,7 @@ body{
 .now-time strong{display:block;font-size:0.82rem;color:var(--ink-mid);font-weight:500}
 .now-next{
   grid-column:1/-1;display:flex;align-items:center;gap:0.55rem;flex-wrap:wrap;
-  padding-top:0.7rem;border-top:2px dashed var(--border-lt);
+  padding-top:0.7rem;border-top:2px dashed rgba(22,22,26,0.18);
   font-size:0.62rem;color:var(--ink-dim);
 }
 .now-next-eyebrow{
@@ -122,8 +143,10 @@ body{
 }
 .hour-header:first-child{padding-top:0}
 .hour-label{
-  font-family:'JetBrains Mono',monospace;font-size:0.85rem;font-weight:500;
-  color:var(--ink-dim);min-width:68px;letter-spacing:-0.01em;flex-shrink:0;
+  font-family:'JetBrains Mono',monospace;font-size:0.62rem;font-weight:600;
+  color:var(--ink-mid);letter-spacing:0.04em;flex-shrink:0;
+  background:var(--bg2);border-radius:6px;padding:0.2rem 0.55rem;
+  text-transform:uppercase;
 }
 .hour-rule{flex:1;height:0;border-top:2px dashed var(--border-lt);}
 
@@ -133,6 +156,7 @@ body{
   padding:0.5rem 0.5rem 0.5rem 0;border-radius:10px;
   transition:background .13s;
 }
+.slot.slot-odd{background:rgba(22,22,26,0.02);}
 .slot:hover{background:rgba(255,201,60,0.09)}
 .slot.is-now{
   background:rgba(255,201,60,0.1);
@@ -141,6 +165,8 @@ body{
 }
 .slot.is-past{opacity:0.4}
 .slot.is-next{opacity:0.78}
+
+.genre-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block;}
 
 .slot-time{
   font-size:0.65rem;color:var(--ink-dim);padding-top:4px;
@@ -190,8 +216,12 @@ body{
   font-size:0.57rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;
   color:var(--ink-dim);margin-bottom:0.9rem;
 }
-.legend-items{display:flex;flex-wrap:wrap;gap:0.5rem 2rem}
-.legend-item{font-size:0.63rem;color:var(--ink-dim);display:flex;align-items:center;gap:0.35rem}
+.legend-items{display:flex;flex-wrap:wrap;gap:0.5rem}
+.legend-item{
+  font-size:0.6rem;color:var(--ink-dim);display:flex;align-items:center;gap:0.4rem;
+  background:var(--surface);border:1.5px solid var(--border-lt);border-radius:99px;
+  padding:0.32rem 0.75rem 0.32rem 0.55rem;
+}
 
 footer{
   text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.62rem;
@@ -205,6 +235,8 @@ footer a{color:var(--accent-lt);text-decoration:none;font-weight:500}
   .day-nav{padding:0.7rem 1rem}
   .page-title{font-size:1.6rem}
   .slot-time{font-size:0.6rem}
+  .channel-bar{font-size:0.56rem;padding:0.5rem 0.8rem;}
+  .now-banner::before,.now-banner::after{display:none;}
 }
 </style>
 </head>
@@ -217,6 +249,10 @@ footer a{color:var(--accent-lt);text-decoration:none;font-weight:500}
       <div class="page-title">tv <em>schedule.</em></div>
     </div>
     <a class="back-link" href="index.html">← home</a>
+  </div>
+  <div class="channel-bar">
+    <span class="ch-left"><span class="ch-num">CH 01</span>island broadcasting network</span>
+    <span class="ch-live" id="chLive"></span>
   </div>
 </div>
 
@@ -576,6 +612,17 @@ function getEmoji(name){
   for(const[n,e]of Object.entries(EMOJI)){if(k.startsWith(n))return e}
   return'📺';
 }
+const GENRE_COLOR={
+  news:'var(--sky)',weather:'var(--sky)',aerobics:'var(--leaf)','test pattern':'var(--dusk)',
+  static:'var(--dusk)',drama:'var(--coral)',nature:'var(--leaf)',action:'var(--coral)',
+  cartoon:'var(--sun)',cooking:'var(--leaf)',talk:'var(--sky)',comedy:'var(--sun)',
+  quiz:'var(--coral)',concert:'var(--coral)',movie:'var(--ink-mid)',tennis:'var(--leaf)',
+};
+function getGenreColor(name){
+  const k=name.toLowerCase().trim();
+  for(const[n,c]of Object.entries(GENRE_COLOR)){if(k.startsWith(n))return c}
+  return'var(--ink-ghost)';
+}
 const CM_LABEL={abs:'💪 abs',fruit:'🍎 fruit juice',car:'🚗 car',cat:'🐱 cat food',wind:'🌬️ windmills',ufo:'🛸 ufo signal',weather:'🌤 weather'};
 const DAY_NAMES=['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
 
@@ -618,6 +665,17 @@ function buildNav(){
   });
 }
 
+function renderChannelBar(){
+  const el=document.getElementById('chLive');
+  if(viewDay===todayIdx){
+    el.className='ch-live live';
+    el.innerHTML='<span class="live-dot"></span>on air now';
+  }else{
+    el.className='ch-live';
+    el.innerHTML=`viewing ${DAY_NAMES[viewDay]}`;
+  }
+}
+
 function renderBanner(){
   const el=document.getElementById('nowBanner');
   if(viewDay!==todayIdx){el.classList.add('hidden');return}
@@ -627,7 +685,7 @@ function renderBanner(){
   const cur=slots[ni], nxt=slots[(ni+1)%slots.length];
   el.innerHTML=`
     <div class="now-top">
-      <span class="now-badge">on now</span>
+      <span class="now-badge"><span class="live-dot"></span>on now</span>
       <span class="now-emoji">${getEmoji(cur.show)}</span>
       <span class="now-name">${cur.show}</span>
     </div>
@@ -663,7 +721,7 @@ function renderSchedule(){
     const isNext=i===ni+1;
     const isPast=ni>=0&&i<ni;
     const d=document.createElement('div');
-    d.className='slot'+(isNow?' is-now':isNext?' is-next':isPast?' is-past':'');
+    d.className='slot'+(isNow?' is-now':isNext?' is-next':isPast?' is-past':'')+(i%2===0?' slot-even':' slot-odd');
     if(isNow)d.id='now-slot';
 
     const badge=isNow?'<span class="badge badge-now">now</span>':isNext?'<span class="badge badge-next">next</span>':'';
@@ -674,6 +732,7 @@ function renderSchedule(){
       <div class="slot-time">${fmtH(slot.h)}</div>
       <div class="slot-body">
         <div class="slot-show">
+          <span class="genre-dot" style="background:${getGenreColor(slot.show)}"></span>
           <span class="slot-emoji">${getEmoji(slot.show)}</span>
           <span class="slot-name">${slot.show}</span>
           ${badge}
@@ -691,7 +750,7 @@ function renderSchedule(){
   }
 }
 
-function render(){renderBanner();renderSchedule()}
+function render(){renderChannelBar();renderBanner();renderSchedule()}
 buildNav();
 render();
 </script>
