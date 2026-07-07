@@ -93,6 +93,52 @@ header{padding:1.6rem 1.8rem 0;border:2px dashed var(--accent);border-radius:16p
 .buy-section{display:flex;align-items:center;gap:1.4rem;flex-wrap:wrap;margin-bottom:1.6rem;background:var(--bg);border:2px dashed var(--sun);border-radius:14px;padding:1rem 1.3rem;}
 .buy-section label{font-size:0.85rem;color:var(--ink-mid);flex:1 1 180px;line-height:1.4;}
 .buy-section label small{display:block;font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--ink-dim);margin-top:0.2rem;}
+.qty-quick{display:flex;gap:0.4rem;}
+.qty-quick button{font-family:'JetBrains Mono',monospace;font-size:0.6rem;font-weight:500;padding:0.4rem 0.65rem;border:1.5px solid var(--border-lt);border-radius:8px;background:var(--surface);color:var(--ink-dim);cursor:pointer;transition:all 0.15s;}
+.qty-quick button:hover{background:var(--sun);border-color:var(--sun);color:#fff;}
+
+/* SELL LOG */
+.ledger-card{border:2px dashed var(--leaf);border-radius:14px;padding:1.1rem 1.3rem;margin-bottom:1.6rem;background:rgba(47,191,113,0.05);}
+.ledger-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:0.9rem;margin-bottom:1.1rem;}
+.ls-item{text-align:center;}
+.ls-label{font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:0.3rem;}
+.ls-val{font-family:'JetBrains Mono',monospace;font-size:1.05rem;font-weight:600;color:var(--ink);}
+.ls-val.up{color:#1c8c52;}
+.ls-val.down{color:var(--clay);}
+.ledger-form{display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;padding-top:0.9rem;border-top:2px dashed rgba(47,191,113,0.25);}
+.ledger-form select{font-family:'JetBrains Mono',monospace;font-size:0.72rem;padding:0.55rem 0.7rem;border:1.5px solid var(--border-lt);border-radius:8px;background:var(--surface);color:var(--ink-mid);cursor:pointer;}
+.field-wrap.sm input{width:70px;}
+.ledger-error{font-size:0.65rem;color:var(--coral);margin-top:0.5rem;min-height:1em;}
+
+.commit-btn{
+  position:relative;overflow:hidden;
+  font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:600;letter-spacing:0.03em;
+  padding:0.6rem 1.3rem;border:none;border-radius:10px;cursor:pointer;
+  background:var(--leaf);color:#fff;
+  box-shadow:0 3px 0 #1c8c52;
+  transition:transform 0.08s,box-shadow 0.08s;
+}
+.commit-btn:hover{filter:brightness(1.06);}
+.commit-btn:active{transform:translateY(3px);box-shadow:0 0 0 #1c8c52;}
+.commit-btn .commit-label{position:relative;z-index:1;}
+.commit-btn .commit-glow{
+  position:absolute;inset:0;border-radius:10px;background:#fff;opacity:0;
+  transform:scale(0.4);pointer-events:none;
+}
+.commit-btn.commit-pop .commit-glow{animation:commitPop 0.5s ease-out;}
+@keyframes commitPop{0%{opacity:0.55;transform:scale(0.4);}100%{opacity:0;transform:scale(1.8);}}
+
+.ledger-list{margin-top:0.9rem;max-height:220px;overflow-y:auto;}
+.ledger-row{display:grid;grid-template-columns:64px 1fr auto 24px;align-items:center;gap:0.7rem;
+  font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--ink-mid);
+  padding:0.5rem 0.3rem;border-bottom:1px dashed var(--border-lt);animation:fadeUp 0.3s ease both;}
+.ledger-row:last-child{border-bottom:none;}
+.lr-label{color:var(--ink-dim);text-transform:uppercase;font-size:0.62rem;}
+.lr-qty{color:var(--ink-mid);}
+.lr-bells{font-weight:600;color:#1c8c52;text-align:right;}
+.lr-del{background:none;border:none;color:var(--ink-ghost);cursor:pointer;font-size:0.85rem;line-height:1;padding:0.2rem;}
+.lr-del:hover{color:var(--coral);}
+.ledger-empty{font-size:0.68rem;color:var(--ink-ghost);text-align:center;padding:0.8rem 0;}
 .field-wrap{display:flex;align-items:center;border:2px solid var(--border-lt);border-radius:99px;background:var(--surface);overflow:hidden;transition:border-color 0.15s;}
 .field-wrap:focus-within{border-color:var(--accent);}
 .field-prefix{font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--ink-dim);padding:0 0.9rem;border-right:2px solid var(--border-lt);user-select:none;background:var(--bg2);}
@@ -211,7 +257,7 @@ canvas#chart{width:100%!important;height:150px!important;display:block;}
 
 /* ARCHIVE */
 .archive-list{display:flex;flex-direction:column;border:2px dashed var(--border-lt);border-radius:14px;overflow:hidden;}
-.archive-row{display:grid;grid-template-columns:1.2fr 0.8fr 0.8fr 0.8fr auto;border-bottom:1px solid var(--border-lt);background:var(--surface);}
+.archive-row{display:grid;grid-template-columns:1.1fr 0.7fr 0.7fr 0.7fr 0.9fr auto;border-bottom:1px solid var(--border-lt);background:var(--surface);}
 .archive-row:last-child{border-bottom:none;}
 .archive-row.hdr{background:var(--bg2);}
 .arc-cell{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--ink-mid);padding:0.65rem 0.85rem;display:flex;align-items:center;}
@@ -226,14 +272,20 @@ footer{text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.65re
 @media(max-width:600px){
   .stat-strip{grid-template-columns:repeat(2,1fr);}
   header{padding:1.3rem 1.1rem 0;}.wrap{padding:1.2rem 1.1rem;}
-  .archive-row{grid-template-columns:1fr 1fr 1fr;}
-  .archive-row .arc-cell:nth-child(4){display:none;}
+  .archive-row{grid-template-columns:1fr 0.8fr 0.9fr auto;}
+  .archive-row .arc-cell:nth-child(3),.archive-row .arc-cell:nth-child(4){display:none;}
   .mini-grid{grid-template-columns:repeat(3,1fr);}
   .grid-days{min-width:520px;}
   .buy-section{padding:0.9rem 1rem;gap:0.9rem;}
   .ticker-card{padding:0.75rem 1rem;gap:0.6rem;}
   .tick-val{font-size:1.25rem;}
   .ticker-price{width:100%;justify-content:space-between;}
+  .ledger-card{padding:0.9rem 1rem;}
+  .ledger-summary{grid-template-columns:repeat(2,1fr);row-gap:0.7rem;}
+  .ledger-form{gap:0.5rem;}
+  .ledger-form select,.field-wrap.sm,.commit-btn{flex:1 1 auto;}
+  .field-wrap.sm input{width:100%;}
+  .ledger-row{grid-template-columns:56px 1fr auto 20px;font-size:0.65rem;gap:0.5rem;}
 }
 </style>
 </head>
@@ -292,8 +344,50 @@ footer{text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.65re
       </div>
     </div>
 
+    <div class="buy-section">
+      <label>
+        how many turnips did you buy?
+        <small>sold in bundles of 10 · max carry 4,000 (40 stacks of 100)</small>
+      </label>
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <div class="field-wrap">
+          <span class="field-prefix">qty</span>
+          <input type="number" id="qtyBought" min="10" max="4000" step="10" placeholder="0" oninput="onQtyInput()"/>
+        </div>
+        <div class="qty-quick">
+          <button type="button" onclick="bumpQty(10)">+10</button>
+          <button type="button" onclick="bumpQty(100)">+100</button>
+          <button type="button" onclick="setQtyMax()">max</button>
+        </div>
+      </div>
+    </div>
+
     <div class="sec-label">weekly sell prices</div>
     <div class="grid-days-scroll"><div class="grid-days" id="priceGrid"></div></div>
+
+    <div class="sec-label">📒 sell log</div>
+    <div class="ledger-card">
+      <div class="ledger-summary" id="ledgerSummary"></div>
+
+      <div class="ledger-form">
+        <select id="saleLabel"></select>
+        <div class="field-wrap sm">
+          <span class="field-prefix">qty</span>
+          <input type="number" id="saleQty" min="10" step="10" placeholder="0"/>
+        </div>
+        <div class="field-wrap sm">
+          <span class="field-prefix">bells</span>
+          <input type="number" id="salePrice" min="1" max="999" placeholder="0"/>
+        </div>
+        <button class="commit-btn" id="commitBtn" onclick="commitSale()">
+          <span class="commit-glow"></span>
+          <span class="commit-label">commit sale</span>
+        </button>
+      </div>
+      <div class="ledger-error" id="ledgerError"></div>
+
+      <div class="ledger-list" id="ledgerList"></div>
+    </div>
 
     <div class="btn-row">
       <button class="btn-primary" onclick="saveWeek()">save week</button>
@@ -568,6 +662,7 @@ const LABELS=DAYS.flatMap(d=>PERIODS.map(p=>`${d} ${p}`));
 let chartInstance=null;
 let currentWeekObj=null;
 let saveTimer=null;
+let sales=[];
 
 (async()=>{
   const u=Parse.User.current();
@@ -576,13 +671,25 @@ let saveTimer=null;
   await loadIslandSettings();
   ['none','early','night'].forEach(x=>document.getElementById('ord-'+x).classList.toggle('active',x===ordinance));
   updateMarketStatus();
+  populateSaleLabels();
   // 1. Load data first (populates currentWeekObj + sets buyPrice input)
   await loadCurrentWeek();
   // 2. Build grid AFTER load so it can restore saved slot values
   buildGrid();
+  renderLedger();
   // 3. Run prediction with restored data
   recalculate();
 })();
+
+function populateSaleLabels(){
+  const sel=document.getElementById('saleLabel');
+  sel.innerHTML=LABELS.map(l=>`<option value="${l}">${l}</option>`).join('');
+  const now=new Date();const dow=now.getDay();
+  if(dow>=1&&dow<=6){
+    const di=dow-1,pi=now.getHours()<12?0:1;
+    sel.value=LABELS[di*2+pi];
+  }
+}
 
 function switchTab(tab,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -628,6 +735,11 @@ async function loadCurrentWeek(){
     if(currentWeekObj){
       const buy=currentWeekObj.get('buyPrice');
       if(buy!=null) document.getElementById('buyPrice').value=buy;
+      const qty=currentWeekObj.get('qtyBought');
+      if(qty!=null) document.getElementById('qtyBought').value=qty;
+      sales=currentWeekObj.get('sales')||[];
+    }else{
+      sales=[];
     }
   }catch(e){console.error('load error:',e);}
 }
@@ -641,8 +753,28 @@ function getWeekId(){
 }
 
 // ── INPUT HANDLERS ──
-function onBuyInput(){debounceSave();recalculate();}
+function onBuyInput(){debounceSave();recalculate();renderLedger();}
 function onSlotInput(){debounceSave();recalculate();}
+function onQtyInput(){
+  const el=document.getElementById('qtyBought');
+  let v=parseInt(el.value)||0;
+  if(v>4000)v=4000;
+  if(v<0)v=0;
+  el.value=v||'';
+  debounceSave();
+  renderLedger();
+}
+function bumpQty(n){
+  const el=document.getElementById('qtyBought');
+  let v=(parseInt(el.value)||0)+n;
+  if(v>4000)v=4000;
+  el.value=v;
+  onQtyInput();
+}
+function setQtyMax(){
+  document.getElementById('qtyBought').value=4000;
+  onQtyInput();
+}
 
 function debounceSave(){
   setStatus('unsaved…','');
@@ -685,6 +817,8 @@ async function saveWeek(){
     }
     // Always persist buy price (the core bug fix — was conditional before)
     if(buy!=null) obj.set('buyPrice',buy);
+    const qty=parseInt(document.getElementById('qtyBought').value)||null;
+    if(qty!=null) obj.set('qtyBought',qty);
     obj.set('prices',prices);
     const vals=Object.values(prices).map(Number).filter(v=>v>0);
     if(vals.length){
@@ -722,12 +856,106 @@ async function resetCurrent(){
     const fc=document.getElementById(`fc_${di}_${pi}`);if(fc){fc.textContent='';fc.className='slot-forecast';}
   }));
   document.getElementById('buyPrice').value='';
+  document.getElementById('qtyBought').value='';
+  sales=[];
+  renderLedger();
   resetUI();
   if(currentWeekObj){try{await currentWeekObj.destroy();currentWeekObj=null;}catch(e){}}
   setStatus('reset','');setTimeout(()=>setStatus('',''),2000);
 }
 
 // ═══════════════════════════════════════════════════════════════
+// SELL LOG (actual sale transactions, separate from market-price grid)
+// ═══════════════════════════════════════════════════════════════
+function qtyBoughtVal(){return parseInt(document.getElementById('qtyBought').value)||0;}
+function qtySoldTotal(){return sales.reduce((s,x)=>s+x.qty,0);}
+function bellsEarnedTotal(){return sales.reduce((s,x)=>s+x.bells,0);}
+
+function showLedgerError(msg){
+  const el=document.getElementById('ledgerError');
+  el.textContent=msg;
+  if(msg)setTimeout(()=>{if(el.textContent===msg)el.textContent='';},3000);
+}
+
+async function commitSale(){
+  const label=document.getElementById('saleLabel').value;
+  const qty=parseInt(document.getElementById('saleQty').value)||0;
+  const price=parseInt(document.getElementById('salePrice').value)||0;
+  const bought=qtyBoughtVal();
+  const remaining=bought-qtySoldTotal();
+
+  if(bought<=0){showLedgerError('enter how many turnips you bought first');return;}
+  if(qty<=0){showLedgerError('enter a quantity to sell');return;}
+  if(price<=0){showLedgerError('enter the sell price');return;}
+  if(qty>remaining){showLedgerError(`only ${remaining} turnips left unsold`);return;}
+
+  sales.push({label,qty,price,bells:qty*price,ts:Date.now()});
+  document.getElementById('saleQty').value='';
+  document.getElementById('salePrice').value='';
+  showLedgerError('');
+  renderLedger();
+
+  const btn=document.getElementById('commitBtn');
+  btn.classList.remove('commit-pop');void btn.offsetWidth;btn.classList.add('commit-pop');
+
+  await persistSales();
+}
+
+async function deleteSale(idx){
+  sales.splice(idx,1);
+  renderLedger();
+  await persistSales();
+}
+
+async function persistSales(){
+  const u=Parse.User.current();if(!u)return;
+  try{
+    let obj=currentWeekObj;
+    if(!obj){
+      const TW=Parse.Object.extend('TurnipWeek');
+      obj=new TW();
+      obj.set('user',u);
+      obj.set('weekId',getWeekId());
+      obj.setACL(new Parse.ACL(u));
+    }
+    obj.set('sales',sales);
+    const qty=qtyBoughtVal();if(qty>0)obj.set('qtyBought',qty);
+    await obj.save();
+    currentWeekObj=obj;
+  }catch(e){console.error('sale save error:',e);showLedgerError('couldn\'t save, try again');}
+}
+
+function renderLedger(){
+  const bought=qtyBoughtVal();
+  const buy=parseInt(document.getElementById('buyPrice').value)||0;
+  const soldQty=qtySoldTotal();
+  const earned=bellsEarnedTotal();
+  const remaining=Math.max(bought-soldQty,0);
+  const costOfSold=soldQty*buy;
+  const net=earned-costOfSold;
+  const hasBuy=buy>0;
+
+  document.getElementById('ledgerSummary').innerHTML=`
+    <div class="ls-item"><div class="ls-label">bought</div><div class="ls-val">${bought||'—'}</div></div>
+    <div class="ls-item"><div class="ls-label">sold</div><div class="ls-val">${soldQty||'—'}</div></div>
+    <div class="ls-item"><div class="ls-label">remaining</div><div class="ls-val">${bought?remaining:'—'}</div></div>
+    <div class="ls-item"><div class="ls-label">net p/l</div><div class="ls-val ${hasBuy&&soldQty?(net>0?'up':net<0?'down':''):''}">${hasBuy&&soldQty?(net>=0?'+':'')+net.toLocaleString()+' 🔔':'—'}</div></div>`;
+
+  const listEl=document.getElementById('ledgerList');
+  if(!sales.length){
+    listEl.innerHTML='<div class="ledger-empty">no sales logged yet, commit one above once you sell some turnips</div>';
+    return;
+  }
+  listEl.innerHTML=sales.slice().reverse().map((s)=>{
+    const realIdx=sales.indexOf(s);
+    return`<div class="ledger-row">
+      <span class="lr-label">${s.label}</span>
+      <span class="lr-qty">${s.qty} turnips × ${s.price}</span>
+      <span class="lr-bells">+${s.bells.toLocaleString()} 🔔</span>
+      <button class="lr-del" onclick="deleteSale(${realIdx})" title="remove">×</button>
+    </div>`;
+  }).join('');
+}
 // TICKER (stock-quote header + scrolling tape)
 // ═══════════════════════════════════════════════════════════════
 const ORD_HOURS={none:{open:8,close:22},early:{open:7,close:22},night:{open:8,close:23}};
@@ -1089,7 +1317,8 @@ async function renderArchive(){
     let html=`<div class="archive-list">
       <div class="archive-row hdr">
         <div class="arc-cell">week of</div><div class="arc-cell">buy</div>
-        <div class="arc-cell">best sell</div><div class="arc-cell">profit</div><div></div>
+        <div class="arc-cell">best sell</div><div class="arc-cell">potential</div>
+        <div class="arc-cell">🔔 actual net</div><div></div>
       </div>`;
     rs.forEach(r=>{
       const wid=r.get('weekId')||'—';
@@ -1097,11 +1326,24 @@ async function renderArchive(){
       const best=r.get('bestPrice');
       const profit=(buy&&best)?((best-buy)/buy*100).toFixed(1)+'%':'—';
       const pc=profit!=='—'?(parseFloat(profit)>0?'up':'down'):'';
+
+      const wSales=r.get('sales')||[];
+      const soldQty=wSales.reduce((s,x)=>s+x.qty,0);
+      const earned=wSales.reduce((s,x)=>s+x.bells,0);
+      let netHtml='<span style="color:var(--ink-ghost)">no sales logged</span>';
+      let netCls='';
+      if(soldQty>0&&buy){
+        const net=earned-(soldQty*buy);
+        netCls=net>0?'up':net<0?'down':'';
+        netHtml=(net>=0?'+':'')+net.toLocaleString()+' Bells';
+      }
+
       html+=`<div class="archive-row">
         <div class="arc-cell">${wid}</div>
         <div class="arc-cell">${buy?buy+' Bells':'—'}</div>
         <div class="arc-cell gold">${best?best+' Bells':'—'}</div>
         <div class="arc-cell ${pc}">${profit}</div>
+        <div class="arc-cell ${netCls}">${netHtml}</div>
         <button class="arc-del" onclick="deleteWeek('${r.id}',this)" title="delete">×</button>
       </div>`;
     });
