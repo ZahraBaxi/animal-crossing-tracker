@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>turnip tracker</title>
+<link rel="icon" type="image/jpeg" href="images/favicon/favicon.jpg">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
 <script>
@@ -47,6 +48,46 @@ header{padding:1.6rem 1.8rem 0;border:2px dashed var(--accent);border-radius:16p
 .tab-btn.active{color:#fff;background:var(--accent);}
 .wrap{max-width:960px;margin:0 auto;padding:1.7rem 1.8rem;border:2px dashed var(--border-lt);border-top:none;border-radius:0 0 16px 16px;background:var(--surface);}
 .sec-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:0.9rem;}
+
+/* TICKER CARD */
+.ticker-card{
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  background:var(--ink);color:#fff;border-radius:14px;
+  padding:0.85rem 1.3rem;margin-bottom:1.4rem;
+}
+.ticker-left{display:flex;align-items:center;gap:0.7rem;flex-wrap:wrap;}
+.ticker-symbol{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:0.78rem;letter-spacing:0.02em;background:var(--accent);color:#fff;padding:0.24rem 0.65rem;border-radius:6px;white-space:nowrap;}
+.market-status{font-family:'JetBrains Mono',monospace;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-ghost);}
+.market-status.open{color:var(--leaf-lt);}
+.market-status.open::before{content:'● ';}
+.market-status.closed{color:var(--coral-lt);}
+.market-status.closed::before{content:'● ';}
+.ticker-price{display:flex;align-items:baseline;gap:0.6rem;}
+.tick-val{font-family:'JetBrains Mono',monospace;font-size:1.55rem;font-weight:600;line-height:1;}
+.tick-unit{font-size:0.62rem;font-weight:400;color:var(--ink-ghost);margin-left:0.3rem;}
+.tick-change{font-family:'JetBrains Mono',monospace;font-size:0.78rem;font-weight:500;padding:0.2rem 0.55rem;border-radius:6px;white-space:nowrap;}
+.tick-change.up{color:var(--leaf-lt);background:rgba(92,212,146,0.15);}
+.tick-change.down{color:var(--coral-lt);background:rgba(255,128,132,0.15);}
+.tick-change.flat{color:var(--ink-ghost);background:rgba(255,255,255,0.06);}
+
+/* TICKER TAPE */
+.ticker-tape-wrap{overflow:hidden;border:2px dashed var(--border-lt);border-radius:99px;background:var(--surface);margin-bottom:1.5rem;padding:0.5rem 0;}
+.ticker-tape-wrap.empty{display:none;}
+.ticker-tape{display:flex;width:max-content;animation:tapeScroll 22s linear infinite;}
+.ticker-tape:hover{animation-play-state:paused;}
+.tape-item{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--ink-mid);white-space:nowrap;padding:0 1.1rem;display:flex;align-items:center;gap:0.35rem;border-right:1px dashed var(--border-lt);}
+.tape-item .tape-day{color:var(--ink-dim);font-size:0.6rem;letter-spacing:0.03em;text-transform:uppercase;}
+.tape-item .tape-arr.up{color:#1c8c52;}
+.tape-item .tape-arr.down{color:var(--clay);}
+.tape-item .tape-arr.spike{color:var(--rust);font-weight:600;}
+@keyframes tapeScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ORDINANCE SELECTOR */
+.ordinance-row{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.2rem;}
+.ordinance-lbl{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-dim);margin-right:0.2rem;}
+.ord-btn{font-family:'JetBrains Mono',monospace;font-size:0.62rem;font-weight:500;letter-spacing:0.03em;padding:0.32rem 0.75rem;border:1.5px solid var(--border-lt);border-radius:99px;background:var(--bg);color:var(--ink-dim);cursor:pointer;transition:all 0.15s;}
+.ord-btn:hover{background:var(--bg2);color:var(--ink-mid);}
+.ord-btn.active{background:var(--ink);border-color:var(--ink);color:#fff;}
 
 /* BUY PRICE */
 .buy-section{display:flex;align-items:center;gap:1.4rem;flex-wrap:wrap;margin-bottom:1.6rem;background:var(--bg);border:2px dashed var(--sun);border-radius:14px;padding:1rem 1.3rem;}
@@ -190,6 +231,9 @@ footer{text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.65re
   .mini-grid{grid-template-columns:repeat(3,1fr);}
   .grid-days{min-width:520px;}
   .buy-section{padding:0.9rem 1rem;gap:0.9rem;}
+  .ticker-card{padding:0.75rem 1rem;gap:0.6rem;}
+  .tick-val{font-size:1.25rem;}
+  .ticker-price{width:100%;justify-content:space-between;}
 }
 </style>
 </head>
@@ -212,6 +256,26 @@ footer{text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.65re
 
 <div class="wrap">
   <div id="tabCurrent">
+
+    <div class="ticker-card">
+      <div class="ticker-left">
+        <span class="ticker-symbol">🥬 NOOK:TURNIP</span>
+        <span class="market-status" id="marketStatus">closed</span>
+      </div>
+      <div class="ticker-price">
+        <span class="tick-val" id="tickerPrice">—<span class="tick-unit">bells</span></span>
+        <span class="tick-change" id="tickerChange"></span>
+      </div>
+    </div>
+    <div class="ordinance-row">
+      <span class="ordinance-lbl">island ordinance</span>
+      <button class="ord-btn" id="ord-none" onclick="setOrdinance('none')">standard</button>
+      <button class="ord-btn" id="ord-early" onclick="setOrdinance('early')">early bird</button>
+      <button class="ord-btn" id="ord-night" onclick="setOrdinance('night')">night owl</button>
+    </div>
+    <div class="ticker-tape-wrap empty" id="tapeWrap">
+      <div class="ticker-tape" id="tickerTape"></div>
+    </div>
 
     <div class="sec-label">sunday buy price</div>
     <div class="buy-section">
@@ -509,6 +573,9 @@ let saveTimer=null;
   const u=Parse.User.current();
   if(!u){window.location.href='index.html';return;}
   document.getElementById('userChip').textContent=u.get('email')||u.get('username');
+  await loadIslandSettings();
+  ['none','early','night'].forEach(x=>document.getElementById('ord-'+x).classList.toggle('active',x===ordinance));
+  updateMarketStatus();
   // 1. Load data first (populates currentWeekObj + sets buyPrice input)
   await loadCurrentWeek();
   // 2. Build grid AFTER load so it can restore saved slot values
@@ -661,12 +728,110 @@ async function resetCurrent(){
 }
 
 // ═══════════════════════════════════════════════════════════════
+// TICKER (stock-quote header + scrolling tape)
+// ═══════════════════════════════════════════════════════════════
+const ORD_HOURS={none:{open:8,close:22},early:{open:7,close:22},night:{open:8,close:23}};
+let ordinance='none';
+let islandSettingsObj=null;
+
+// Shared "IslandSettings" class (one row per user) so any page on the
+// site can read/write general island-wide notes/preferences, not just
+// this tracker. Extend by adding more .get()/.set() keys as needed.
+async function loadIslandSettings(){
+  const u=Parse.User.current();if(!u)return;
+  try{
+    const q=new Parse.Query('IslandSettings');q.equalTo('user',u);
+    islandSettingsObj=await q.first()||null;
+    ordinance=islandSettingsObj?.get('ordinance')||'none';
+  }catch(e){console.error('island settings load error:',e);}
+}
+
+async function saveIslandSetting(key,value){
+  const u=Parse.User.current();if(!u)return;
+  try{
+    if(!islandSettingsObj){
+      const IS=Parse.Object.extend('IslandSettings');
+      islandSettingsObj=new IS();islandSettingsObj.set('user',u);
+      const acl=new Parse.ACL(u);islandSettingsObj.setACL(acl);
+    }
+    islandSettingsObj.set(key,value);
+    await islandSettingsObj.save();
+  }catch(e){console.error('island settings save error:',e);}
+}
+
+function setOrdinance(o){
+  ordinance=o;
+  ['none','early','night'].forEach(x=>document.getElementById('ord-'+x).classList.toggle('active',x===o));
+  updateMarketStatus();
+  saveIslandSetting('ordinance',o);
+}
+
+function updateMarketStatus(){
+  const el=document.getElementById('marketStatus');
+  const now=new Date();
+  const isSunday=now.getDay()===0;
+  const hour=now.getHours();
+  const hrs=ORD_HOURS[ordinance]||ORD_HOURS.none;
+  const inHours=hour>=hrs.open&&hour<hrs.close;
+  const isOpen=!isSunday&&inHours;
+  if(isSunday){el.textContent='closed · sun';}
+  else if(!inHours){el.textContent=`closed · opens ${hrs.open>12?hrs.open-12+'pm':hrs.open+'am'}`;}
+  else{el.textContent='open · nook\'s cranny';}
+  el.className='market-status'+(isOpen?' open':' closed');
+}
+
+function updateTicker(buy,known){
+  const filled=known.map((v,i)=>({v,i})).filter(x=>x.v!==null);
+  const priceEl=document.getElementById('tickerPrice');
+  const changeEl=document.getElementById('tickerChange');
+  if(!filled.length){
+    priceEl.innerHTML='—<span class="tick-unit">bells</span>';
+    changeEl.textContent='';changeEl.className='tick-change';
+    return;
+  }
+  const latest=filled[filled.length-1];
+  priceEl.innerHTML=latest.v+'<span class="tick-unit">bells · '+LABELS[latest.i]+'</span>';
+  if(buy){
+    const diff=latest.v-buy;
+    const pct=((diff/buy)*100).toFixed(1);
+    const arrow=diff>0?'▲':diff<0?'▼':'●';
+    changeEl.textContent=arrow+' '+(diff>=0?'+':'')+pct+'%';
+    changeEl.className='tick-change '+(diff>0?'up':diff<0?'down':'flat');
+  }else{
+    changeEl.textContent='';changeEl.className='tick-change';
+  }
+}
+
+function updateTickerTape(known){
+  const wrap=document.getElementById('tapeWrap');
+  const tape=document.getElementById('tickerTape');
+  const filled=known.map((v,i)=>({v,i})).filter(x=>x.v!==null);
+  if(filled.length<2){wrap.classList.add('empty');tape.innerHTML='';return;}
+  wrap.classList.remove('empty');
+  const items=filled.map((f,idx)=>{
+    let arrCls='',arrGlyph='●';
+    if(idx>0){
+      const prev=filled[idx-1].v;
+      if(f.v>prev*1.5){arrGlyph='▲▲';arrCls='spike';}
+      else if(f.v>prev){arrGlyph='▲';arrCls='up';}
+      else if(f.v<prev){arrGlyph='▼';arrCls='down';}
+    }
+    return`<span class="tape-item"><span class="tape-day">${LABELS[f.i]}</span><span class="tape-arr ${arrCls}">${arrGlyph}</span>${f.v}</span>`;
+  }).join('');
+  tape.innerHTML=items+items; // duplicate for seamless loop
+}
+
+setInterval(updateMarketStatus,60000);
+
+// ═══════════════════════════════════════════════════════════════
 // RECALCULATE
 // ═══════════════════════════════════════════════════════════════
 function recalculate(){
   const buy=parseInt(document.getElementById('buyPrice').value)||null;
   const known=getKnownPrices();
   const filled=known.filter(p=>p!==null);
+  updateTicker(buy,known);
+  updateTickerTape(known);
 
   // Colour inputs + trend arrows
   known.forEach((v,idx)=>{
@@ -706,7 +871,8 @@ function recalculate(){
       const diff=best-buy;
       const pct=((diff/buy)*100).toFixed(1);
       const profEl=document.getElementById('statProfit');
-      profEl.textContent=(diff>=0?'+':'')+pct+'%';
+      const arrow=diff>0?'▲ ':diff<0?'▼ ':'';
+      profEl.textContent=arrow+(diff>=0?'+':'')+pct+'%';
       profEl.className='stat-val'+(diff>0?' up':' down');
       document.getElementById('statProfitBells').textContent=(diff>=0?'+':'')+diff+' bells/turnip';
     }
@@ -899,6 +1065,11 @@ function resetUI(){
   document.getElementById('statProfit').className='stat-val';
   document.getElementById('tipBox').innerHTML='enter your sunday buy price and this week\'s sell prices to unlock pattern prediction.';
   document.getElementById('forecastBody').innerHTML='';
+  document.getElementById('tickerPrice').innerHTML='—<span class="tick-unit">bells</span>';
+  document.getElementById('tickerChange').textContent='';
+  document.getElementById('tickerChange').className='tick-change';
+  document.getElementById('tapeWrap').classList.add('empty');
+  document.getElementById('tickerTape').innerHTML='';
   if(chartInstance){chartInstance.destroy();chartInstance=null;}
   updateProbBars({0:0,1:0,2:0,3:0});
 }
