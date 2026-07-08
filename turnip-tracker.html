@@ -96,6 +96,7 @@ header{padding:1.6rem 1.8rem 0;border:2px dashed var(--accent);border-radius:16p
 .qty-quick{display:flex;gap:0.4rem;}
 .qty-quick button{font-family:'JetBrains Mono',monospace;font-size:0.6rem;font-weight:500;padding:0.4rem 0.65rem;border:1.5px solid var(--border-lt);border-radius:8px;background:var(--surface);color:var(--ink-dim);cursor:pointer;transition:all 0.15s;}
 .qty-quick button:hover{background:var(--sun);border-color:var(--sun);color:#fff;}
+.lastweek-select{font-family:'JetBrains Mono',monospace;font-size:0.75rem;padding:0.55rem 0.8rem;border:2px solid var(--border-lt);border-radius:99px;background:var(--surface);color:var(--ink-mid);cursor:pointer;width:100%;max-width:280px;}
 
 /* SELL LOG */
 .ledger-card{border:2px dashed var(--leaf);border-radius:14px;padding:1.1rem 1.3rem;margin-bottom:1.6rem;background:rgba(47,191,113,0.05);}
@@ -362,6 +363,21 @@ footer{text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.65re
       </div>
     </div>
 
+    <div class="buy-section">
+      <label>
+        what pattern did you get last week?
+        <small>optional, but sharpens the forecast a lot (patterns aren't random week to week)</small>
+      </label>
+      <select id="lastWeekPattern" class="lastweek-select" onchange="onLastWeekChange()">
+        <option value="">don't know / skip</option>
+        <option value="fluctuating">fluctuating</option>
+        <option value="large-spike">large spike</option>
+        <option value="decreasing">decreasing</option>
+        <option value="small-spike">small spike</option>
+        <option value="first-time">first time buying turnips</option>
+      </select>
+    </div>
+
     <div class="sec-label">weekly sell prices</div>
     <div class="grid-days-scroll"><div class="grid-days" id="priceGrid"></div></div>
 
@@ -457,201 +473,209 @@ footer{text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.65re
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
 // ACNH TURNIP PREDICTION ENGINE
-// Algorithm based on Treeki/Mike Bryant reverse-engineering of ACNH price code
-// Reference: turnipprophet.io community documentation
+// Rewritten directly from the real game algorithm (sead::Random + TurnipPrices::calculate,
+// as reverse-engineered by Treeki/simontime — the same source turnipprophet.io is built on).
 //
-// PATTERNS:
-//   0 = Large Spike  — peak 200–600% of buy, 3 consec. rises, Mon PM–Thu PM
-//   1 = Decreasing   — 85–90% Mon AM, drops 3–5%/step, min ~27 bells
-//   2 = Small Spike  — peak 140–200%, 4 rises or ↑↓↑↑, Mon AM–Thu PM
-//   3 = Fluctuating  — exactly 7 high slots (90–140%), 60–80% lows
+// PATTERN INDICES match the game's own `whatPattern` field exactly:
+//   0 = Fluctuating  — exactly 7 high slots (90–140%) across 1–3 bursts, 60–80% lows between
+//   1 = Large Spike  — decreasing lead-in, then a peak of 200–600%, Mon PM–Thu PM start
+//   2 = Decreasing   — 85–90% Mon AM, drops 3–5%/step, floor ~27 bells
+//   3 = Small Spike  — decreasing lead-in, then a peak of 140–200%, Mon AM–Thu PM start
+//
+// Rather than sampling a single linear "sweep" parameter (which misses the real
+// per-step randomness and was why the forecast band could come up empty), this
+// enumerates every discrete phase-length combination the game can choose, and for
+// each one propagates an interval (min/max) for the underlying rate through every
+// slot, narrowing that interval wherever a real observed price is known — exactly
+// the analytical approach real turnip calculators use.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
 
-// Generate envelope of [min,max] for each of 12 sell slots under a given pattern.
-// Sweeps parameter space (N samples) and filters against known prices (±15 bell tolerance).
-function generatePattern(buy, pattern, known){
-  if(!buy) return Array(12).fill({min:null,max:null,known:false});
-  const N=350;
-  const slots=Array.from({length:12},()=>({min:Infinity,max:-Infinity}));
-
-  for(let s=0;s<N;s++){
-    const t=s/(N-1); // 0..1
-    let px=[];
-
-    if(pattern===0){
-      // ── LARGE SPIKE ──
-      // Decreasing pre-phase: Mon AM = 85–90%, drops 3–5%/step
-      const startRate=0.85+t*0.05;
-      const decay=0.03+t*0.02;
-      // Spike can start slots 1–7 (Mon PM through Thu PM)
-      const spikeStart=1+Math.round(t*6);
-      let rate=startRate;
-      for(let i=0;i<spikeStart&&px.length<12;i++){
-        px.push(Math.round(rate*buy));
-        rate=Math.max(0.3,rate-decay);
-      }
-      // Spike body: slot0=90–140%, slot1=140–200%, slot2=200–600% (peak), slot3=140–200%, slot4=90–140%
-      if(px.length<12){
-        const peakMult=2.0+t*4.0;
-        [
-          Math.round(clamp(0.9+t*0.5,0.9,1.4)*buy),
-          Math.round(clamp(1.4+t*0.6,1.4,2.0)*buy),
-          Math.round(clamp(peakMult,2.0,6.0)*buy),
-          Math.round(clamp(1.4+t*0.3,1.4,2.0)*buy),
-          Math.round(clamp(0.9+t*0.2,0.9,1.4)*buy)
-        ].forEach(v=>{if(px.length<12)px.push(v);});
-      }
-      // Post-spike: decreasing ~60–80%
-      rate=0.6+t*0.2;
-      while(px.length<12){px.push(Math.max(10,Math.round(rate*buy)));rate=Math.max(0.3,rate-0.04);}
-
-    } else if(pattern===1){
-      // ── DECREASING ──
-      const startRate=0.85+t*0.05;
-      const decay=0.03+t*0.02;
-      let rate=startRate;
-      for(let i=0;i<12;i++){
-        px.push(Math.max(10,Math.round(rate*buy)));
-        rate=Math.max(0.27,rate-decay);
-      }
-
-    } else if(pattern===2){
-      // ── SMALL SPIKE ──
-      // Spike can start slots 0–7 (Mon AM through Thu PM)
-      const spikeStart=Math.round(t*7);
-      let rate=0.4+t*0.5;
-      const decay=0.03+t*0.02;
-      for(let i=0;i<spikeStart&&px.length<12;i++){
-        px.push(Math.max(10,Math.round(rate*buy)));
-        rate=Math.max(0.27,rate-decay);
-      }
-      // Spike body: 90–140% start, peak 140–200%
-      // Two shapes: ↑↑↑↑ or ↑↓↑↑ (zigzag)
-      const zigzag=(s%3===1);
-      if(px.length<12){
-        const peakMult=1.4+t*0.6;
-        const p0=Math.round((0.9+t*0.2)*buy);
-        const p1=zigzag?Math.round((0.85+t*0.1)*buy):Math.round((1.0+t*0.2)*buy);
-        const p2=Math.round(clamp(peakMult*buy,1.4*buy,2.0*buy));
-        const p3=Math.round(clamp((peakMult-0.3)*buy,1.1*buy,1.7*buy));
-        [p0,p1,p2,p3].forEach(v=>{if(px.length<12)px.push(v);});
-      }
-      rate=0.6+t*0.1;
-      while(px.length<12){px.push(Math.max(10,Math.round(rate*buy)));rate=Math.max(0.27,rate-0.04);}
-
-    } else {
-      // ── FLUCTUATING ──
-      // Exactly 7 high slots (90–140%), spread in 1–3 bursts; lows at 60–80%
-      const highMult=0.9+t*0.5;
-      const lowStart=0.6+t*0.2;
-      const lowDecay=0.04+t*0.06;
-      let highsLeft=7, inHigh=true, phaseLen=0;
-      const maxPhaseLen=2+Math.round(t*2);
-      let rate=lowStart;
-      for(let i=0;i<12;i++){
-        if(highsLeft>0&&inHigh){
-          px.push(Math.round(clamp(highMult*(0.9+0.1*((i+s)%3/3)),0.6,1.4)*buy));
-          highsLeft--;phaseLen++;
-          if(phaseLen>=maxPhaseLen){inHigh=false;phaseLen=0;rate=lowStart;}
-        } else if(!inHigh){
-          px.push(Math.max(10,Math.round(rate*buy)));
-          rate=Math.max(0.3,rate-lowDecay);phaseLen++;
-          if(phaseLen>=2&&highsLeft>0){inHigh=true;phaseLen=0;}
-        } else {
-          px.push(Math.max(10,Math.round(rate*buy)));
-        }
-      }
-    }
-
-    px=px.slice(0,12);
-
-    // Filter: known price must be within ±15 of predicted
-    let ok=true;
-    for(let i=0;i<12;i++){
-      if(known[i]!==null&&Math.abs((px[i]||0)-known[i])>15){ok=false;break;}
-    }
-    if(!ok)continue;
-
-    for(let i=0;i<12;i++){
-      if(px[i]!==undefined){
-        slots[i].min=Math.min(slots[i].min,px[i]);
-        slots[i].max=Math.max(slots[i].max,px[i]);
-      }
-    }
-  }
-
-  return slots.map((sl,i)=>{
-    if(known[i]!==null) return{min:known[i],max:known[i],known:true};
-    if(sl.min===Infinity) return{min:null,max:null,known:false};
-    return{min:sl.min,max:sl.max,known:false};
-  });
+function ivSub(iv,subLo,subHi){return{lo:iv.lo-subHi,hi:iv.hi-subLo};}
+function ivIntersect(iv,lo,hi){
+  const nlo=Math.max(iv.lo,lo),nhi=Math.min(iv.hi,hi);
+  if(nlo>nhi+1e-9)return null;
+  return{lo:nlo,hi:Math.max(nlo,nhi)};
 }
 
-// Probability scoring using base transition rates + compatibility filtering
-function computeProbabilities(buy, known){
-  if(!buy) return{0:35,1:25,2:30,3:10};
-  // Game base rates (no prior week info; roughly: large spike ~35%, small ~30%, dec ~25%, fluc ~10%)
-  const base={0:0.35,1:0.25,2:0.30,3:0.10};
-  const N=200;
-  const scores={};
-
-  for(const p of[0,1,2,3]){
-    let hits=0;
-    for(let s=0;s<N;s++){
-      const t=s/(N-1);
-      let px=[];
-      if(p===0){
-        const sr=0.85+t*0.05,dc=0.03+t*0.02,ss=1+Math.round(t*6);
-        let rate=sr;
-        for(let i=0;i<ss&&px.length<12;i++){px.push(Math.round(rate*buy));rate=Math.max(0.3,rate-dc);}
-        const pm=2.0+t*4.0;
-        [Math.round((0.9+t*0.5)*buy),Math.round((1.4+t*0.6)*buy),Math.round(pm*buy),Math.round((1.4+t*0.3)*buy),Math.round((0.9+t*0.2)*buy)].forEach(v=>{if(px.length<12)px.push(v);});
-        rate=0.6+t*0.2;while(px.length<12){px.push(Math.max(10,Math.round(rate*buy)));rate=Math.max(0.3,rate-0.04);}
-      } else if(p===1){
-        let rate=0.85+t*0.05,dc=0.03+t*0.02;
-        for(let i=0;i<12;i++){px.push(Math.max(10,Math.round(rate*buy)));rate=Math.max(0.27,rate-dc);}
-      } else if(p===2){
-        const ss=Math.round(t*7);let rate=0.4+t*0.5,dc=0.03+t*0.02;
-        for(let i=0;i<ss&&px.length<12;i++){px.push(Math.max(10,Math.round(rate*buy)));rate=Math.max(0.27,rate-dc);}
-        const pm=1.4+t*0.6;
-        [Math.round((0.9+t*0.2)*buy),Math.round((1.0+t*0.2)*buy),Math.round(pm*buy),Math.round((pm-0.3)*buy)].forEach(v=>{if(px.length<12)px.push(v);});
-        rate=0.6+t*0.1;while(px.length<12){px.push(Math.max(10,Math.round(rate*buy)));rate=Math.max(0.27,rate-0.04);}
-      } else {
-        const hm=0.9+t*0.5,ls=0.6+t*0.2,ld=0.04+t*0.06;
-        let hl=7,inH=true,pl=0,mpl=2+Math.round(t*2),rate=ls;
-        for(let i=0;i<12;i++){
-          if(hl>0&&inH){px.push(Math.round(clamp(hm,0.6,1.4)*buy));hl--;pl++;if(pl>=mpl){inH=false;pl=0;rate=ls;}}
-          else if(!inH){px.push(Math.max(10,Math.round(rate*buy)));rate=Math.max(0.3,rate-ld);pl++;if(pl>=2&&hl>0){inH=true;pl=0;}}
-          else px.push(Math.max(10,Math.round(rate*buy)));
-        }
-      }
-      px=px.slice(0,12);
-      let ok=true;
-      for(let i=0;i<12;i++){if(known[i]!==null&&Math.abs((px[i]||0)-known[i])>15){ok=false;break;}}
-      if(ok)hits++;
+// Run one discrete phase-length combo's spec sequence through interval arithmetic,
+// narrowing against known prices as we go. Returns null if this combo is provably
+// incompatible with the known data, otherwise 12 {min,max} price bounds.
+function simulateSpecSequence(specs,buy,known){
+  let chainIv=null;
+  const out=[];
+  for(let i=0;i<specs.length;i++){
+    const spec=specs[i];
+    let iv;
+    if(spec.kind==='chainStep'){
+      iv=ivSub(chainIv,spec.decLo,spec.decHi);
+      chainIv=iv;
+    }else{
+      iv={lo:spec.lo,hi:spec.hi};
+      if(spec.kind==='chainStart')chainIv=iv;
     }
-    scores[p]=base[p]*(hits/N);
+    const offset=spec.offset||0;
+    if(known[i]!=null){
+      const target=known[i]-offset;
+      const niv=ivIntersect(iv,(target-1)/buy,target/buy);
+      if(!niv)return null;
+      iv=niv;
+      if(spec.kind!=='fixed')chainIv=iv;
+    }
+    const pa=Math.max(1,Math.ceil(iv.lo*buy)+offset);
+    const pb=Math.max(1,Math.ceil(iv.hi*buy)+offset);
+    out.push({min:Math.min(pa,pb),max:Math.max(pa,pb)});
+  }
+  return out;
+}
+
+// ── Pattern 0: Fluctuating ──
+function* combosFluctuating(){
+  for(let hi1=0;hi1<=6;hi1++){
+    const hi23=7-hi1;
+    for(const dec1 of[2,3]){
+      const dec2=5-dec1;
+      for(let hi3=0;hi3<=hi23-1;hi3++) yield{hi1,hi2:hi23-hi3,dec1,dec2,hi3};
+    }
+  }
+}
+function specsFluctuating(c){
+  const s=[];
+  for(let i=0;i<c.hi1;i++)s.push({kind:'fixed',lo:0.9,hi:1.4});
+  for(let i=0;i<c.dec1;i++)s.push(i===0?{kind:'chainStart',lo:0.6,hi:0.8}:{kind:'chainStep',decLo:0.04,decHi:0.10});
+  for(let i=0;i<c.hi2;i++)s.push({kind:'fixed',lo:0.9,hi:1.4});
+  for(let i=0;i<c.dec2;i++)s.push(i===0?{kind:'chainStart',lo:0.6,hi:0.8}:{kind:'chainStep',decLo:0.04,decHi:0.10});
+  for(let i=0;i<c.hi3;i++)s.push({kind:'fixed',lo:0.9,hi:1.4});
+  return s;
+}
+
+// ── Pattern 1: Large Spike ──
+function* combosLargeSpike(){for(let peakStart=3;peakStart<=9;peakStart++)yield{peakStart};}
+function specsLargeSpike(c){
+  const s=[];
+  const preLen=c.peakStart-2;
+  for(let i=0;i<preLen;i++)s.push(i===0?{kind:'chainStart',lo:0.85,hi:0.90}:{kind:'chainStep',decLo:0.03,decHi:0.05});
+  s.push({kind:'fixed',lo:0.9,hi:1.4});
+  s.push({kind:'fixed',lo:1.4,hi:2.0});
+  s.push({kind:'fixed',lo:2.0,hi:6.0});
+  s.push({kind:'fixed',lo:1.4,hi:2.0});
+  s.push({kind:'fixed',lo:0.9,hi:1.4});
+  while(s.length<12)s.push({kind:'fixed',lo:0.4,hi:0.9});
+  return s;
+}
+
+// ── Pattern 2: Decreasing ──
+function specsDecreasing(){
+  const s=[];
+  for(let i=0;i<12;i++)s.push(i===0?{kind:'chainStart',lo:0.85,hi:0.90}:{kind:'chainStep',decLo:0.03,decHi:0.05});
+  return s;
+}
+
+// ── Pattern 3: Small Spike ──
+function* combosSmallSpike(){for(let peakStart=2;peakStart<=9;peakStart++)yield{peakStart};}
+function specsSmallSpike(c){
+  const s=[];
+  const preLen=c.peakStart-2;
+  for(let i=0;i<preLen;i++)s.push(i===0?{kind:'chainStart',lo:0.4,hi:0.9}:{kind:'chainStep',decLo:0.03,decHi:0.05});
+  s.push({kind:'fixed',lo:0.9,hi:1.4});
+  s.push({kind:'fixed',lo:0.9,hi:1.4});
+  s.push({kind:'fixed',lo:1.4,hi:2.0,offset:-1});
+  s.push({kind:'fixed',lo:1.4,hi:2.0});
+  s.push({kind:'fixed',lo:1.4,hi:2.0,offset:-1});
+  const postLen=9-c.peakStart;
+  for(let i=0;i<postLen;i++)s.push(i===0?{kind:'chainStart',lo:0.4,hi:0.9}:{kind:'chainStep',decLo:0.03,decHi:0.05});
+  return s;
+}
+
+const PATTERN_BUILDERS={
+  0:{combosFn:combosFluctuating,specsFn:specsFluctuating},
+  1:{combosFn:combosLargeSpike,specsFn:specsLargeSpike},
+  2:{combosFn:function*(){yield{};},specsFn:specsDecreasing},
+  3:{combosFn:combosSmallSpike,specsFn:specsSmallSpike},
+};
+
+// Enumerates every discrete combo for a pattern, unions the surviving price
+// envelopes, and reports how many combos were even compatible with the known
+// data (used as evidence for the probability model below).
+function evaluatePattern(buy,pattern,known){
+  const{combosFn,specsFn}=PATTERN_BUILDERS[pattern];
+  const slotsMin=Array(12).fill(Infinity),slotsMax=Array(12).fill(-Infinity);
+  let survived=0,total=0;
+  for(const combo of combosFn()){
+    total++;
+    const result=simulateSpecSequence(specsFn(combo),buy,known);
+    if(!result)continue;
+    survived++;
+    result.forEach((r,i)=>{slotsMin[i]=Math.min(slotsMin[i],r.min);slotsMax[i]=Math.max(slotsMax[i],r.max);});
+  }
+  const envelope=Array.from({length:12},(_,i)=>{
+    if(known[i]!=null)return{min:known[i],max:known[i],known:true};
+    if(slotsMin[i]===Infinity)return{min:null,max:null,known:false};
+    return{min:slotsMin[i],max:slotsMax[i],known:false};
+  });
+  return{envelope,survived,total:total||1};
+}
+
+function generatePattern(buy,pattern,known){
+  if(!buy)return Array(12).fill({min:null,max:null,known:false});
+  return evaluatePattern(buy,pattern,known).envelope;
+}
+
+// Datamined week-to-week transition table (row = last week's pattern, values = this
+// week's chances). The version pasted from the wiki was missing each row's 4th
+// column; filled in here using the published complete matrix (rows sum to 100%).
+const TRANSITION={
+  0:{0:0.20,1:0.30,2:0.15,3:0.35}, // last week: Fluctuating
+  1:{0:0.50,1:0.05,2:0.20,3:0.25}, // last week: Large Spike
+  2:{0:0.25,1:0.45,2:0.05,3:0.25}, // last week: Decreasing
+  3:{0:0.45,1:0.25,2:0.15,3:0.15}, // last week: Small Spike
+};
+// Unconditional distribution (average of all 4 rows) — used when last week's
+// pattern isn't specified.
+const UNKNOWN_PRIOR={0:0.35,1:0.2625,2:0.1375,3:0.25};
+const LASTWEEK_KEY_TO_IDX={'fluctuating':0,'large-spike':1,'decreasing':2,'small-spike':3};
+
+function computeProbabilities(buy,known,lastWeekKey){
+  if(!buy)return{0:35,1:26,2:14,3:25};
+
+  let prior;
+  if(lastWeekKey==='first-time'){
+    prior={0:0,1:0,2:0,3:1}; // first turnip purchase is always a small spike
+  }else if(lastWeekKey&&LASTWEEK_KEY_TO_IDX[lastWeekKey]!=null){
+    prior=TRANSITION[LASTWEEK_KEY_TO_IDX[lastWeekKey]];
+  }else{
+    prior=UNKNOWN_PRIOR;
   }
 
-  const total=Object.values(scores).reduce((a,b)=>a+b,0)||1;
+  const scores={};
+  for(const p of[0,1,2,3]){
+    const{survived,total}=evaluatePattern(buy,p,known);
+    scores[p]=prior[p]*(survived/total);
+  }
+  const totalScore=Object.values(scores).reduce((a,b)=>a+b,0);
   const result={};
-  for(const p of[0,1,2,3]) result[p]=Math.max(1,Math.round((scores[p]/total)*100));
+  if(totalScore<=0){
+    for(const p of[0,1,2,3])result[p]=Math.round(prior[p]*100);
+    return result;
+  }
+  for(const p of[0,1,2,3])result[p]=Math.max(1,Math.round((scores[p]/totalScore)*100));
   return result;
 }
 
 // Advice per pattern
+
 const PATTERNS={
-  0:{name:'large spike',key:'large-spike',advClass:'adv-spike',
+  0:{name:'fluctuating',key:'fluctuating',advClass:'adv-gain',
+    advice:(fmax)=>`<strong>Fluctuating</strong> — exactly 7 high-price slots (90–140%) distributed in 1–3 bursts with low phases between them. Peak up to <strong>${fmax} bells</strong>. All high slots are roughly equal, so sell as soon as you're in profit — don't gamble waiting for higher unless you can track which burst you're in.`},
+  1:{name:'large spike',key:'large-spike',advClass:'adv-spike',
     advice:(fmax,fslot)=>`<strong>Large spike</strong> — prices shoot up 200–600% then drop sharply. Look for 3 consecutive increases (↑↑↑). ${fslot!=null?`Spike projected to start around <strong>${LABELS[fslot]}</strong>.`:''} Peak can reach up to <strong>${fmax} bells</strong>. Sell at the 3rd rise or the moment prices exceed 200% of your buy price — the crash follows immediately.`},
-  1:{name:'decreasing',key:'decreasing',advClass:'adv-loss',
+  2:{name:'decreasing',key:'decreasing',advClass:'adv-loss',
     advice:()=>`<strong>Decreasing pattern</strong> — prices start at 85–90% and drop steadily 3–5% every slot. They will not recover. Minimum floor is roughly 27 bells. Sell now to minimize loss, or check a friend's island — maybe they have a spike going.`},
-  2:{name:'small spike',key:'small-spike',advClass:'adv-spike',
-    advice:(fmax)=>`<strong>Small spike</strong> — prices rise to 140–200% of buy price. Pattern is either 4 straight rises (↑↑↑↑) or a slight dip then rise (↑↓↑↑). Peak around <strong>${fmax} bells</strong>. If two back-to-back prices look similarly high, sell immediately — the drop follows quickly.`},
-  3:{name:'fluctuating',key:'fluctuating',advClass:'adv-gain',
-    advice:(fmax)=>`<strong>Fluctuating</strong> — exactly 7 high-price slots (90–140%) distributed in 1–3 bursts with low phases between them. Peak up to <strong>${fmax} bells</strong>. All high slots are roughly equal, so sell as soon as you're in profit — don't gamble waiting for higher unless you can track which burst you're in.`}
+  3:{name:'small spike',key:'small-spike',advClass:'adv-spike',
+    advice:(fmax)=>`<strong>Small spike</strong> — prices rise to 140–200% of buy price. Pattern is either 4 straight rises (↑↑↑↑) or a slight dip then rise (↑↓↑↑). Peak around <strong>${fmax} bells</strong>. If two back-to-back prices look similarly high, sell immediately — the drop follows quickly.`}
 };
+
 
 // ═══════════════════════════════════════════════════════════════
 // APP STATE & INIT
@@ -737,6 +761,8 @@ async function loadCurrentWeek(){
       if(buy!=null) document.getElementById('buyPrice').value=buy;
       const qty=currentWeekObj.get('qtyBought');
       if(qty!=null) document.getElementById('qtyBought').value=qty;
+      const lwp=currentWeekObj.get('lastWeekPattern');
+      if(lwp!=null) document.getElementById('lastWeekPattern').value=lwp;
       sales=currentWeekObj.get('sales')||[];
     }else{
       sales=[];
@@ -775,6 +801,7 @@ function setQtyMax(){
   document.getElementById('qtyBought').value=4000;
   onQtyInput();
 }
+function onLastWeekChange(){debounceSave();recalculate();}
 
 function debounceSave(){
   setStatus('unsaved…','');
@@ -819,6 +846,8 @@ async function saveWeek(){
     if(buy!=null) obj.set('buyPrice',buy);
     const qty=parseInt(document.getElementById('qtyBought').value)||null;
     if(qty!=null) obj.set('qtyBought',qty);
+    const lwp=document.getElementById('lastWeekPattern').value;
+    obj.set('lastWeekPattern',lwp||null);
     obj.set('prices',prices);
     const vals=Object.values(prices).map(Number).filter(v=>v>0);
     if(vals.length){
@@ -857,6 +886,7 @@ async function resetCurrent(){
   }));
   document.getElementById('buyPrice').value='';
   document.getElementById('qtyBought').value='';
+  document.getElementById('lastWeekPattern').value='';
   sales=[];
   renderLedger();
   resetUI();
@@ -893,12 +923,30 @@ async function commitSale(){
   document.getElementById('saleQty').value='';
   document.getElementById('salePrice').value='';
   showLedgerError('');
+
+  // A committed sale IS an observed market price — feed it straight into the
+  // price grid so the forecast actually uses it (this was the missing link:
+  // sales used to only affect the ledger, never the predictor).
+  syncSaleToGrid(label,price);
   renderLedger();
 
   const btn=document.getElementById('commitBtn');
   btn.classList.remove('commit-pop');void btn.offsetWidth;btn.classList.add('commit-pop');
 
   await persistSales();
+  debounceSave();
+}
+
+function syncSaleToGrid(label,price){
+  const idx=LABELS.indexOf(label);
+  if(idx<0)return;
+  const di=Math.floor(idx/2),pi=idx%2;
+  const input=document.getElementById(`p_${di}_${pi}`);
+  if(!input)return;
+  // The price you actually sold at IS the real market price for that slot,
+  // so it's always authoritative over a manually-typed guess.
+  input.value=price;
+  recalculate();
 }
 
 async function deleteSale(idx){
@@ -1114,7 +1162,8 @@ function recalculate(){
   if(!buy) return;
 
   // Compute probabilities
-  const probs=computeProbabilities(buy,known);
+  const lastWeekKey=document.getElementById('lastWeekPattern').value;
+  const probs=computeProbabilities(buy,known,lastWeekKey);
   updateProbBars(probs);
 
   // Per-pattern envelopes
@@ -1164,7 +1213,7 @@ function recalculate(){
 }
 
 function updateProbBars(probs){
-  const map={0:['barLS','pctLS'],2:['barSS','pctSS'],1:['barDec','pctDec'],3:['barFluc','pctFluc']};
+  const map={1:['barLS','pctLS'],3:['barSS','pctSS'],2:['barDec','pctDec'],0:['barFluc','pctFluc']};
   for(const[p,[bid,pid]] of Object.entries(map)){
     const v=probs[p]||0;
     document.getElementById(bid).style.width=v+'%';
@@ -1222,7 +1271,7 @@ function drawChart(known,buy,aggMin,aggMax){
 function renderForecastPanel(forecasts,probs,known,buy){
   const body=document.getElementById('forecastBody');
   body.innerHTML='';
-  const sorted=[0,2,1,3].sort((a,b)=>(probs[b]||0)-(probs[a]||0));
+  const sorted=[0,1,2,3].sort((a,b)=>(probs[b]||0)-(probs[a]||0));
 
   sorted.forEach((p,rank)=>{
     const pat=PATTERNS[p];
