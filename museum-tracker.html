@@ -18,7 +18,8 @@
     --rust:var(--accent);--rust-lt:var(--accent-lt);--moss:var(--leaf);--clay:var(--sun);--wheat:var(--coral);
     --dusk:#83848c;--ink:#16161a;--ink-mid:#4c4d54;--ink-dim:#83848c;
     --done-bg:#e4f7ec;--done-tx:#1c8c52;--urgent-bg:#fff1e0;--urgent-tx:#c25a10;
-    --now-bg:#fff8e0;--now-tx:#9a7810;}
+    --now-bg:#fff8e0;--now-tx:#9a7810;
+    --brass:#a97142;--brass-dk:#3d2b1f;--brass-lt:#e8c98f;}
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}html{font-size:15px;}
   body{font-family:'JetBrains Mono',monospace;font-weight:300;background:var(--bg);color:var(--ink);min-height:100vh;padding:0.9rem 0.9rem 3rem;
     overflow-x:hidden;
@@ -35,6 +36,28 @@
   .back-link{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--ink-dim);text-decoration:none;letter-spacing:0.04em;border-bottom:2px dashed var(--border-lt);padding-bottom:1px;transition:color 0.15s;}
   .back-link:hover{color:var(--accent);border-color:var(--accent);}
   .user-chip{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--ink-dim);}
+
+  /* museum plaque bar */
+  .museum-bar{
+    margin-top:1.1rem;background:var(--brass-dk);color:var(--brass-lt);border-radius:10px;
+    display:flex;align-items:center;justify-content:space-between;gap:0.8rem;flex-wrap:wrap;
+    padding:0.55rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:500;
+  }
+  .museum-bar .mb-badge{background:var(--brass);color:#fff;border-radius:5px;padding:0.16rem 0.55rem;font-weight:700;margin-right:0.55rem;letter-spacing:0.03em;}
+  .museum-bar .mb-tally{color:var(--brass-lt);opacity:0.85;}
+  .museum-bar .mb-tally strong{color:#fff;font-weight:600;}
+
+  /* catalogued stamp ribbon, shown on any collected/done specimen card */
+  .ct-card,.item-card{position:relative;overflow:hidden;}
+  .ct-card.done::after,.item-card.collected::after{
+    content:'catalogued';
+    position:absolute;top:9px;right:-30px;z-index:1;
+    background:var(--moss);color:#fff;
+    font-family:'JetBrains Mono',monospace;font-size:0.5rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+    padding:0.18rem 2.1rem;transform:rotate(38deg);
+    box-shadow:0 1px 3px rgba(0,0,0,0.18);
+    pointer-events:none;
+  }
   .primary-tab-nav{display:flex;gap:0.4rem;margin-top:1.2rem;}
   .primary-tab-btn{font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;
     color:var(--ink-dim);background:var(--bg2);border:none;border-radius:99px 99px 0 0;
@@ -65,29 +88,32 @@
   .now-toggle-btn{font-family:'JetBrains Mono',monospace;font-size:0.65rem;font-weight:500;letter-spacing:0.06em;padding:0.32rem 0.8rem;border:2px solid var(--border-lt);border-radius:99px;background:none;color:var(--ink-dim);cursor:pointer;transition:all 0.15s;}
   .now-toggle-btn.active{border-color:var(--sun);color:var(--now-tx);background:var(--now-bg);}
 
-  /* month table */
-  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:2px dashed var(--border-lt);border-radius:14px;}
-  .critter-table{width:100%;min-width:480px;border-collapse:collapse;}
-  .critter-table thead tr{background:var(--bg2);}
-  .critter-table th{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-dim);padding:0.55rem 0.75rem;text-align:left;font-weight:500;border-bottom:1px solid var(--border-lt);}
-  .critter-table td{font-size:0.8rem;padding:0.65rem 0.75rem;border-bottom:1px solid var(--border-lt);vertical-align:top;}
-  .critter-table tr:last-child td{border-bottom:none;}
-  .critter-table tbody tr{cursor:pointer;transition:background 0.1s;}
-  .critter-table tbody tr:hover{background:var(--bg2);}
-  .critter-table tbody tr.done-row td{background:var(--done-bg);}
-  .critter-table tbody tr.done-row td .ct-name{color:var(--done-tx);text-decoration:line-through;text-decoration-color:rgba(28,140,82,0.4);}
-  .critter-table tbody tr.done-row td{color:#7a9e6a;}
-  .critter-table tbody tr.now-row{background:var(--now-bg);}
-  .critter-table tbody tr.now-row.done-row{background:var(--done-bg);}
-  .ct-check{width:20px;height:20px;border:2px solid var(--border-lt);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.12s,border-color 0.12s;}
-  .done-row .ct-check{background:var(--moss);border-color:var(--moss);}
-  .ct-check svg{display:none;width:12px;height:9px;}.done-row .ct-check svg{display:block;}
-  .ct-name{font-weight:500;color:var(--ink);}
-  .ct-shadow,.ct-loc,.ct-time{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--ink-dim);}
-  .ct-bells{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--wheat);}
-  .badge-leaving{font-family:'JetBrains Mono',monospace;font-size:0.52rem;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;background:rgba(76,141,255,0.1);color:var(--rust);border:1px solid rgba(76,141,255,0.25);border-radius:99px;padding:0.1rem 0.5rem;margin-left:0.4rem;vertical-align:middle;}
-  .badge-new{font-family:'JetBrains Mono',monospace;font-size:0.52rem;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;background:rgba(47,191,113,0.12);color:var(--moss);border:1px solid rgba(47,191,113,0.3);border-radius:99px;padding:0.1rem 0.5rem;margin-left:0.4rem;vertical-align:middle;}
-  .badge-now{font-family:'JetBrains Mono',monospace;font-size:0.52rem;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;background:var(--now-bg);color:var(--now-tx);border:1px solid rgba(255,201,60,0.4);border-radius:99px;padding:0.1rem 0.5rem;margin-left:0.4rem;vertical-align:middle;}
+  /* month specimen cards — replaces the old horizontally-scrolling table so
+     nothing (location, time, etc.) ever gets clipped on mobile; each card is
+     its own big, well-spaced tap target instead of a dense table row. */
+  .ct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:0.7rem;}
+  .ct-card{background:var(--surface);border:2px solid var(--border-lt);border-radius:14px;padding:0.95rem 1.05rem;cursor:pointer;transition:all 0.12s;position:relative;}
+  .ct-card:hover{border-color:var(--accent);background:var(--bg2);}
+  .ct-card.done{background:var(--done-bg);border-color:var(--leaf);}
+  .ct-card.done:hover{background:#d3f0e0;}
+  .ct-card.now:not(.done){background:var(--now-bg);border-color:var(--sun);}
+  .ct-card-top{display:flex;align-items:flex-start;gap:0.75rem;}
+  .ct-check{width:26px;height:26px;border:2px solid var(--border-lt);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.12s,border-color 0.12s;margin-top:1px;}
+  .done .ct-check{background:var(--moss);border-color:var(--moss);}
+  .ct-check svg{display:none;width:14px;height:11px;}.done .ct-check svg{display:block;}
+  .ct-card-name{min-width:0;}
+  .ct-name{font-weight:500;color:var(--ink);font-size:0.9rem;line-height:1.35;}
+  .done .ct-name{color:var(--done-tx);text-decoration:line-through;text-decoration-color:rgba(28,140,82,0.4);}
+  .ct-card-badges{display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.35rem;}
+  .ct-card-details{margin-top:0.65rem;padding-left:2.55rem;display:flex;flex-direction:column;gap:0.3rem;}
+  .ct-detail{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--ink-dim);line-height:1.5;display:flex;gap:0.4rem;}
+  .done .ct-detail{color:#7a9e6a;}
+  .ct-bells{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--wheat);margin-top:0.1rem;}
+  .done .ct-bells{color:#7a9e6a;}
+  .ct-empty{grid-column:1/-1;}
+  .badge-leaving{font-family:'JetBrains Mono',monospace;font-size:0.52rem;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;background:rgba(76,141,255,0.1);color:var(--rust);border:1px solid rgba(76,141,255,0.25);border-radius:99px;padding:0.12rem 0.5rem;}
+  .badge-new{font-family:'JetBrains Mono',monospace;font-size:0.52rem;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;background:rgba(47,191,113,0.12);color:var(--moss);border:1px solid rgba(47,191,113,0.3);border-radius:99px;padding:0.12rem 0.5rem;}
+  .badge-now{font-family:'JetBrains Mono',monospace;font-size:0.52rem;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;background:var(--now-bg);color:var(--now-tx);border:1px solid rgba(255,201,60,0.4);border-radius:99px;padding:0.12rem 0.5rem;}
   .section-controls{display:flex;align-items:center;gap:0.5rem;margin-left:auto;flex-wrap:wrap;}
 
   /* COLLECTION */
@@ -116,24 +142,24 @@
   .filter-btn.active{color:#fff;border-color:var(--rust);background:var(--rust);}
 
   /* Collection grid — richer cards */
-  .item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:2px;border:2px dashed var(--border-lt);border-radius:14px;overflow:hidden;background:var(--border-lt);}
-  .item-grid.art-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));}
-  .item-card{background:var(--surface);padding:0.85rem 0.9rem;min-height:44px;cursor:pointer;transition:background 0.12s;user-select:none;}
-  .item-card:hover{background:var(--bg2);}.item-card.collected{background:var(--done-bg);}.item-card.collected:hover{background:#d3f0e0;}
-  .item-card-top{display:flex;align-items:flex-start;gap:0.6rem;}
-  .item-check{width:20px;height:20px;border:2px solid var(--border-lt);border-radius:6px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:background 0.12s,border-color 0.12s;}
+  .item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:0.7rem;}
+  .item-grid.art-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));}
+  .item-card{background:var(--surface);border:2px solid var(--border-lt);border-radius:12px;padding:0.9rem 1rem;min-height:44px;cursor:pointer;transition:all 0.12s;user-select:none;}
+  .item-card:hover{background:var(--bg2);border-color:var(--accent);}.item-card.collected{background:var(--done-bg);border-color:var(--leaf);}.item-card.collected:hover{background:#d3f0e0;}
+  .item-card-top{display:flex;align-items:flex-start;gap:0.75rem;}
+  .item-check{width:26px;height:26px;border:2px solid var(--border-lt);border-radius:7px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:background 0.12s,border-color 0.12s;}
   .item-card.collected .item-check{background:var(--moss);border-color:var(--moss);}
-  .item-check svg{display:none;width:12px;height:9px;}.item-card.collected .item-check svg{display:block;}
+  .item-check svg{display:none;width:14px;height:11px;}.item-card.collected .item-check svg{display:block;}
   .item-name{font-size:0.8rem;font-weight:500;color:var(--ink);line-height:1.3;}
   .item-card.collected .item-name{color:var(--done-tx);}
-  .item-details{margin-top:0.35rem;padding-left:1.6rem;}
+  .item-details{margin-top:0.45rem;padding-left:2.55rem;}
   .item-detail{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--ink-dim);line-height:1.55;}
   .item-card.collected .item-detail{color:#3fa876;}
   .item-bells{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--wheat);margin-top:0.1rem;}
   .item-card.collected .item-bells{color:#3fa876;}
 
   /* simple card (fossil/art) */
-  .item-card-simple{display:flex;align-items:center;gap:0.65rem;}
+  .item-card-simple{display:flex;align-items:center;gap:0.75rem;}
   .item-sub{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--ink-dim);margin-top:0.15rem;}
   .art-fake-badge{font-family:'JetBrains Mono',monospace;font-size:0.58rem;font-weight:500;letter-spacing:0.04em;color:var(--rust);background:rgba(76,141,255,0.08);border:1px solid rgba(76,141,255,0.22);border-radius:99px;padding:0.1rem 0.45rem;margin-top:0.3rem;display:inline-block;}
   .art-safe-badge{font-family:'JetBrains Mono',monospace;font-size:0.58rem;font-weight:500;letter-spacing:0.04em;color:var(--moss);background:rgba(47,191,113,0.1);border:1px solid rgba(47,191,113,0.25);border-radius:99px;padding:0.1rem 0.45rem;margin-top:0.3rem;display:inline-block;}
@@ -142,7 +168,7 @@
   .item-card.collected .art-fake-badge{color:var(--done-tx);background:rgba(28,140,82,0.1);border-color:rgba(28,140,82,0.2);}
 
   /* month availability pills */
-  .mo-pills{display:flex;flex-wrap:wrap;gap:2px;margin-top:0.32rem;padding-left:1.6rem;}
+  .mo-pills{display:flex;flex-wrap:wrap;gap:2px;margin-top:0.32rem;padding-left:2.55rem;}
   .mo-pill{font-family:'JetBrains Mono',monospace;font-size:0.52rem;letter-spacing:0.01em;border-radius:4px;padding:0.07rem 0.3rem;background:var(--border-lt);color:var(--ink-dim);line-height:1.4;}
   .mo-pill.on{background:rgba(47,191,113,0.18);color:var(--moss);}
   .mo-pill.cur{background:var(--rust);color:#fff;font-weight:500;}
@@ -170,13 +196,15 @@
   .empty-msg{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--ink-dim);text-align:center;padding:3rem 1rem;border:2px dashed var(--border-lt);border-radius:14px;}
   footer{text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--ink-dim);letter-spacing:0.06em;padding:0 2rem;max-width:960px;margin:2rem auto 0;}
   @media(max-width:600px){
-    .item-grid{grid-template-columns:repeat(auto-fill,minmax(145px,1fr));}
+    .item-grid{grid-template-columns:1fr;}
+    .item-grid.art-grid{grid-template-columns:1fr;}
+    .ct-grid{grid-template-columns:1fr;}
     header{padding:1.3rem 1.1rem 0;}.wrap{padding:1.2rem 1.1rem;}
-    .critter-table th:nth-child(5),.critter-table td:nth-child(5){display:none;}
-    .ct-check,.item-check{width:23px;height:23px;}
-    .ct-check svg,.item-check svg{width:13px;height:10px;}
-    .item-details,.mo-pills{padding-left:1.75rem;}
-    .critter-table td{padding:0.75rem 0.65rem;}
+    .museum-bar{font-size:0.55rem;padding:0.5rem 0.8rem;}
+    .ct-check,.item-check{width:28px;height:28px;}
+    .ct-check svg,.item-check svg{width:15px;height:12px;}
+    .item-details,.mo-pills{padding-left:2.7rem;}
+    .ct-card-details{padding-left:2.7rem;}
     .filter-btn,.tab-btn,.now-toggle-btn,.toggle-caught-btn,.legend-btn{padding:0.6rem 1rem;min-height:38px;display:inline-flex;align-items:center;}
   }
 </style>
@@ -190,6 +218,10 @@
       <span class="user-chip" id="userChip"></span>
       <a class="back-link" href="index.html">← home</a>
     </div>
+  </div>
+  <div class="museum-bar">
+    <span><span class="mb-badge">est. blathers'</span>museum of natural history</span>
+    <span class="mb-tally" id="mbTally"></span>
   </div>
   <nav class="primary-tab-nav">
     <button class="primary-tab-btn active" id="ptab-month" onclick="setPrimaryTab('month')">
@@ -210,7 +242,7 @@
       </div>
       <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
         <div class="month-summary" id="monthSummary"></div>
-        <button class="legend-btn" onclick="openLegend()">&#9432; key</button>
+        <button class="legend-btn" onclick="openLegend()">🏷️ placard key</button>
       </div>
     </div>
     <div id="monthContent"></div>
@@ -227,7 +259,7 @@
 <div class="legend-overlay" id="legendOverlay" onclick="if(event.target===this)closeLegend()">
   <div class="legend-box">
     <div class="legend-title">
-      what things mean
+      exhibit placard key
       <button class="legend-close" onclick="closeLegend()">&#x2715;</button>
     </div>
 
@@ -242,6 +274,10 @@
     <div class="legend-row">
       <div class="legend-swatch"><span class="badge-now" style="font-family:'JetBrains Mono',monospace;font-size:0.48rem;letter-spacing:0.04em;text-transform:uppercase;background:var(--now-bg);color:var(--now-tx);border:1px solid rgba(255,201,60,0.4);border-radius:3px;padding:0.07rem 0.35rem;">now</span></div>
       <div class="legend-desc"><strong>catchable right now</strong> — active at your current time of day based on your device clock.</div>
+    </div>
+    <div class="legend-row">
+      <div class="legend-swatch"><span style="display:inline-block;background:var(--moss);color:#fff;font-family:'JetBrains Mono',monospace;font-size:0.46rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;border-radius:3px;padding:0.1rem 0.4rem;transform:rotate(-8deg);">catalogued</span></div>
+      <div class="legend-desc"><strong>catalogued stamp</strong> — the little ribbon across a card means it's checked off and donated to Blathers.</div>
     </div>
 
     <hr class="legend-divider"/>
@@ -388,8 +424,19 @@ async function saveData(){
 function render(){
   const now=new Date();
   document.getElementById('monthName').textContent=MONTH_NAMES[now.getMonth()];
+  updateMuseumTally();
   renderMonth();
   renderCollection();
+}
+
+function updateMuseumTally(){
+  let done=0,total=0;
+  Object.entries(SECTIONS).forEach(([key,sec])=>{
+    done+=collected[key].length;
+    total+=sec.total;
+  });
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('mbTally').innerHTML=`<strong>${done}</strong> / ${total} specimens catalogued &nbsp;·&nbsp; ${pct}%`;
 }
 
 // ── THIS MONTH ──────────────────────────────────────────────────────────────
@@ -445,25 +492,17 @@ function renderMonth(){
         html+=`<div class="month-all-done" style="background:var(--bg2);color:var(--ink-dim);border-color:var(--border)">nothing matches current filter</div>`;
       }
     }else{
-      html+=buildCritterTable(sec,toShow);
+      html+=buildCritterCards(sec,toShow);
     }
     html+='</div>';
   });
   document.getElementById('monthContent').innerHTML=html;
 }
 
-function buildCritterTable(sec,rows){
+function buildCritterCards(sec,rows){
   const isSeaCreature=(sec==='sea');
-  const isBug=(sec==='bugs');
   const isFish=(sec==='fish');
-  let h=`<div class="table-scroll"><table class="critter-table"><thead><tr>
-    <th style="width:16px"></th>
-    <th>name</th>
-    <th>${isSeaCreature?'shadow / speed':'shadow'}</th>
-    <th>where to find</th>
-    <th>time</th>
-    <th>bells</th>
-  </tr></thead><tbody>`;
+  let h='<div class="ct-grid">';
 
   rows.forEach(x=>{
     const {item,i}=x;
@@ -472,25 +511,32 @@ function buildCritterTable(sec,rows){
     const leaving=isLeavingNextMonth(item);
     const newThis=isActiveThisMonthAndLastMonth(item);
 
-    const shadowStr=isSeaCreature?`${item.s} · ${item.sp}`:isFish?item.s:'—';
-    const locStr=isSeaCreature?'Ocean (diving)':item.l||'—';
+    const shadowStr=isSeaCreature?`${item.s} · ${item.sp}`:isFish?item.s:null;
+    const locStr=isSeaCreature?'Ocean (diving)':item.l||null;
     const bellsStr=(item.b||0).toLocaleString();
 
     const leavingBadge=leaving?'<span class="badge-leaving">leaving</span>':'';
     const newBadge=newThis?'<span class="badge-new">new</span>':'';
     const nowBadge=isNow&&!isDone?'<span class="badge-now">now</span>':'';
+    const badges=leavingBadge+newBadge+nowBadge;
 
-    h+=`<tr class="${isDone?'done-row':''}${isNow&&!isDone?' now-row':''}"
-       onclick="toggleCritter('${sec}',${i})">
-      <td><div class="ct-check">${SVG_CHECK}</div></td>
-      <td><span class="ct-name">${item.n}</span>${leavingBadge}${newBadge}${nowBadge}</td>
-      <td class="ct-shadow">${shadowStr}</td>
-      <td class="ct-loc">${locStr}</td>
-      <td class="ct-time">${item.t}</td>
-      <td class="ct-bells">${bellsStr}</td>
-    </tr>`;
+    h+=`<div class="ct-card${isDone?' done':''}${isNow&&!isDone?' now':''}" onclick="toggleCritter('${sec}',${i})">
+      <div class="ct-card-top">
+        <div class="ct-check">${SVG_CHECK}</div>
+        <div class="ct-card-name">
+          <div class="ct-name">${item.n}</div>
+          ${badges?`<div class="ct-card-badges">${badges}</div>`:''}
+        </div>
+      </div>
+      <div class="ct-card-details">
+        ${shadowStr?`<div class="ct-detail">🌑 ${shadowStr}</div>`:''}
+        ${locStr?`<div class="ct-detail">📍 ${locStr}</div>`:''}
+        <div class="ct-detail">⏰ ${item.t}</div>
+        <div class="ct-bells">🔔 ${bellsStr} bells</div>
+      </div>
+    </div>`;
   });
-  h+='</tbody></table></div>';
+  h+='</div>';
   return h;
 }
 
@@ -561,7 +607,7 @@ function renderSection(key){
     <button class="filter-btn${f==='all'?' active':''}" onclick="setFilter('${key}','all')">all</button>
     <button class="filter-btn${f==='missing'?' active':''}" onclick="setFilter('${key}','missing')">missing</button>
     <button class="filter-btn${f==='collected'?' active':''}" onclick="setFilter('${key}','collected')">collected</button>
-    ${isCreature?`<button class="legend-btn" onclick="openLegend()">&#9432; key</button>`:''}
+    ${isCreature?`<button class="legend-btn" onclick="openLegend()">🏷️ placard key</button>`:''}
   </div>`;
 
   if(items.length===0){
