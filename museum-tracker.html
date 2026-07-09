@@ -33,7 +33,7 @@
   .site-title span{color:var(--accent);font-size:0.9rem;}
   .site-meta{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--ink-dim);letter-spacing:0.04em;text-transform:uppercase;}
   .nav-links{margin-left:auto;display:flex;gap:1rem;align-items:center;}
-  .back-link{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--ink-dim);text-decoration:none;letter-spacing:0.04em;border-bottom:2px dashed var(--border-lt);padding-bottom:1px;transition:color 0.15s;}
+  .back-link{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--ink-dim);text-decoration:none;letter-spacing:0.04em;border-bottom:2px dashed var(--border-lt);transition:color 0.15s;display:inline-block;padding:0.5rem 0.2rem;margin:-0.5rem -0.2rem;}
   .back-link:hover{color:var(--accent);border-color:var(--accent);}
   .user-chip{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--ink-dim);}
 
@@ -75,7 +75,7 @@
   .month-name{font-family:'JetBrains Mono',monospace;font-size:1.1rem;color:var(--accent);font-weight:500;}
   .month-summary{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--ink-dim);}
   .month-section{margin-bottom:2rem;}
-  .month-sec-header{display:flex;align-items:center;gap:0.8rem;margin-bottom:0.75rem;}
+  .month-sec-header{display:flex;align-items:center;gap:0.6rem 0.8rem;margin-bottom:0.75rem;flex-wrap:wrap;}
   .month-sec-title{font-family:'JetBrains Mono',monospace;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-mid);}
   .month-sec-badge{font-family:'JetBrains Mono',monospace;font-size:0.6rem;font-weight:500;background:var(--urgent-bg);color:var(--urgent-tx);border:1.5px dashed var(--sun);border-radius:99px;padding:0.12rem 0.6rem;}
   .month-sec-badge.all-done{background:var(--done-bg);color:var(--done-tx);border-color:var(--leaf);}
@@ -135,7 +135,7 @@
   .controls-row{display:flex;gap:0.7rem;margin-bottom:1.2rem;flex-wrap:wrap;}
   .search-wrap{flex:1 1 200px;display:flex;align-items:center;border:2px solid var(--border-lt);border-radius:99px;background:var(--bg);overflow:hidden;transition:border-color 0.15s;}
   .search-wrap:focus-within{border-color:var(--rust);}
-  .search-wrap input{font-family:'JetBrains Mono',monospace;font-size:0.82rem;border:none;background:transparent;color:var(--ink);padding:0.55rem 0.9rem;outline:none;width:100%;}
+  .search-wrap input{font-family:'JetBrains Mono',monospace;font-size:16px;border:none;background:transparent;color:var(--ink);padding:0.55rem 0.9rem;outline:none;width:100%;}
   .search-wrap input::placeholder{color:var(--ink-dim);}
   .filter-btn{font-family:'JetBrains Mono',monospace;font-size:0.68rem;font-weight:500;letter-spacing:0.05em;padding:0.5rem 0.95rem;border:2px solid var(--border-lt);border-radius:99px;background:var(--bg);color:var(--ink-dim);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
   .filter-btn:hover{background:var(--bg2);color:var(--ink);border-color:var(--dusk);}
@@ -206,6 +206,7 @@
     .item-details,.mo-pills{padding-left:2.7rem;}
     .ct-card-details{padding-left:2.7rem;}
     .filter-btn,.tab-btn,.now-toggle-btn,.toggle-caught-btn,.legend-btn{padding:0.6rem 1rem;min-height:38px;display:inline-flex;align-items:center;}
+    .primary-tab-btn{padding:0.7rem 1.2rem 0.75rem;min-height:40px;}
   }
 </style>
 </head>
