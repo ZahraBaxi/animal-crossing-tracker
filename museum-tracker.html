@@ -145,6 +145,11 @@
   .tab-btn:hover{color:var(--ink-mid);}.tab-btn.active{color:#fff;background:var(--rust);}
   .tab-count{font-size:0.6rem;color:var(--ink-dim);margin-left:0.4rem;font-family:'JetBrains Mono',monospace;}
   .tab-btn.active .tab-count{color:rgba(255,255,255,0.75);}
+  .tab-btn.complete{color:var(--brass);}
+  .tab-btn.complete .tab-count{color:var(--brass);}
+  .tab-btn.complete.active{background:var(--brass);color:#fff;}
+  .tab-btn.complete.active .tab-count{color:rgba(255,255,255,0.8);}
+  .tab-trophy{margin-right:0.3rem;}
   .tab-panel{display:none;}.tab-panel.active{display:block;}
   .sub-panel-wrap{padding-top:1.5rem;}
   .progress-row{display:flex;align-items:center;gap:1rem;margin-bottom:1.6rem;}
@@ -451,13 +456,15 @@ function render(){
 }
 
 function updateMuseumTally(){
-  let done=0,total=0;
+  let done=0,total=0,fullSets=0;
   Object.entries(SECTIONS).forEach(([key,sec])=>{
     done+=collected[key].length;
     total+=sec.total;
+    if(collected[key].length===sec.total)fullSets++;
   });
   const pct=total?Math.round(done/total*100):0;
-  document.getElementById('mbTally').innerHTML=`<strong>${done}</strong> / ${total} specimens cataloged &nbsp;·&nbsp; ${pct}%`;
+  const trophyStr=fullSets>0?` &nbsp;·&nbsp; 🏆 <strong>${fullSets}</strong>/${Object.keys(SECTIONS).length} complete`:'';
+  document.getElementById('mbTally').innerHTML=`<strong>${done}</strong> / ${total} specimens cataloged &nbsp;·&nbsp; ${pct}%${trophyStr}`;
 }
 
 // ── THIS MONTH ──────────────────────────────────────────────────────────────
@@ -619,11 +626,12 @@ function buildSubTabs(){
   nav.innerHTML=''; panels.innerHTML='';
   Object.entries(SECTIONS).forEach(([key,sec])=>{
     const done=collected[key].length;
+    const isComplete=done===sec.total;
     const btn=document.createElement('button');
-    btn.className='tab-btn'+(key===activeTab?' active':'');
+    btn.className='tab-btn'+(key===activeTab?' active':'')+(isComplete?' complete':'');
     btn.id='tab-'+key;
     btn.onclick=()=>setTab(key);
-    btn.innerHTML=sec.label+'<span class="tab-count">'+done+'/'+sec.total+'</span>';
+    btn.innerHTML=(isComplete?'<span class="tab-trophy">🏆</span>':'')+sec.label+'<span class="tab-count">'+done+'/'+sec.total+'</span>';
     nav.appendChild(btn);
     const panel=document.createElement('div');
     panel.className='tab-panel'+(key===activeTab?' active':'');

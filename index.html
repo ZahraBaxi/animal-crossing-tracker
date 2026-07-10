@@ -272,6 +272,9 @@ body::before{
 .tool-card:nth-child(4n+3){--accent:var(--sun);}
 .tool-card:nth-child(4n+4){--accent:var(--leaf);}
 .tool-card:hover{background:var(--surface);border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 20px -6px color-mix(in srgb, var(--accent) 35%, transparent);}
+.tool-card.card-complete{border:2px solid #a97142;background:linear-gradient(135deg, rgba(255,201,60,0.1), rgba(169,113,66,0.06));}
+.tool-card.card-complete:hover{border-color:#a97142;box-shadow:0 8px 20px -6px rgba(169,113,66,0.35);}
+.tool-card.card-complete .card-prog{background:#a97142;}
 
 .card-num{
   font-size:1.15rem;font-weight:600;
@@ -605,7 +608,12 @@ async function buildGrid(){
     if(!tool.progress)return;
     try{
       const p=await tool.progress();const el=document.getElementById('prog-'+i);if(!el)return;
-      if(p&&p.total>0){el.textContent=p.done+'/'+p.total+' · '+Math.round(p.done/p.total*100)+'%';el.style.opacity='1';}
+      if(p&&p.total>0){
+        const isComplete=p.done>=p.total;
+        el.textContent=(isComplete?'🏆 ':'')+p.done+'/'+p.total+' · '+Math.round(p.done/p.total*100)+'%';
+        el.style.opacity='1';
+        document.getElementById('tc'+i)?.classList.toggle('card-complete',isComplete);
+      }
       else{el.textContent='0% collected';el.style.opacity='0.5';}
     }catch{const el=document.getElementById('prog-'+i);if(el)el.textContent='';}
   });
