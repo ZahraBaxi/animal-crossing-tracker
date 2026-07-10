@@ -154,6 +154,32 @@
   .how-tag.special{color:#b5860c;background:rgba(255,201,60,0.16);}
   .song-row.owned .how-tag{color:#3fa876;background:rgba(63,168,118,0.12);}
   .empty-msg{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--ink-dim);text-align:center;padding:3rem 1rem;border:2px dashed var(--border-lt);border-radius:14px;}
+  .song-row.playing{background:rgba(76,141,255,0.12);}
+  .song-row.playing .song-name{color:var(--sky);}
+  .song-row.playing .sw-num{opacity:0;}
+  .song-row.playing .sw-play{opacity:1;}
+  .song-swatch.no-audio{opacity:0.4;cursor:default;}
+  .song-swatch.no-audio .sw-play{display:none;}
+  .now-playing{
+    position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%) translateY(120%);
+    width:min(560px,92vw);display:flex;align-items:center;gap:0.9rem;
+    background:var(--ink);color:#fff;border-radius:16px;padding:0.7rem 1rem;
+    box-shadow:0 10px 30px -6px rgba(0,0,0,0.4);z-index:9998;
+    transition:transform 0.35s ease;
+  }
+  .now-playing.show{transform:translateX(-50%) translateY(0);}
+  .np-vinyl{width:34px;height:34px;border-radius:50%;flex-shrink:0;
+    background:repeating-radial-gradient(circle at center,#2b2a30 0px,#2b2a30 2px,#000 3px,#000 4px);
+    position:relative;animation:vinylSpin 5s linear infinite;animation-play-state:running;}
+  .now-playing.paused .np-vinyl{animation-play-state:paused;}
+  .np-vinyl::after{content:'';position:absolute;inset:34%;border-radius:50%;background:var(--sun);border:2px solid #000;}
+  .np-info{flex:1;min-width:0;}
+  .np-title{font-family:'JetBrains Mono',monospace;font-size:0.75rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .np-track{margin-top:0.35rem;}
+  .np-track input[type="range"]{width:100%;height:3px;accent-color:var(--sun);cursor:pointer;}
+  .np-btn{background:transparent;border:none;color:#fff;font-size:0.95rem;cursor:pointer;flex-shrink:0;padding:0.2rem 0.35rem;opacity:0.85;transition:opacity 0.15s;}
+  .np-btn:hover{opacity:1;}
+  @media(max-width:520px){.now-playing{bottom:0.6rem;padding:0.6rem 0.8rem;gap:0.6rem;}}
   footer{text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--ink-dim);letter-spacing:0.06em;padding:1.6rem 2rem 0;max-width:860px;margin:0 auto;}
   @media(max-width:520px){.how-tag{display:none;}header{padding:1.3rem 1.2rem 1.2rem;}.wrap{padding:1.3rem 1.2rem 1.6rem;}
     .vinyl{width:36px;height:36px;}
@@ -205,8 +231,32 @@
 </div>
 <footer>data synced via back4app<br>made by zahra w/ html,css,js & some sparkle dust</footer>
 
+<div class="now-playing" id="nowPlaying">
+  <div class="np-vinyl" id="npVinyl"></div>
+  <div class="np-info">
+    <div class="np-title" id="npTitle">—</div>
+    <div class="np-track"><input type="range" id="npSeek" min="0" max="100" value="0" step="0.1"></div>
+  </div>
+  <button class="np-btn" id="npPlayPause" onclick="toggleCurrentPlayback()">⏸</button>
+  <button class="np-btn" id="npClose" onclick="stopPlayback()">✕</button>
+</div>
+<audio id="audioEl"></audio>
+
 <script>
 const SONGS=[{name:'Agent K.K.',genre:'folk',how:'request'},{name:'Aloha K.K.',genre:'reggae',how:'request'},{name:'Animal City',genre:'pop',how:'secret'},{name:'Bubblegum K.K.',genre:'pop',how:'request'},{name:'Café K.K.',genre:'jazz',how:'request'},{name:'Chillwave',genre:'electronic',how:'request'},{name:'Comrade K.K.',genre:'folk',how:'request'},{name:'DJ K.K.',genre:'electronic',how:'request'},{name:'Drivin’',genre:'other',how:'secret'},{name:'Farewell',genre:'folk',how:'secret'},{name:'Forest Life',genre:'folk',how:'request'},{name:'Go K.K. Rider',genre:'rock',how:'request'},{name:'Hypno K.K.',genre:'electronic',how:'request'},{name:'I Love You',genre:'folk',how:'request'},{name:'Imperial K.K.',genre:'world',how:'request'},{name:'King K.K.',genre:'rock',how:'request'},{name:'K.K. Adventure',genre:'electronic',how:'request'},{name:'K.K. Aria',genre:'classical',how:'request'},{name:'K.K. Ballad',genre:'easy listening',how:'request'},{name:'K.K. Bashment',genre:'reggae',how:'request'},{name:'K.K. Bazaar',genre:'world',how:'request'},{name:'K.K. Birthday',genre:'pop',how:'special'},{name:'K.K. Blues',genre:'blues',how:'request'},{name:'K.K. Bossa',genre:'bossa nova',how:'request'},{name:'K.K. Break',genre:'electronic',how:'request'},{name:'K.K. Calypso',genre:'world',how:'request'},{name:'K.K. Casbah',genre:'world',how:'request'},{name:'K.K. Chorale',genre:'classical',how:'request'},{name:'K.K. Chorinho',genre:'bossa nova',how:'request'},{name:'K.K. Condor',genre:'world',how:'request'},{name:'K.K. Country',genre:'folk',how:'request'},{name:'K.K. Cruisin’',genre:'other',how:'request'},{name:'K.K. D&B',genre:'electronic',how:'request'},{name:'K.K. Dirge',genre:'horror',how:'request'},{name:'K.K. Disco',genre:'pop',how:'request'},{name:'K.K. Dixie',genre:'jazz',how:'request'},{name:'K.K. Dub',genre:'reggae',how:'request'},{name:'K.K. Étude',genre:'classical',how:'request'},{name:'K.K. Faire',genre:'folk',how:'request'},{name:'K.K. Flamenco',genre:'world',how:'request'},{name:'K.K. Folk',genre:'folk',how:'request'},{name:'K.K. Fugue',genre:'classical',how:'request'},{name:'K.K. Fusion',genre:'jazz',how:'request'},{name:'K.K. Groove',genre:'r&b',how:'request'},{name:'K.K. Gumbo',genre:'blues',how:'request'},{name:'K.K. Hop',genre:'electronic',how:'request'},{name:'K.K. House',genre:'electronic',how:'request'},{name:'K.K. Island',genre:'world',how:'request'},{name:'K.K. Jazz',genre:'jazz',how:'request'},{name:'K.K. Jongara',genre:'world',how:'request'},{name:'K.K. Khoomei',genre:'world',how:'request'},{name:'K.K. Lament',genre:'blues',how:'request'},{name:'K.K. Love Song',genre:'easy listening',how:'request'},{name:'K.K. Lovers',genre:'easy listening',how:'request'},{name:'K.K. Lullaby',genre:'easy listening',how:'request'},{name:'K.K. Mambo',genre:'latin',how:'request'},{name:'K.K. Marathon',genre:'electronic',how:'request'},{name:'K.K. March',genre:'classical',how:'request'},{name:'K.K. Mariachi',genre:'latin',how:'request'},{name:'K.K. Metal',genre:'rock',how:'request'},{name:'K.K. Milonga',genre:'latin',how:'request'},{name:'K.K. Moody',genre:'jazz',how:'request'},{name:'K.K. Oasis',genre:'world',how:'request'},{name:'K.K. Parade',genre:'classical',how:'request'},{name:'K.K. Polka',genre:'folk',how:'request'},{name:'K.K. Ragtime',genre:'jazz',how:'request'},{name:'K.K. Rally',genre:'pop',how:'request'},{name:'K.K. Reggae',genre:'reggae',how:'request'},{name:'K.K. Robot Synth',genre:'electronic',how:'request'},{name:'K.K. Rock',genre:'rock',how:'request'},{name:'K.K. Rockabilly',genre:'rock',how:'request'},{name:'K.K. Safari',genre:'world',how:'request'},{name:'K.K. Salsa',genre:'latin',how:'request'},{name:'K.K. Samba',genre:'latin',how:'request'},{name:'K.K. Ska',genre:'reggae',how:'request'},{name:'K.K. Slack-Key',genre:'folk',how:'request'},{name:'K.K. Sonata',genre:'classical',how:'request'},{name:'K.K. Song',genre:'folk',how:'request'},{name:'K.K. Soul',genre:'r&b',how:'request'},{name:'K.K. Steppe',genre:'world',how:'request'},{name:'K.K. Stroll',genre:'easy listening',how:'request'},{name:'K.K. Swing',genre:'jazz',how:'request'},{name:'K.K. Synth',genre:'electronic',how:'request'},{name:'K.K. Tango',genre:'latin',how:'request'},{name:'K.K. Technopop',genre:'electronic',how:'request'},{name:'K.K. Waltz',genre:'classical',how:'request'},{name:'K.K. Western',genre:'folk',how:'request'},{name:'Lucky K.K.',genre:'folk',how:'request'},{name:'Marine Song 2001',genre:'folk',how:'request'},{name:'Mountain Song',genre:'folk',how:'request'},{name:'Mr. K.K.',genre:'easy listening',how:'request'},{name:'My Place',genre:'folk',how:'request'},{name:'Neapolitan',genre:'folk',how:'request'},{name:'Only Me',genre:'folk',how:'request'},{name:'Pondering',genre:'easy listening',how:'request'},{name:'Rockin’ K.K.',genre:'other',how:'request'},{name:'Soulful K.K.',genre:'r&b',how:'request'},{name:'Space K.K.',genre:'electronic',how:'request'},{name:'Spring Blossoms',genre:'folk',how:'request'},{name:'Stale Cupcakes',genre:'easy listening',how:'request'},{name:'Steep Hill',genre:'folk',how:'request'},{name:'Surfin’ K.K.',genre:'other',how:'request'},{name:'The K. Funk',genre:'r&b',how:'request'},{name:'To the Edge',genre:'rock',how:'request'},{name:'Two Days Ago',genre:'blues',how:'request'},{name:'Wandering',genre:'folk',how:'request'},{name:'Welcome Horizons',genre:'pop',how:'special'}].sort((a,b)=>a.name.localeCompare(b.name));
+
+// ── AUDIO FILES (from your files/audio/kk-slider folder) ──────────────────
+const AUDIO_FILES=["1-01 K.K. Cruisin'.mp3","1-02 Lucky K.K..mp3","1-03 Mountain Song.mp3","1-04 Aloha K.K..mp3","1-05 Hypno K.K..mp3","1-06 Surfin' K.K..mp3","1-07 K.K. Stroll.mp3","1-08 Two Days Ago.mp3","1-09 Only Me.mp3","1-10 Pondering.mp3","1-11 K.K. Birthday.mp3","1-12 Bubblegum K.K..mp3","1-13 K.K. Safari.mp3","1-14 K.K. Western.mp3","1-15 K.K. Lament.mp3","1-16 K.K. Rally.mp3","1-17 K.K. Marathon.mp3","1-18 K.K. Calypso.mp3","1-19 K.K. Country.mp3","1-20 K.K. Groove.mp3","1-21 Agent K.K..mp3","1-22 Soulful K.K..mp3","1-23 K.K. Salsa.mp3","1-24 K.K. Samba.mp3","1-25 K.K. Chorale.mp3","1-26 K.K. Jazz.mp3","1-27 K.K. Jongara.mp3","1-28 K.K. Swing.mp3","1-29 K.K. Ska.mp3","1-30 Mr. K.K..mp3","1-31 K.K. Soul.mp3","1-32 K.K. Song.mp3","2-01 King K.K..mp3","2-02 K.K. Tango.mp3","2-03 Imperial K.K..mp3","2-04 K.K. Dixie.mp3","2-05 K.K. Disco.mp3","2-06 K.K. Synth.mp3","2-07 K.K. Étude.mp3","2-08 K.K. Sonata.mp3","2-09 K.K. Milonga.mp3","2-10 Rockin' K.K..mp3","2-11 K.K. House.mp3","2-12 K.K. Ballad.mp3","2-13 Café K.K..mp3","2-14 K.K. Adventure.mp3","2-15 K.K. Parade.mp3","2-16 K.K. Rockabilly.mp3","2-17 The K. Funk.mp3","2-18 K.K. Fusion.mp3","2-19 K.K. Flamenco.mp3","2-20 K.K. Blues.mp3","2-21 K.K. Bossa.mp3","2-22 K.K. Moody.mp3","2-23 K.K. March.mp3","2-24 K.K. Oasis.mp3","2-25 K.K. Aria.mp3","2-26 K.K. Mambo.mp3","2-27 K.K. Folk.mp3","2-28 K.K. Metal.mp3","2-29 K.K. Love Song.mp3","2-30 K.K. Lullaby.mp3","2-31 K.K. Reggae.mp3","2-32 K.K. Rock.mp3","3-01 K.K. Bazaar.mp3","3-02 K.K. Waltz.mp3","3-03 K.K. Steppe.mp3","3-04 K.K. Dirge.mp3","3-05 Farewell.mp3","3-06 Comrade K.K..mp3","3-07 K.K. Mariachi.mp3","3-08 I Love You.mp3","3-09 K.K. Technopop.mp3","3-10 K.K. Island.mp3","3-11 Animal City.mp3","3-12 Drivin'.mp3","3-13 K.K. D&B.mp3","3-14 K.K. Casbah.mp3","3-15 Neapolitan.mp3","3-16 To the Edge.mp3","3-17 Steep Hill.mp3","3-18 K.K. Gumbo.mp3","3-19 K.K. Faire.mp3","3-20 Spring Blossoms.mp3","3-21 Marine Song 2001.mp3","3-22 Stale Cupcakes.mp3","3-23 K.K. Condor.mp3","3-24 Wandering.mp3","3-25 My Place.mp3","3-26 Space K.K..mp3","3-27 Welcome Horizons.mp3","3-28 Forest Life.mp3","3-29 DJ K.K..mp3","3-30 Go K.K. Rider.mp3","3-31 K.K. Ragtime.mp3"];
+function normName(s){return s.toLowerCase().replace(/[\u2018\u2019']/g,"'").replace(/\s+/g,' ').trim();}
+const FILE_MAP={};
+AUDIO_FILES.forEach(f=>{
+  const m=f.match(/^\d+-\d+\s+(.+)\.mp3$/i);
+  if(m) FILE_MAP[normName(m[1])]=f;
+});
+function audioPathFor(name){
+  const f=FILE_MAP[normName(name)];
+  return f?('files/audio/kk-slider/'+encodeURIComponent(f)):null;
+}
 
 const GENRES=[...new Set(SONGS.map(s=>s.genre))].sort();
 const GENRE_COLOR={
@@ -219,6 +269,66 @@ function genreColor(g){return GENRE_COLOR[g]||'var(--dusk)';}
 let owned=new Set();
 let parseObj=null;
 let activeFilter='all',activeGenre='all';
+
+// ── AUDIO PLAYBACK ──────────────────────────────────────────────────────
+const audioEl=document.getElementById('audioEl');
+const nowPlayingEl=document.getElementById('nowPlaying');
+const npTitleEl=document.getElementById('npTitle');
+const npSeekEl=document.getElementById('npSeek');
+const npPlayPauseEl=document.getElementById('npPlayPause');
+let currentPlayingIdx=null;
+
+function playSong(idx){
+  const song=SONGS[idx];
+  const path=audioPathFor(song.name);
+  if(!path)return;
+  if(currentPlayingIdx===idx){
+    if(audioEl.paused)audioEl.play();else audioEl.pause();
+  }else{
+    currentPlayingIdx=idx;
+    audioEl.src=path;
+    audioEl.currentTime=0;
+    audioEl.play().catch(()=>{});
+    npTitleEl.textContent=song.name;
+  }
+  updatePlayerUI();
+  renderList();
+}
+
+function toggleCurrentPlayback(){
+  if(currentPlayingIdx===null)return;
+  if(audioEl.paused)audioEl.play();else audioEl.pause();
+  updatePlayerUI();
+}
+
+function stopPlayback(){
+  audioEl.pause();
+  audioEl.currentTime=0;
+  currentPlayingIdx=null;
+  updatePlayerUI();
+  renderList();
+}
+
+function updatePlayerUI(){
+  const active=currentPlayingIdx!==null;
+  nowPlayingEl.classList.toggle('show',active);
+  nowPlayingEl.classList.toggle('paused',active&&audioEl.paused);
+  npPlayPauseEl.textContent=(active&&!audioEl.paused)?'⏸':'▶';
+}
+
+audioEl.addEventListener('play',updatePlayerUI);
+audioEl.addEventListener('pause',updatePlayerUI);
+audioEl.addEventListener('timeupdate',()=>{
+  if(audioEl.duration)npSeekEl.value=(audioEl.currentTime/audioEl.duration)*100;
+});
+audioEl.addEventListener('ended',()=>{
+  currentPlayingIdx=null;
+  updatePlayerUI();
+  renderList();
+});
+npSeekEl.addEventListener('input',()=>{
+  if(audioEl.duration)audioEl.currentTime=(npSeekEl.value/100)*audioEl.duration;
+});
 
 (async()=>{
   const u=Parse.User.current();
@@ -309,14 +419,20 @@ function renderList(){
     const mS=!q||song.name.toLowerCase().includes(q)||song.genre.toLowerCase().includes(q);
     if(!mF||!mG||!mS)return;
     visible++;
+    const hasAudio=!!audioPathFor(song.name);
+    const isPlaying=currentPlayingIdx===idx;
     const row=document.createElement('div');
-    row.className='song-row'+(isOwned?' owned':'');
+    row.className='song-row'+(isOwned?' owned':'')+(isPlaying?' playing':'');
     row.innerHTML=`<div class="song-check"><svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="song-swatch" style="background:${genreColor(song.genre)}"><span class="sw-num">${String(idx+1).padStart(2,'0')}</span><span class="sw-play">▶</span></div>
+      <div class="song-swatch${hasAudio?'':' no-audio'}" style="background:${genreColor(song.genre)}" title="${hasAudio?'play preview':'no audio file found'}"><span class="sw-num">${String(idx+1).padStart(2,'0')}</span><span class="sw-play">${isPlaying&&!audioEl.paused?'⏸':'▶'}</span></div>
       <div class="song-info"><div class="song-name">${song.name}</div><div class="song-meta">${song.genre}</div></div>
       <div class="song-genre">${song.genre}</div>
       <div class="how-tag${song.how==='secret'?' secret':song.how==='special'?' special':''}">${song.how==='secret'?'🔒 secret':song.how==='special'?'🎂 special':'📻 request'}</div>`;
-    row.onclick=()=>toggle(idx);list.appendChild(row);
+    row.onclick=()=>toggle(idx);
+    if(hasAudio){
+      row.querySelector('.song-swatch').onclick=(e)=>{e.stopPropagation();playSong(idx);};
+    }
+    list.appendChild(row);
   });
   list.style.display=visible?'flex':'none';emptyMsg.style.display=visible?'none':'block';
 }
