@@ -131,6 +131,25 @@ footer{text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.65re
   .stab{padding:0.6rem 1.1rem;min-height:38px;display:inline-flex;align-items:center;}
   .primary-tab-btn{padding:0.7rem 1.2rem 0.75rem;min-height:40px;}
 }
+/* 100% completion celebration */
+.confetti-piece{position:fixed;top:-20px;z-index:9999;pointer-events:none;border-radius:2px;
+  animation:confettiFall linear forwards;}
+@keyframes confettiFall{
+  0%{transform:translateY(0) rotate(0deg);opacity:1;}
+  85%{opacity:1;}
+  100%{transform:translateY(110vh) rotate(540deg);opacity:0;}
+}
+.complete-toast{
+  position:fixed;top:1.3rem;left:50%;transform:translateX(-50%) translateY(-30px);
+  z-index:10000;background:var(--ink);color:#fff;
+  border-radius:14px;padding:0.9rem 1.4rem;box-shadow:0 10px 30px -6px rgba(0,0,0,0.35);
+  display:flex;align-items:center;gap:0.7rem;max-width:90vw;
+  opacity:0;transition:opacity 0.35s ease,transform 0.35s ease;
+}
+.complete-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.complete-toast-emoji{font-size:1.4rem;flex-shrink:0;}
+.complete-toast-text{font-family:'JetBrains Mono',monospace;font-size:0.78rem;line-height:1.4;}
+.complete-toast-text strong{color:var(--accent-lt);}
 </style>
 </head>
 <body>
@@ -731,6 +750,38 @@ function renderSection(key,pfx){
   el.innerHTML=html;
 }
 
+// ── 100% COMPLETION CELEBRATION ────────────────────────────────────────────
+const CONFETTI_COLORS=['#ff5a5f','#4c8dff','#ffc93c','#2fbf71'];
+function fireConfetti(){
+  const count=42;
+  for(let i=0;i<count;i++){
+    const p=document.createElement('div');
+    p.className='confetti-piece';
+    const size=5+Math.random()*5;
+    p.style.width=size+'px';
+    p.style.height=size+'px';
+    p.style.left=Math.random()*100+'vw';
+    p.style.background=CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)];
+    const duration=2.2+Math.random()*1.3;
+    p.style.animationDuration=duration+'s';
+    p.style.animationDelay=(Math.random()*0.3)+'s';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),(duration+0.3)*1000+200);
+  }
+}
+function celebrate(label){
+  fireConfetti();
+  const toast=document.createElement('div');
+  toast.className='complete-toast';
+  toast.innerHTML=`<span class="complete-toast-emoji">🎉</span><span class="complete-toast-text"><strong>${label} complete!</strong><br>every recipe obtained, nice work.</span>`;
+  document.body.appendChild(toast);
+  requestAnimationFrame(()=>toast.classList.add('show'));
+  setTimeout(()=>{
+    toast.classList.remove('show');
+    setTimeout(()=>toast.remove(),400);
+  },3800);
+}
+
 function toggle(key,pfx,idx){
   const arr=obtained[key];
   const pos=arr.indexOf(idx);
@@ -738,6 +789,8 @@ function toggle(key,pfx,idx){
   saveData();
   renderSection(key,pfx);
   updateNavCounts();
+  const SECS=pfx==='f'?FOOD_SECTIONS:CRAFT_SECTIONS;
+  if(pos<0 && arr.length===SECS[key].data.length) celebrate(SECS[key].label);
 }
 
 function setSearch(key,pfx,val){

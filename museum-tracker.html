@@ -47,10 +47,10 @@
   .museum-bar .mb-tally{color:var(--brass-lt);opacity:0.85;}
   .museum-bar .mb-tally strong{color:#fff;font-weight:600;}
 
-  /* catalogued stamp ribbon, shown on any collected/done specimen card */
+  /* cataloged stamp ribbon, shown on any collected/done specimen card */
   .ct-card,.item-card{position:relative;overflow:hidden;}
   .ct-card.done::after,.item-card.collected::after{
-    content:'catalogued';
+    content:'cataloged';
     position:absolute;top:9px;right:-30px;z-index:1;
     background:var(--moss);color:#fff;
     font-family:'JetBrains Mono',monospace;font-size:0.5rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
@@ -58,6 +58,26 @@
     box-shadow:0 1px 3px rgba(0,0,0,0.18);
     pointer-events:none;
   }
+
+  /* 100% completion celebration */
+  .confetti-piece{position:fixed;top:-20px;z-index:9999;pointer-events:none;border-radius:2px;
+    animation:confettiFall linear forwards;}
+  @keyframes confettiFall{
+    0%{transform:translateY(0) rotate(0deg);opacity:1;}
+    85%{opacity:1;}
+    100%{transform:translateY(110vh) rotate(540deg);opacity:0;}
+  }
+  .complete-toast{
+    position:fixed;top:1.3rem;left:50%;transform:translateX(-50%) translateY(-30px);
+    z-index:10000;background:var(--ink);color:#fff;
+    border-radius:14px;padding:0.9rem 1.4rem;box-shadow:0 10px 30px -6px rgba(0,0,0,0.35);
+    display:flex;align-items:center;gap:0.7rem;max-width:90vw;
+    opacity:0;transition:opacity 0.35s ease,transform 0.35s ease;
+  }
+  .complete-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .complete-toast-emoji{font-size:1.4rem;flex-shrink:0;}
+  .complete-toast-text{font-family:'JetBrains Mono',monospace;font-size:0.78rem;line-height:1.4;}
+  .complete-toast-text strong{color:var(--brass-lt);}
   .primary-tab-nav{display:flex;gap:0.4rem;margin-top:1.2rem;}
   .primary-tab-btn{font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;
     color:var(--ink-dim);background:var(--bg2);border:none;border-radius:99px 99px 0 0;
@@ -277,8 +297,8 @@
       <div class="legend-desc"><strong>catchable right now</strong> — active at your current time of day based on your device clock.</div>
     </div>
     <div class="legend-row">
-      <div class="legend-swatch"><span style="display:inline-block;background:var(--moss);color:#fff;font-family:'JetBrains Mono',monospace;font-size:0.46rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;border-radius:3px;padding:0.1rem 0.4rem;transform:rotate(-8deg);">catalogued</span></div>
-      <div class="legend-desc"><strong>catalogued stamp</strong> — the little ribbon across a card means it's checked off and donated to Blathers.</div>
+      <div class="legend-swatch"><span style="display:inline-block;background:var(--moss);color:#fff;font-family:'JetBrains Mono',monospace;font-size:0.46rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;border-radius:3px;padding:0.1rem 0.4rem;transform:rotate(-8deg);">cataloged</span></div>
+      <div class="legend-desc"><strong>cataloged stamp</strong> — the little ribbon across a card means it's checked off and donated to Blathers.</div>
     </div>
 
     <hr class="legend-divider"/>
@@ -437,7 +457,7 @@ function updateMuseumTally(){
     total+=sec.total;
   });
   const pct=total?Math.round(done/total*100):0;
-  document.getElementById('mbTally').innerHTML=`<strong>${done}</strong> / ${total} specimens catalogued &nbsp;·&nbsp; ${pct}%`;
+  document.getElementById('mbTally').innerHTML=`<strong>${done}</strong> / ${total} specimens cataloged &nbsp;·&nbsp; ${pct}%`;
 }
 
 // ── THIS MONTH ──────────────────────────────────────────────────────────────
@@ -550,12 +570,46 @@ function toggleCaught(sec){
   renderMonth();
 }
 
+// ── 100% COMPLETION CELEBRATION ────────────────────────────────────────────
+const CONFETTI_COLORS=['#ff5a5f','#4c8dff','#ffc93c','#2fbf71','#a97142'];
+function fireConfetti(){
+  const count=42;
+  for(let i=0;i<count;i++){
+    const p=document.createElement('div');
+    p.className='confetti-piece';
+    const size=5+Math.random()*5;
+    p.style.width=size+'px';
+    p.style.height=size+'px';
+    p.style.left=Math.random()*100+'vw';
+    p.style.background=CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)];
+    const duration=2.2+Math.random()*1.3;
+    p.style.animationDuration=duration+'s';
+    p.style.animationDelay=(Math.random()*0.3)+'s';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),(duration+0.3)*1000+200);
+  }
+}
+function celebrate(sectionKey){
+  const sec=SECTIONS[sectionKey];
+  fireConfetti();
+  const toast=document.createElement('div');
+  toast.className='complete-toast';
+  toast.innerHTML=`<span class="complete-toast-emoji">🎉</span><span class="complete-toast-text"><strong>${sec.label} complete!</strong><br>all ${sec.total} cataloged, nice work.</span>`;
+  document.body.appendChild(toast);
+  requestAnimationFrame(()=>toast.classList.add('show'));
+  setTimeout(()=>{
+    toast.classList.remove('show');
+    setTimeout(()=>toast.remove(),400);
+  },3800);
+}
+
 function toggleCritter(sec,idx){
   const arr=collected[sec];
   const pos=arr.indexOf(idx);
   if(pos>=0) arr.splice(pos,1); else arr.push(idx);
   saveData();
   render();
+  if(pos<0 && arr.length===SECTIONS[sec].total) celebrate(sec);
 }
 
 // ── COLLECTION ───────────────────────────────────────────────────────────────
@@ -696,6 +750,7 @@ function toggleItem(key,idx){
   if(pos>=0) arr.splice(pos,1); else arr.push(idx);
   saveData();
   render();
+  if(pos<0 && arr.length===SECTIONS[key].total) celebrate(key);
 }
 
 function setTab(key){
