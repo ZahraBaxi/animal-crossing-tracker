@@ -249,10 +249,11 @@ body::before{
 .tool-grid{
   margin:1.1rem 1.5rem 1.5rem;display:grid;
   grid-template-columns:repeat(2,1fr);
-  grid-template-rows:repeat(2,1fr);
+  grid-auto-rows:minmax(100px,1fr);
   gap:0.8rem;
-  overflow:hidden;flex:1;min-height:0;
+  overflow-y:auto;flex:1;min-height:0;
 }
+.tool-grid .tool-card:nth-child(5){grid-column:1/-1;}
 
 /* Cards with big index number, cycling accent color per card */
 .tool-card{
@@ -271,6 +272,7 @@ body::before{
 .tool-card:nth-child(4n+2){--accent:var(--sky);}
 .tool-card:nth-child(4n+3){--accent:var(--sun);}
 .tool-card:nth-child(4n+4){--accent:var(--leaf);}
+.tool-card:nth-child(5){--accent:#c2603d;}
 .tool-card:hover{background:var(--surface);border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 20px -6px color-mix(in srgb, var(--accent) 35%, transparent);}
 .tool-card.card-complete{border:2px solid #a97142;background:linear-gradient(135deg, rgba(255,201,60,0.1), rgba(169,113,66,0.06));}
 .tool-card.card-complete:hover{border-color:#a97142;box-shadow:0 8px 20px -6px rgba(169,113,66,0.35);}
@@ -316,6 +318,7 @@ body::before{
 .tool-card:nth-child(2){animation-delay:.12s;}
 .tool-card:nth-child(3){animation-delay:.19s;}
 .tool-card:nth-child(4){animation-delay:.26s;}
+.tool-card:nth-child(5){animation-delay:.33s;}
 
 /* ── FOOTER ── */
 footer{
@@ -584,6 +587,17 @@ const TOOLS=[
         const all=r.get('obtained')||{};let done=0;
         Object.values(all).forEach(arr=>{done+=arr.length;});
         return{done,total:450};
+      }catch{return null;}
+    }},
+  {href:'gyroids.html',tag:'collection',emoji:'🏺',title:'gyroid dex',
+    desc:'Track which of the 36 gyroids you\'ve unearthed. Color options shown for reference, no need to collect every one.',
+    pills:['36 gyroids','dig log','color reference'],
+    progress:async()=>{
+      const u=Parse.User.current();if(!u)return null;
+      try{
+        const q=new Parse.Query('GyroidData');q.equalTo('user',u);const r=await q.first();
+        if(!r)return{done:0,total:36};
+        return{done:(r.get('obtained')||[]).length,total:36};
       }catch{return null;}
     }},
 ];

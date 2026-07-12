@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>gyroid dex · collection tracker</title>
+<link rel="icon" type="image/jpeg" href="images/favicon/favicon.jpg">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+<script>
+  Parse.initialize("G9QH61WfFxbMqM8pfxMTlkBQDkDkHornk0MRX6Zb", "9oUG5sdMcxYQwTe5XqdNDw8gXmyLmwsN3v3vUom2");
+  Parse.serverURL = "https://parseapi.back4app.com/";
+</script>
+<style>
+  :root{--bg:#faf6ec;--bg2:#f3ecdc;--surface:#ffffff;--border:#17161a;--border-lt:#e4dcc8;
+    --coral:#ff5a5f;--leaf:#2fbf71;--sun:#ffc93c;--sky:#4c8dff;--sky-lt:#79aaff;
+    --clay:#c2603d;--clay-lt:#e08a63;--clay-dk:#7a3d24;
+    --accent:var(--clay);--accent-lt:var(--clay-lt);
+    --rust:var(--accent);--rust-lt:var(--accent-lt);--moss:var(--leaf);--wheat:var(--coral);
+    --dusk:#83848c;--ink:#16161a;--ink-mid:#4c4d54;--ink-dim:#83848c;--ink-ghost:#b3ac9a;
+    --done-bg:#e4f7ec;--done-tx:#1c8c52;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}html{font-size:15px;}
+  body{font-family:'JetBrains Mono',monospace;font-weight:300;background:var(--bg);color:var(--ink);min-height:100vh;padding:0.9rem 0.9rem 3rem;
+    overflow-x:hidden;
+    background-image:
+      linear-gradient(var(--border-lt) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-lt) 1px, transparent 1px);
+    background-size:28px 28px;}
+
+  header{padding:1.6rem 1.8rem 0;border:2px dashed var(--accent);border-radius:16px 16px 0 0;max-width:960px;margin:0 auto 0;background:var(--surface);}
+  .header-top{display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;padding-bottom:1.5rem;}
+  .gyro-icon{
+    width:44px;height:44px;flex-shrink:0;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:1.35rem;
+    background:color-mix(in srgb, var(--clay) 12%, var(--bg));
+    border:2px dashed var(--clay);
+    animation:potWobble 3.6s ease-in-out infinite;
+  }
+  @keyframes potWobble{0%,100%{transform:rotate(0deg);}25%{transform:rotate(-5deg);}75%{transform:rotate(5deg);}}
+  .header-titles{display:flex;flex-direction:column;gap:0.32rem;min-width:0;}
+  .site-title{font-family:'JetBrains Mono',monospace;font-weight:500;font-size:1.05rem;color:var(--ink);}
+  .site-title span{color:var(--accent);font-size:0.9rem;}
+  .site-meta{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--ink-dim);letter-spacing:0.04em;text-transform:uppercase;display:flex;align-items:center;gap:0.55rem;flex-wrap:wrap;}
+  .rank-badge{display:inline-flex;align-items:center;gap:0.35rem;background:var(--clay-dk);color:#f0d9c8;border-radius:99px;padding:0.18rem 0.65rem;font-size:0.56rem;letter-spacing:0.06em;}
+  .nav-links{margin-left:auto;display:flex;gap:1rem;align-items:center;}
+  .back-link{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--ink-dim);text-decoration:none;letter-spacing:0.04em;border-bottom:2px dashed var(--border-lt);transition:color 0.15s;display:inline-block;padding:0.5rem 0.2rem;margin:-0.5rem -0.2rem;}
+  .back-link:hover{color:var(--accent);border-color:var(--accent);}
+  .user-chip{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--ink-dim);}
+
+  .dig-card{
+    display:flex;align-items:center;gap:1.1rem;
+    border:2px dashed var(--clay);border-radius:16px;
+    padding:1rem 1.3rem;margin-top:1.1rem;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 1px, transparent 1px, transparent 4px),
+      rgba(194,96,61,0.08);
+  }
+  .dig-icon{
+    width:46px;height:46px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:1.35rem;
+    background:color-mix(in srgb, var(--clay) 14%, var(--bg));
+    border:2px solid var(--clay);
+  }
+  .dig-info{flex:1;min-width:0;}
+  .dig-title{font-family:'JetBrains Mono',monospace;font-size:0.85rem;font-weight:600;color:var(--ink);}
+  .dig-card .progress-row{display:flex;align-items:center;gap:1rem;margin-top:0.55rem;}
+  .dig-card .prog-track{flex:1;height:8px;background:var(--border-lt);border-radius:99px;overflow:hidden;}
+  .dig-card .prog-fill{height:100%;background:var(--clay);border-radius:99px;transition:width 0.4s ease;}
+  .dig-card .prog-label{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--ink-dim);white-space:nowrap;}
+  .dig-card .prog-label strong{color:var(--clay);font-weight:600;}
+
+  .spotlight-bar{
+    margin-top:0.8rem;border:2px dashed var(--sun);border-radius:10px;
+    background:rgba(255,201,60,0.1);
+    display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;
+    padding:0.5rem 0.9rem;font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:var(--ink-mid);
+  }
+  .spotlight-bar.hidden{display:none;}
+  .spotlight-flash{font-size:0.85rem;flex-shrink:0;animation:spotlightPulse 1.6s ease-in-out infinite;}
+  @keyframes spotlightPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.6;transform:scale(0.92);}}
+  .spotlight-label{font-weight:500;letter-spacing:0.05em;text-transform:uppercase;font-size:0.56rem;color:#9a7810;flex-shrink:0;}
+  .spotlight-name{color:var(--ink);font-weight:500;}
+
+  .dig-hint{font-size:0.6rem;color:var(--ink-dim);line-height:1.5;margin-top:0.5rem;}
+
+  .wrap{max-width:960px;margin:0 auto;padding:1.7rem 1.8rem;border:2px dashed var(--border-lt);border-top:none;border-radius:0 0 16px 16px;background:var(--surface);}
+
+  .controls-row{display:flex;gap:0.7rem;margin-bottom:1.2rem;flex-wrap:wrap;}
+  .search-wrap{flex:1 1 200px;display:flex;align-items:center;border:2px solid var(--border-lt);border-radius:99px;background:var(--bg);overflow:hidden;transition:border-color 0.15s;}
+  .search-wrap:focus-within{border-color:var(--accent);}
+  .search-wrap input{font-family:'JetBrains Mono',monospace;font-size:16px;border:none;background:transparent;color:var(--ink);padding:0.55rem 0.9rem;outline:none;width:100%;}
+  .search-wrap input::placeholder{color:var(--ink-dim);}
+  .filter-btn{font-family:'JetBrains Mono',monospace;font-size:0.68rem;font-weight:500;letter-spacing:0.05em;padding:0.5rem 0.95rem;border:2px solid var(--border-lt);border-radius:99px;background:var(--bg);color:var(--ink-dim);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+  .filter-btn:hover{background:var(--bg2);color:var(--ink);border-color:var(--dusk);}
+  .filter-btn.active{color:#fff;border-color:var(--accent);background:var(--accent);}
+
+  .gyro-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:0.7rem;}
+  .gyro-card{background:var(--surface);border:2px solid var(--border-lt);border-radius:14px;padding:0.95rem 1.05rem;cursor:pointer;transition:all 0.12s;position:relative;overflow:hidden;}
+  .gyro-card:hover{border-color:var(--accent);background:var(--bg2);}
+  .gyro-card.done{background:var(--done-bg);border-color:var(--leaf);}
+  .gyro-card.done:hover{background:#d3f0e0;}
+  .gyro-card.done::after{
+    content:'unearthed';
+    position:absolute;top:9px;right:-30px;z-index:1;
+    background:var(--moss);color:#fff;
+    font-family:'JetBrains Mono',monospace;font-size:0.5rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+    padding:0.18rem 2.1rem;transform:rotate(38deg);
+    box-shadow:0 1px 3px rgba(0,0,0,0.18);
+    pointer-events:none;
+  }
+  .gyro-top{display:flex;align-items:flex-start;gap:0.75rem;}
+  .gyro-check{width:26px;height:26px;border:2px solid var(--border-lt);border-radius:7px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:background 0.12s,border-color 0.12s;}
+  .done .gyro-check{background:var(--moss);border-color:var(--moss);}
+  .gyro-check svg{display:none;width:14px;height:11px;}.done .gyro-check svg{display:block;}
+  .gyro-name{font-weight:500;color:var(--ink);font-size:0.9rem;line-height:1.35;}
+  .done .gyro-name{color:var(--done-tx);}
+  .gyro-colors{margin-top:0.65rem;padding-left:2.55rem;display:flex;flex-wrap:wrap;gap:0.35rem;}
+  .color-chip{display:inline-flex;align-items:center;gap:0.3rem;font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--ink-dim);
+    background:var(--bg2);border:1.5px solid var(--border-lt);border-radius:99px;padding:0.16rem 0.5rem 0.16rem 0.32rem;cursor:pointer;transition:all 0.12s;}
+  .color-chip:hover{border-color:var(--accent);color:var(--ink-mid);}
+  .color-chip.picked{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500;}
+  .color-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;border:1px solid rgba(0,0,0,0.15);}
+  .color-chip-plain{padding-left:0.5rem;}
+  .gyro-note{margin-top:0.65rem;padding-left:2.55rem;font-size:0.62rem;color:var(--ink-dim);line-height:1.5;}
+
+  /* 100% completion celebration */
+  .confetti-piece{position:fixed;top:-20px;z-index:9999;pointer-events:none;border-radius:2px;
+    animation:confettiFall linear forwards;}
+  @keyframes confettiFall{
+    0%{transform:translateY(0) rotate(0deg);opacity:1;}
+    85%{opacity:1;}
+    100%{transform:translateY(110vh) rotate(540deg);opacity:0;}
+  }
+  .complete-toast{
+    position:fixed;top:1.3rem;left:50%;transform:translateX(-50%) translateY(-30px);
+    z-index:10000;background:var(--ink);color:#fff;
+    border-radius:14px;padding:0.9rem 1.4rem;box-shadow:0 10px 30px -6px rgba(0,0,0,0.35);
+    display:flex;align-items:center;gap:0.7rem;max-width:90vw;
+    opacity:0;transition:opacity 0.35s ease,transform 0.35s ease;
+  }
+  .complete-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .complete-toast-emoji{font-size:1.4rem;flex-shrink:0;}
+  .complete-toast-text{font-family:'JetBrains Mono',monospace;font-size:0.78rem;line-height:1.4;}
+  .complete-toast-text strong{color:var(--clay-lt);}
+
+  footer{max-width:960px;margin:1.5rem auto 0;text-align:center;font-size:0.58rem;color:var(--ink-ghost);letter-spacing:0.05em;}
+
+  @media(max-width:600px){
+    header{padding:1.3rem 1.1rem 0;}.wrap{padding:1.2rem 1.1rem;}
+    .gyro-icon{width:36px;height:36px;font-size:1.1rem;}
+    .dig-card{padding:0.85rem 1.05rem;gap:0.85rem;margin-top:1rem;}
+    .dig-icon{width:38px;height:38px;font-size:1.1rem;}
+    .spotlight-bar{font-size:0.6rem;padding:0.5rem 0.8rem;}
+    .gyro-grid{grid-template-columns:1fr;}
+    .gyro-check{width:28px;height:28px;}
+    .gyro-check svg{width:15px;height:12px;}
+    .gyro-colors,.gyro-note{padding-left:2.7rem;}
+    .filter-btn{padding:0.6rem 1rem;min-height:38px;display:inline-flex;align-items:center;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-top">
+    <div class="gyro-icon">🏺</div>
+    <div class="header-titles">
+      <div class="site-title">gyroid <span>/ dex tracker</span></div>
+      <div class="site-meta">
+        <span class="rank-badge" id="rankBadge">⛏️ novice digger</span>
+        animal crossing · nh
+      </div>
+    </div>
+    <div class="nav-links">
+      <span class="user-chip" id="userChip"></span>
+      <a class="back-link" href="index.html">← home</a>
+    </div>
+  </div>
+  <div class="dig-card">
+    <div class="dig-icon">⛏️</div>
+    <div class="dig-info">
+      <div class="dig-title">dig log</div>
+      <div class="progress-row"><div class="prog-track"><div class="prog-fill" id="digFill" style="width:0%"></div></div><div class="prog-label" id="digTally"></div></div>
+      <div class="dig-hint">keep track of the gyroids you've found. colors can be changed anytime at a customization kiosk. tap a color chip on any card to note which one you have</div>
+    </div>
+  </div>
+  <div class="spotlight-bar hidden" id="spotlightBar">
+    <span class="spotlight-flash">🔦</span>
+    <span class="spotlight-label">still missing</span>
+    <span class="spotlight-name" id="spotlightName"></span>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="controls-row">
+    <div class="search-wrap"><input type="text" id="searchInput" placeholder="search gyroids…" oninput="onSearch()"/></div>
+    <button class="filter-btn active" id="filter-all" onclick="setFilter('all')">all</button>
+    <button class="filter-btn" id="filter-missing" onclick="setFilter('missing')">missing</button>
+    <button class="filter-btn" id="filter-found" onclick="setFilter('found')">found</button>
+  </div>
+  <div class="gyro-grid" id="gyroGrid"></div>
+</div>
+
+<footer>made for animal crossing: new horizons &nbsp;·&nbsp; data from the GyroiDex</footer>
+
+<script>
+const SVG_CHECK='<svg width="12" height="9" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+const COLOR_HEX={
+  Silver:'#c0c0c0',Copper:'#b87333',Blue:'#4c8dff',Black:'#2a2a2a',
+  Yellow:'#ffc93c',Brown:'#8b5a2b',Green:'#2fbf71',Pink:'#ff8fa3',
+  Purple:'#9b6dd6',White:'#f7f5ef',Orange:'#ff8c42',Beige:'#d9c8a9',
+  Gray:'#9a9a9a',Red:'#ff5a5f',Gold:'#d4af37',Camel:'#c19a6b',
+  Wood:'#a0714f','Light Brown':'#b08968','Light Green':'#8fd19e',
+};
+
+// ── DATA ────────────────────────────────────────────────────────────────────
+// Source: GyroiDex list. Colors/variants are reference info only, the
+// collection goal is one of each named gyroid, not every color.
+const GYROIDS=[
+  {n:'Alumnoid',variants:['Silver','Copper','Blue','Black']},
+  {n:'Arfoid',variants:['Yellow','Brown','Green','Pink','Blue']},
+  {n:'Babbloid',variants:['Blue','Pink','Green','Purple','Brown','White']},
+  {n:'Bendoid',variants:['Orange','Beige','Green','Brown','Blue','Gray']},
+  {n:'Bloopoid',variants:['Blue','Red','Green','Purple']},
+  {n:'Boioingoid',variants:['Orange','Green','Blue','Purple','Black','Wood']},
+  {n:'Boomoid',variants:['Brown','Camel','Green','Blue','Purple','Black']},
+  {n:'Brewstoid',variants:[],note:'Only available through getting coffee from Brewster for 50+ days.'},
+  {n:'Bubbloid',variants:['Brown','Green','Pink','Purple','White']},
+  {n:'Bwongoid',variants:['Brown','Yellow','Green','Blue']},
+  {n:'Clatteroid',variants:['Pop','Natural','Cool','Cute','Chic']},
+  {n:'Crumploid',variants:['Yellow','Brown','Blue','Red','Green','Black']},
+  {n:'Dootoid',variants:['Gray','Brown','Green','Pink','Blue','White','Black']},
+  {n:'Drummoid',variants:['Blue','Green','Brown','Purple','Gray']},
+  {n:'Flutteroid',variants:['Orange','Yellow','Green','Pink','Purple']},
+  {n:'Jingloid',variants:['Purple','Gold','Pink','Silver','Blue']},
+  {n:'Laseroid',variants:['Green','Yellow','Pink','Blue','Silver']},
+  {n:'Oinkoid',variants:['Beige','Brown','Yellow','Blue','Pink','Black']},
+  {n:'Petaloid',variants:['Green','Brown','Yellow','Blue','Pink','Purple','White']},
+  {n:'Rattloid',variants:['Red','Brown','White','Blue','Green','Black']},
+  {n:'Ringoid',variants:['Red','Yellow','Green','Blue','Purple','White']},
+  {n:'Rumbloid',variants:['Purple','Yellow','Green','Pink','Blue','White','Gray']},
+  {n:'Scatteroid',variants:['Light Brown','Brown','Green','Pink','White']},
+  {n:'Spikenoid',variants:['Green','Orange','Brown','Light Green','Blue','Camel','Gray']},
+  {n:'Sproingoid',variants:['Camel','Green','Red','Blue']},
+  {n:'Squeakoid',variants:['Yellow','White','Brown','Pink','Blue']},
+  {n:'Squeezoid',variants:['Beige','Yellow','Pink','Blue','White','Black']},
+  {n:'Stelloid',variants:['Green','Yellow','Blue','White','Black']},
+  {n:'Thwopoid',variants:['Pink','Beige','Green','Gray']},
+  {n:'Tockoid',variants:['Pop','Natural','Cool','Cute','Chic']},
+  {n:'Tremoloid',variants:['Blue','Yellow','Green','Purple','White']},
+  {n:'Twangoid',variants:['Brown','Yellow','Green','Blue','Black']},
+  {n:'Wallopoid',variants:['Camel','Brown','Green','Blue','White','Black']},
+  {n:'Whirroid',variants:['Blue','Red','Gold','Silver']},
+  {n:'Whistloid',variants:['Blue','Brown','Yellow','Green','Pink','White']},
+  {n:'Xylophoid',variants:['Yellow','Blue','Pink','White','Brown']},
+];
+const TOTAL=GYROIDS.length;
+
+let obtained=[];
+let colorPick={};
+let parseObj=null;
+let searchQ='';
+let filter='all';
+let spotlightPick=null;
+
+function colorChipHtml(name,c){
+  const picked=colorPick[name]===c;
+  const hex=COLOR_HEX[c];
+  const dot=hex?`<span class="color-dot" style="background:${hex}"></span>`:'';
+  return `<span class="color-chip${picked?' picked':''}${hex?'':' color-chip-plain'}" onclick="pickColor(event,'${name}','${c}')">${dot}${c}</span>`;
+}
+
+function pickColor(ev,name,c){
+  ev.stopPropagation();
+  colorPick[name]=(colorPick[name]===c)?null:c;
+  saveData();
+  renderGrid();
+}
+
+function toggleGyroid(name){
+  const pos=obtained.indexOf(name);
+  if(pos>=0)obtained.splice(pos,1);else obtained.push(name);
+  saveData();
+  render();
+  if(pos<0 && obtained.length===TOTAL) celebrate();
+}
+
+function onSearch(){searchQ=document.getElementById('searchInput').value.toLowerCase();renderGrid();}
+function setFilter(f){
+  filter=f;
+  ['all','missing','found'].forEach(x=>document.getElementById('filter-'+x).classList.toggle('active',x===f));
+  renderGrid();
+}
+
+function render(){
+  updateDigLog();
+  updateSpotlight();
+  renderGrid();
+}
+
+function updateDigLog(){
+  const done=obtained.length;
+  const pct=Math.round(done/TOTAL*100);
+  document.getElementById('digFill').style.width=pct+'%';
+  document.getElementById('digTally').innerHTML=`<strong>${done}</strong> / ${TOTAL} gyroids &nbsp;·&nbsp; ${pct}%`;
+  document.getElementById('rankBadge').textContent=getRank(pct);
+}
+
+function getRank(pct){
+  if(pct>=100)return '🏆 gyroid grandmaster';
+  if(pct>=75)return '⛏️ master archaeologist';
+  if(pct>=50)return '⛏️ expert digger';
+  if(pct>=25)return '⛏️ seasoned digger';
+  if(pct>0)return '⛏️ apprentice digger';
+  return '⛏️ novice digger';
+}
+
+function updateSpotlight(){
+  const pool=GYROIDS.filter(g=>!obtained.includes(g.n));
+  const bar=document.getElementById('spotlightBar');
+  if(!pool.length){spotlightPick=null;bar.classList.add('hidden');return;}
+  if(!spotlightPick||obtained.includes(spotlightPick.n)||!pool.includes(spotlightPick)){
+    spotlightPick=pool[Math.floor(Math.random()*pool.length)];
+  }
+  bar.classList.remove('hidden');
+  document.getElementById('spotlightName').innerHTML=`🏺 <strong>${spotlightPick.n}</strong> hasn't turned up yet`;
+}
+
+function renderGrid(){
+  let rows=GYROIDS.filter(g=>g.n.toLowerCase().includes(searchQ));
+  if(filter==='missing')rows=rows.filter(g=>!obtained.includes(g.n));
+  if(filter==='found')rows=rows.filter(g=>obtained.includes(g.n));
+
+  const grid=document.getElementById('gyroGrid');
+  if(!rows.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--ink-dim);font-size:0.75rem;">no gyroids match</div>';
+    return;
+  }
+  grid.innerHTML=rows.map(g=>{
+    const isDone=obtained.includes(g.n);
+    const body=g.variants.length
+      ? `<div class="gyro-colors">${g.variants.map(c=>colorChipHtml(g.n,c)).join('')}</div>`
+      : `<div class="gyro-note">${g.note||''}</div>`;
+    return `<div class="gyro-card${isDone?' done':''}" onclick="toggleGyroid('${g.n}')">
+      <div class="gyro-top">
+        <div class="gyro-check">${SVG_CHECK}</div>
+        <div class="gyro-name">${g.n}</div>
+      </div>
+      ${body}
+    </div>`;
+  }).join('');
+}
+
+// ── 100% COMPLETION CELEBRATION ────────────────────────────────────────────
+const CONFETTI_COLORS=['#ff5a5f','#4c8dff','#ffc93c','#2fbf71','#c2603d'];
+function fireConfetti(){
+  const count=42;
+  for(let i=0;i<count;i++){
+    const p=document.createElement('div');
+    p.className='confetti-piece';
+    const size=5+Math.random()*5;
+    p.style.width=size+'px';
+    p.style.height=size+'px';
+    p.style.left=Math.random()*100+'vw';
+    p.style.background=CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)];
+    const duration=2.2+Math.random()*1.3;
+    p.style.animationDuration=duration+'s';
+    p.style.animationDelay=(Math.random()*0.3)+'s';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),(duration+0.3)*1000+200);
+  }
+}
+function celebrate(){
+  fireConfetti();
+  const toast=document.createElement('div');
+  toast.className='complete-toast';
+  toast.innerHTML=`<span class="complete-toast-emoji">🎉</span><span class="complete-toast-text"><strong>GyroiDex complete!</strong><br>all ${TOTAL} gyroids unearthed, nice digging.</span>`;
+  document.body.appendChild(toast);
+  requestAnimationFrame(()=>toast.classList.add('show'));
+  setTimeout(()=>{
+    toast.classList.remove('show');
+    setTimeout(()=>toast.remove(),400);
+  },3800);
+}
+
+// ── DATA PERSISTENCE ────────────────────────────────────────────────────────
+async function loadData(){
+  const u=Parse.User.current();
+  try{
+    const q=new Parse.Query('GyroidData');q.equalTo('user',u);
+    parseObj=await q.first()||null;
+    if(parseObj){
+      obtained=parseObj.get('obtained')||[];
+      colorPick=parseObj.get('colorPick')||{};
+    }
+  }catch(e){console.error(e);}
+}
+
+async function saveData(){
+  const u=Parse.User.current();if(!u)return;
+  try{
+    if(!parseObj){
+      const GD=Parse.Object.extend('GyroidData');parseObj=new GD();
+      parseObj.set('user',u);
+      const acl=new Parse.ACL(u);parseObj.setACL(acl);
+    }
+    parseObj.set('obtained',obtained);
+    parseObj.set('colorPick',colorPick);
+    await parseObj.save();
+  }catch(e){console.error(e);}
+}
+
+(async()=>{
+  const u=Parse.User.current();
+  if(!u){window.location.href='index.html';return;}
+  document.getElementById('userChip').textContent=u.get('email')||u.get('username');
+  await loadData();
+  render();
+})();
+</script>
+</body>
+</html>

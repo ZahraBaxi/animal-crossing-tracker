@@ -28,24 +28,66 @@
       linear-gradient(90deg, var(--border-lt) 1px, transparent 1px);
     background-size:28px 28px;}
   header{padding:1.6rem 1.8rem 0;border:2px dashed var(--accent);border-radius:16px 16px 0 0;max-width:960px;margin:0 auto 0;background:var(--surface);}
-  .header-top{display:flex;align-items:baseline;gap:1.2rem;flex-wrap:wrap;padding-bottom:1.5rem;}
+  .header-top{display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;padding-bottom:1.5rem;}
+  .museum-icon{
+    width:44px;height:44px;flex-shrink:0;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:1.35rem;
+    background:color-mix(in srgb, var(--brass) 12%, var(--bg));
+    border:2px dashed var(--brass);
+    animation:owlBob 3.4s ease-in-out infinite;
+  }
+  @keyframes owlBob{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-3px) rotate(4deg);}}
+  .header-titles{display:flex;flex-direction:column;gap:0.32rem;min-width:0;}
   .site-title{font-family:'JetBrains Mono',monospace;font-weight:500;font-size:1.05rem;color:var(--ink);}
   .site-title span{color:var(--accent);font-size:0.9rem;}
-  .site-meta{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--ink-dim);letter-spacing:0.04em;text-transform:uppercase;}
+  .site-meta{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--ink-dim);letter-spacing:0.04em;text-transform:uppercase;display:flex;align-items:center;gap:0.55rem;flex-wrap:wrap;}
+  .museum-open{display:inline-flex;align-items:center;gap:0.35rem;background:var(--brass-dk);color:var(--brass-lt);border-radius:99px;padding:0.18rem 0.65rem 0.18rem 0.55rem;font-size:0.56rem;letter-spacing:0.06em;}
+  .open-dot{width:5px;height:5px;border-radius:50%;background:#5cd492;flex-shrink:0;animation:openBlink 2.2s infinite;}
+  @keyframes openBlink{0%,60%{opacity:1;}80%{opacity:0.3;}100%{opacity:1;}}
+  .museum-open.napping{background:#3a3550;color:#b8b0d8;}
+  .museum-open.napping .open-dot{background:#8f7fd4;animation:none;opacity:0.6;}
+  .museum-icon.napping{animation:owlNap 3s ease-in-out infinite;filter:saturate(0.6);}
+  @keyframes owlNap{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(1px) rotate(-2deg);}}
   .nav-links{margin-left:auto;display:flex;gap:1rem;align-items:center;}
   .back-link{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--ink-dim);text-decoration:none;letter-spacing:0.04em;border-bottom:2px dashed var(--border-lt);transition:color 0.15s;display:inline-block;padding:0.5rem 0.2rem;margin:-0.5rem -0.2rem;}
   .back-link:hover{color:var(--accent);border-color:var(--accent);}
   .user-chip{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--ink-dim);}
 
   /* museum plaque bar */
-  .museum-bar{
-    margin-top:1.1rem;background:var(--brass-dk);color:var(--brass-lt);border-radius:10px;
-    display:flex;align-items:center;justify-content:space-between;gap:0.8rem;flex-wrap:wrap;
-    padding:0.55rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:500;
+  .journal-card{
+    display:flex;align-items:center;gap:1.1rem;
+    border:2px dashed var(--brass);border-radius:16px;
+    padding:1rem 1.3rem;margin-top:1.1rem;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 1px, transparent 1px, transparent 4px),
+      rgba(169,113,66,0.08);
   }
-  .museum-bar .mb-badge{background:var(--brass);color:#fff;border-radius:5px;padding:0.16rem 0.55rem;font-weight:700;margin-right:0.55rem;letter-spacing:0.03em;}
-  .museum-bar .mb-tally{color:var(--brass-lt);opacity:0.85;}
-  .museum-bar .mb-tally strong{color:#fff;font-weight:600;}
+  .journal-icon{
+    width:46px;height:46px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:1.35rem;
+    background:color-mix(in srgb, var(--brass) 14%, var(--bg));
+    border:2px solid var(--brass);
+  }
+  .journal-info{flex:1;min-width:0;}
+  .journal-title{font-family:'JetBrains Mono',monospace;font-size:0.85rem;font-weight:600;color:var(--ink);}
+  .journal-card .progress-row{display:flex;align-items:center;gap:1rem;margin-top:0.55rem;}
+  .journal-card .prog-track{flex:1;height:8px;background:var(--border-lt);border-radius:99px;overflow:hidden;}
+  .journal-card .prog-fill{height:100%;background:var(--brass);border-radius:99px;transition:width 0.4s ease;}
+  .journal-card .prog-label{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--ink-dim);white-space:nowrap;}
+  .journal-card .prog-label strong{color:var(--brass);font-weight:600;}
+
+  /* spotlight ticker: rotating suggestion of something uncaught this month */
+  .spotlight-bar{
+    margin-top:0.8rem;border:2px dashed var(--sun);border-radius:10px;
+    background:rgba(255,201,60,0.1);
+    display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;
+    padding:0.5rem 0.9rem;font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:var(--ink-mid);
+  }
+  .spotlight-bar.hidden{display:none;}
+  .spotlight-flash{font-size:0.85rem;flex-shrink:0;animation:spotlightPulse 1.6s ease-in-out infinite;}
+  @keyframes spotlightPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.6;transform:scale(0.92);}}
+  .spotlight-label{font-weight:500;letter-spacing:0.05em;text-transform:uppercase;font-size:0.56rem;color:#9a7810;flex-shrink:0;}
+  .spotlight-name{color:var(--ink);font-weight:500;}
 
   /* cataloged stamp ribbon, shown on any collected/done specimen card */
   .ct-card,.item-card{position:relative;overflow:hidden;}
@@ -95,7 +137,7 @@
   .month-name{font-family:'JetBrains Mono',monospace;font-size:1.1rem;color:var(--accent);font-weight:500;}
   .month-summary{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--ink-dim);}
   .month-section{margin-bottom:2rem;}
-  .month-sec-header{display:flex;align-items:center;gap:0.6rem 0.8rem;margin-bottom:0.75rem;flex-wrap:wrap;}
+  .month-sec-header{display:flex;align-items:center;gap:0.8rem;margin-bottom:0.75rem;}
   .month-sec-title{font-family:'JetBrains Mono',monospace;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-mid);}
   .month-sec-badge{font-family:'JetBrains Mono',monospace;font-size:0.6rem;font-weight:500;background:var(--urgent-bg);color:var(--urgent-tx);border:1.5px dashed var(--sun);border-radius:99px;padding:0.12rem 0.6rem;}
   .month-sec-badge.all-done{background:var(--done-bg);color:var(--done-tx);border-color:var(--leaf);}
@@ -225,7 +267,10 @@
     .item-grid.art-grid{grid-template-columns:1fr;}
     .ct-grid{grid-template-columns:1fr;}
     header{padding:1.3rem 1.1rem 0;}.wrap{padding:1.2rem 1.1rem;}
-    .museum-bar{font-size:0.55rem;padding:0.5rem 0.8rem;}
+    .museum-icon{width:36px;height:36px;font-size:1.1rem;}
+    .journal-card{padding:0.85rem 1.05rem;gap:0.85rem;margin-top:1rem;}
+    .journal-icon{width:38px;height:38px;font-size:1.1rem;}
+    .spotlight-bar{font-size:0.6rem;padding:0.45rem 0.75rem;}
     .ct-check,.item-check{width:28px;height:28px;}
     .ct-check svg,.item-check svg{width:15px;height:12px;}
     .item-details,.mo-pills{padding-left:2.7rem;}
@@ -238,16 +283,30 @@
 <body>
 <header>
   <div class="header-top">
-    <div class="site-title">museum <span>/ collection tracker</span></div>
-    <div class="site-meta">animal crossing · nh</div>
+    <div class="museum-icon" id="museumIcon">🦉</div>
+    <div class="header-titles">
+      <div class="site-title">museum <span>/ collection tracker</span></div>
+      <div class="site-meta">
+        <span class="museum-open" id="museumStatus"><span class="open-dot"></span>&nbsp;</span>
+        animal crossing · nh
+      </div>
+    </div>
     <div class="nav-links">
       <span class="user-chip" id="userChip"></span>
       <a class="back-link" href="index.html">← home</a>
     </div>
   </div>
-  <div class="museum-bar">
-    <span><span class="mb-badge">est. blathers'</span>museum of natural history</span>
-    <span class="mb-tally" id="mbTally"></span>
+  <div class="journal-card">
+    <div class="journal-icon">📖</div>
+    <div class="journal-info">
+      <div class="journal-title">field journal</div>
+      <div class="progress-row"><div class="prog-track"><div class="prog-fill" id="mbFill" style="width:0%"></div></div><div class="prog-label" id="mbTally"></div></div>
+    </div>
+  </div>
+  <div class="spotlight-bar hidden" id="spotlightBar">
+    <span class="spotlight-flash">🔦</span>
+    <span class="spotlight-label">spotlight</span>
+    <span class="spotlight-name" id="spotlightName"></span>
   </div>
   <nav class="primary-tab-nav">
     <button class="primary-tab-btn active" id="ptab-month" onclick="setPrimaryTab('month')">
@@ -447,12 +506,55 @@ async function saveData(){
   }catch(e){console.error(e);}
 }
 
+// Blathers is an owl — nocturnal, so he naps through the day and is awake
+// at night. The museum building itself never closes, but he does doze off.
+// Rough daytime napping window used here: 6am to 6pm.
+function updateBlathersStatus(){
+  const hour=new Date().getHours();
+  const isAwake=hour<6||hour>=18;
+  const icon=document.getElementById('museumIcon');
+  const badge=document.getElementById('museumStatus');
+  if(!icon||!badge)return;
+  icon.textContent=isAwake?'🦉':'😴';
+  icon.classList.toggle('napping',!isAwake);
+  badge.classList.toggle('napping',!isAwake);
+  badge.innerHTML=`<span class="open-dot"></span>${isAwake?'blathers is awake':'blathers is napping'}`;
+}
+updateBlathersStatus();
+setInterval(updateBlathersStatus,60000);
+
 function render(){
   const now=new Date();
   document.getElementById('monthName').textContent=MONTH_NAMES[now.getMonth()];
   updateMuseumTally();
+  updateSpotlight();
   renderMonth();
   renderCollection();
+}
+
+const SPOTLIGHT_ICON={fish:'🐟',bugs:'🪲',sea:'🐚'};
+let spotlightPick=null;
+function updateSpotlight(){
+  const pool=[];
+  ['fish','bugs','sea'].forEach(sec=>{
+    SECTIONS[sec].data.forEach((item,i)=>{
+      if(collected[sec].includes(i))return;
+      if(isActiveThisMonth(item)) pool.push({sec,item,i});
+    });
+  });
+  const bar=document.getElementById('spotlightBar');
+  if(!pool.length){
+    spotlightPick=null;
+    bar.classList.add('hidden');
+    return;
+  }
+  // keep the same pick stable across re-renders unless it's been caught or wasn't set yet
+  if(!spotlightPick || !pool.some(p=>p.sec===spotlightPick.sec&&p.i===spotlightPick.i)){
+    spotlightPick=pool[Math.floor(Math.random()*pool.length)];
+  }
+  bar.classList.remove('hidden');
+  document.getElementById('spotlightName').innerHTML=
+    `${SPOTLIGHT_ICON[spotlightPick.sec]} <strong>${spotlightPick.item.n}</strong> is still uncaught this month`;
 }
 
 function updateMuseumTally(){
@@ -463,8 +565,9 @@ function updateMuseumTally(){
     if(collected[key].length===sec.total)fullSets++;
   });
   const pct=total?Math.round(done/total*100):0;
-  const trophyStr=fullSets>0?` &nbsp;·&nbsp; 🏆 <strong>${fullSets}</strong>/${Object.keys(SECTIONS).length} complete`:'';
-  document.getElementById('mbTally').innerHTML=`<strong>${done}</strong> / ${total} specimens cataloged &nbsp;·&nbsp; ${pct}%${trophyStr}`;
+  document.getElementById('mbFill').style.width=pct+'%';
+  const trophyStr=fullSets>0?` &nbsp;·&nbsp; 🏆 ${fullSets}/${Object.keys(SECTIONS).length}`:'';
+  document.getElementById('mbTally').innerHTML=`<strong>${done}</strong> / ${total} specimens &nbsp;·&nbsp; ${pct}%${trophyStr}`;
 }
 
 // ── THIS MONTH ──────────────────────────────────────────────────────────────
